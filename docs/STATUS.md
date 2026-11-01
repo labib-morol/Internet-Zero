@@ -93,6 +93,8 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
 - 2026-11-02 — `pnpm build` — all 10 workspace projects built (tsc 6.0.3, strict).
 - 2026-11-02 — `pnpm test` — 10 test files, 10 tests passed, 0 failed (smoke stubs).
 - 2026-11-02 — `pnpm lint` — eslint 10.14.0 + typescript-eslint 8.72.1 clean on stubs.
+- 2026-11-02 — `pnpm --filter @iz/schema test` — 6 files, 50 tests passed (ids, conditions, gates, safe AST, world/bundle sources, actions/events/WS/REST/MCP contracts, JSON Schema export).
+- 2026-11-02 — `pnpm build && pnpm test && pnpm lint` — full workspace green with schema implemented.
 
 ## Feature ledger (§19.5 format)
 
@@ -103,7 +105,7 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
 | Toolchain bring-up (Node/pnpm/docker daemon) | done | pnpm 12.16.1, node v24.15.0 (D1), docker server 29.6.1 up; see test log (2026-11-02) | |
 | Monorepo scaffold (strict TS, ESLint, Prettier, Vitest) | done | `pnpm build`/`pnpm test` 10/10, `pnpm lint` clean (2026-11-02) | ESLint game-logic import bans active in eslint.config.mjs |
 | §4.1 third-party skills + AGENTS.md | not started | | |
-| packages/schema | not started | | |
+| packages/schema | done | `pnpm --filter @iz/schema test` 6 files / 50 tests passed (2026-11-02) | §19.3 frozen contracts: world source, bundle, actions, events, view models, REST, WS, MCP I/O; JSON Schema export |
 | packages/compiler core (load, hash, emit) | not started | | |
 | packages/compiler checks 1–12 + fixtures | not started | | |
 | worlds/tutorial "Lost and Found" compiles | not started | | |
