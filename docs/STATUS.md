@@ -105,20 +105,22 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
 | Feature | Status | Evidence | Notes |
 | --- | --- | --- | --- |
 | Repo hygiene: private docs and .env ignored | done | `git check-ignore -v` matched all three (2026-11-02) | protective rule added before first commit |
-| Environment + dependency verification (§0.1/§0.3) | done | this file, tables above (2026-11-02) | D1/D2/D3 open |
+| Environment + dependency verification (§0.1/§0.3) | done | this file, tables above (2026-11-02) | D1/D2/D3 resolved |
 | Toolchain bring-up (Node/pnpm/docker daemon) | done | pnpm 12.16.1, node v24.15.0 (D1), docker server 29.6.1 up; see test log (2026-11-02) | |
-| Monorepo scaffold (strict TS, ESLint, Prettier, Vitest) | done | `pnpm build`/`pnpm test` 10/10, `pnpm lint` clean (2026-11-02) | ESLint game-logic import bans active in eslint.config.mjs |
-| §4.1 third-party skills + AGENTS.md | not started | | |
-| packages/schema | done | `pnpm --filter @iz/schema test` 6 files / 50 tests passed (2026-11-02) | §19.3 frozen contracts: world source, bundle, actions, events, view models, REST, WS, MCP I/O; JSON Schema export |
-| packages/compiler core (load, hash, emit) | not started | | |
-| packages/compiler checks 1–12 + fixtures | not started | | |
-| worlds/tutorial "Lost and Found" compiles | not started | | |
-| packages/runtime apply/fold | not started | | |
-| Determinism property tests | not started | | |
-| Headless tutorial playthrough (actions only) | not started | | |
-| Server skeleton + Postgres + event store + /healthz /readyz | not started | | needs Docker daemon running |
-| Dockerfile + compose up | not started | | |
-| CI green on a PR | not started | | needs push auth (D5) |
-| M0 gate (§19.1) | not started | | build + headless play + property test |
-| M1 (desktop shell, services UI, NODE_17 stages) | not started | | explicitly out of scope for now |
-| M2 (MCP, teams live sync, forum, deploy) | not started | | explicitly out of scope for now |
+| Monorepo scaffold (strict TS, ESLint, Prettier, Vitest) | done | `pnpm build`/`pnpm test` green, `pnpm lint` clean (2026-11-02) | ESLint game-logic import bans active |
+| §4.1 third-party skills + AGENTS.md | done | 10 skills in .agents/skills with licenses; THIRD_PARTY_NOTICES.md (2026-11-02) | commit 3724773 |
+| Six project skills (§20) | done | .agents/skills/{world-authoring,story-consistency-audit,blind-playtesting,fictional-service-development,mcp-integration,security-audit}/SKILL.md (2026-11-02) | commit 3ee90f5 |
+| packages/schema | done | 50 tests (2026-11-02) | §19.3 contracts frozen; commit b6bf061 |
+| packages/compiler (12 checks + fixtures) | done | 23 tests incl. per-check invalid fixtures; `worlds:build` zero warnings (2026-11-02) | commits 780aa11, cffbe9c |
+| packages/services loaders | done | 21 tests (2026-11-02) | view()/collectibles() arrive with M1 UI |
+| packages/runtime apply/fold + property tests | done | 53 tests incl. fast-check fold==apply, chunked replay (2026-11-02) | commit 780aa11 |
+| worlds/tutorial "Lost and Found" compiles | done | 17 artifacts, 3 gates, 9 hints, zero warnings (2026-11-02) | commit cffbe9c |
+| Headless tutorial playthrough (M0 gate cond. 2) | done | `pnpm run test:integration` 3/3: completes by actions only, score 300, deterministic, no answer/canon leak (2026-11-02) | commit cffbe9c |
+| Security: import scan (§16.1) | done | test/security-import-scan.spec.ts green on runtime/services/terminal/mcp (2026-11-02) | commit 5db13b7 |
+| Server + event store + /healthz /readyz (M0 gate infra) | done | 24 tests vs real Postgres incl. isolation + retry race; /readyz {database:true, migrationsCurrent:true} (2026-11-02) | commit 9f49462 |
+| Dockerfile + compose + CI workflow files | done | image builds 589 MB; compose config valid; ci.yml mirrors local runs (2026-11-02) | full compose-up proof logged separately |
+| CI green on a PR | partial | identical commands run locally and green: lint, typecheck, build, unit+integration, worlds:build, test:integration | blocked: awaiting push auth (D5) — never pushed per owner directive |
+| packages/terminal interpreter (M1 groundwork) | done | 18 tests: parser, vfs, all §10.5 commands, pipes, redirect caps, events (2026-11-02) | commit 3ee90f5 |
+| M0 gate (§19.1) | in progress | conditions 1+2 pass; compose-up proof running | final record in MORNING_REPORT |
+| M1 (desktop shell, services UI, NODE_17 stages) | not started | M1 plan appended to docs/PLAN.md | NODE_17 blocked on private repo (owner) |
+| M2 (MCP, teams live sync, forum, deploy) | not started | | MCP SDK v2 packages verified (D4) |

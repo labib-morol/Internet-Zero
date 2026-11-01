@@ -12,7 +12,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:integration": "vitest run",
-    "worlds:build": "pnpm --filter @iz/compiler build && node packages/compiler/dist/cli.js build worlds/tutorial --out dist/worlds --salt 0123456789abcdef0123456789abcdef",
+    "worlds:build": "pnpm --filter @iz/compiler build && node packages/compiler/dist/cli.js build worlds/tutorial --out dist/worlds --salt 0123456789abcdef0123456789abcdef --report dist/worlds-report.json",
     "lint": "eslint .",
     "format": "prettier --write .",
     "iz": "pnpm --filter @iz/compiler build && node packages/compiler/dist/cli.js"

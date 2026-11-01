@@ -9,7 +9,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-intranet}
       POSTGRES_DB: ${POSTGRES_DB:-intranet_zero}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # Postgres 18+ layout: single mount at /var/lib/postgresql (data in a
+      # subdirectory, so pg_upgrade --link works across the mount boundary).
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-intranet} -d ${POSTGRES_DB:-intranet_zero}"]
       interval: 5s

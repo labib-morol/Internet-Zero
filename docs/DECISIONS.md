@@ -45,8 +45,29 @@ Docker Desktop was launched once (owner-approved) and became ready in ~10 s (ser
 `pnpm deploy --prod` was deferred: pnpm 12's deploy flow needs extra workspace
 configuration and the slim-runtime optimization is deferred to the M2 deploy task
 (master prompt §17.3). The M0 image is functional (multi-stage, non-root, compiled
-worlds baked in) but not yet minimal; image size recorded in the ledger when the
-build is proven end to end.
+worlds baked in, 589 MB) but not yet minimal.
+
+### D13 — RuntimeState over the wire (server integration)
+JSON cannot carry `Set`, so the server serializes `RuntimeState.unlocked` and
+`.firedEvents` as sorted arrays (apps/server/src/state-wire.ts) and the response is
+validated against the frozen schema before conversion. Clients wrap them in `new Set()`.
+Recorded per §19.3's contract-change rule: the schema itself is unchanged.
+
+### D14 — Event store identity column
+`events.id` uses `GENERATED ALWAYS AS IDENTITY` (bigint) instead of `bigserial` —
+same effect, stricter; §15's `id bigserial` intent preserved.
+
+### D15 — Recovery codes are reusable credentials
+"Shown once" is implemented as display-once (users keep the code like a password and
+can resume with it repeatedly). api.ts's "only way back into a guest account" reading.
+
+### D16 — packages/terminal exec context parameter
+§19.3 freezes `exec(fs, overlay, cwd, line)`; the implementation adds an optional
+5th parameter `ctx` ({host, user, now, forge?, verify?}) needed to emit schema-valid
+`TerminalRead`/`TerminalOverlayWrite` events (which require `host`) and to serve
+`whoami`/`date`/`log`/`verify`. Backwards compatible with the frozen 4-arg signature.
+`connect` is intercepted by the server (gate-checked host operation, not a filesystem
+one); `clear`/`history`/`logout` are accepted client-side no-ops.
 
 ### D10 — Docker daemon started
 Docker Desktop was launched once (owner-approved) and became ready in ~10 s (server

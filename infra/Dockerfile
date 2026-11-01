@@ -14,9 +14,10 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm -r build
 # Compile the public tutorial world into the image (private worlds come from
 # the separate content repo via a mounted WORLDS_DIR at deploy time).
+# The build report goes OUTSIDE WORLDS_DIR: the server fail-closes on any
+# non-bundle JSON it finds there (§16).
 ARG BUILD_SALT=0123456789abcdef0123456789abcdef
-RUN node packages/compiler/dist/cli.js build worlds/tutorial --out dist/worlds --salt "${BUILD_SALT}" \
-    && node packages/compiler/dist/cli.js build worlds/tutorial --out dist/worlds --salt "${BUILD_SALT}" --report dist/worlds/report.json
+RUN node packages/compiler/dist/cli.js build worlds/tutorial --out dist/worlds --salt "${BUILD_SALT}" --report dist/worlds-report.json
 
 FROM node:24-slim AS runtime
 WORKDIR /app
