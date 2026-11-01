@@ -38,9 +38,6 @@ export function scoreRun(bundle: WorldBundle, events: GameEvent[], agent: string
     events.filter((e) => e.type === "EvidenceCollected").map((e) => e.artifactId)
   );
   const requiredFacts = bundle.canon.facts.filter((f) => f.required);
-  const directProvedArtifacts = new Set(
-    bundle.canon.proofs.filter((p) => p.strength === "direct").flatMap((p) => p.artifacts)
-  );
   const requiredFactsEvidenced = requiredFacts.filter((fact) =>
     bundle.canon.proofs.some(
       (p) => p.fact === fact.id && p.strength === "direct" && p.artifacts.some((a) => collectedArtifacts.has(a))

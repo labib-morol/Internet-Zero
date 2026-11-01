@@ -1,1 +1,20 @@
 @import "tailwindcss";
+@import "@iz/ui/styles.css";
+
+/* App-level base: the desktop fills the viewport, no page scroll. */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #0c1013;
+  color: #e7ebee;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.iz-browser__content:focus-visible {
+  outline: none;
+}
