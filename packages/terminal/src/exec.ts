@@ -151,7 +151,7 @@ export function exec(
     return { path: p, content: r.content };
   };
 
-  let text = "";
+  let text: string;
 
   switch (cmd) {
     case "pwd":

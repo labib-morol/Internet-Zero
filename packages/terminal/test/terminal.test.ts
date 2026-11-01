@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ParseError, parseLine, MAX_LINE_LENGTH } from "../src/parser.js";
 import { normalizePath } from "../src/vfs.js";
-import { exec, MAX_FILE_SIZE, type ExecContext } from "../src/exec.js";
+import { exec, type ExecContext } from "../src/exec.js";
 
 const fs = {
   "/etc/motd": "Welcome to the printer node.\nThe shop cat is fine.\n",

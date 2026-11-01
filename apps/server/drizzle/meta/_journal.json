@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793564567912,
+      "tag": "0000_aromatic_umar",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,846 @@
+{
+  "world": {
+    "id": "fixture",
+    "version": "0.1.0",
+    "format": "iz/1",
+    "title": "Fixture World",
+    "summary": "A minimal valid world covering forge, mail, archive and terminal for compiler tests.",
+    "license": "CC-BY-4.0",
+    "hostSuffix": "pcp",
+    "clock": {
+      "mode": "session",
+      "epoch": "2026-11-02T09:00:00Z"
+    },
+    "hosts": [
+      {
+        "host": "forge.fix.pcp",
+        "service": "forge"
+      },
+      {
+        "host": "mail.fix.pcp",
+        "service": "mail",
+        "requires": {
+          "gateSolved": "g.first-commit"
+        }
+      },
+      {
+        "host": "term.fix.pcp",
+        "service": "terminal"
+      },
+      {
+        "host": "archive.fix.pcp",
+        "service": "archive",
+        "requires": {
+          "gateSolved": "g.files"
+        }
+      }
+    ],
+    "entry": "forge.fix.pcp/acme/notes",
+    "reports": [
+      "r.final"
+    ]
+  },
+  "entities": [
+    {
+      "id": "p.jamie",
+      "displayName": "Jamie Fox",
+      "role": "intern",
+      "bio": "First week at Acme."
+    },
+    {
+      "id": "p.mara",
+      "displayName": "Mara Voss",
+      "role": "office manager"
+    },
+    {
+      "id": "o.acme",
+      "name": "Acme Office Co",
+      "kind": "company",
+      "description": "A mid-sized office supply company."
+    },
+    {
+      "id": "o.printer",
+      "name": "Floor 2 Printer",
+      "kind": "device"
+    }
+  ],
+  "identities": [
+    {
+      "id": "id.jamie-git",
+      "service": "forge",
+      "login": "jamiefox",
+      "displayName": "Jamie Fox",
+      "person": "p.jamie",
+      "deleted": false
+    },
+    {
+      "id": "id.mara-git",
+      "service": "forge",
+      "login": "mara.voss",
+      "displayName": "Mara Voss",
+      "person": "p.mara",
+      "deleted": false
+    },
+    {
+      "id": "id.jamie-mail",
+      "service": "mail",
+      "login": "jamie.fox@acme.pcp",
+      "displayName": "Jamie Fox",
+      "person": "p.jamie",
+      "deleted": false
+    },
+    {
+      "id": "id.mara-mail",
+      "service": "mail",
+      "login": "mara.voss@acme.pcp",
+      "displayName": "Mara Voss",
+      "person": "p.mara",
+      "deleted": false
+    },
+    {
+      "id": "id.it-mail",
+      "service": "mail",
+      "login": "it-desk@acme.pcp",
+      "displayName": "IT Desk",
+      "org": "o.acme",
+      "deleted": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "a.5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+      "host": "forge.fix.pcp",
+      "path": "acme/notes/commit/5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+      "kind": "commit",
+      "title": "Rotate floor-2 printer admin password (approved by Mara Voss)",
+      "body": "Rotate floor-2 printer admin password (approved by Mara Voss)\nmodify: printer.conf\n- admin_password=hunter2\n+ admin_password=papercut-7331",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Rotate floor-2 printer admin password (approved by Mara Voss)"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "modify: printer.conf\n- admin_password=hunter2\n+ admin_password=papercut-7331"
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.notes",
+        "sha": "5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+        "authorName": "Mara Voss",
+        "authorEmail": "mara.voss@acme.pcp",
+        "committerEmail": "ci@acme.pcp",
+        "date": "2026-10-28T14:12:00Z",
+        "signed": "true"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.doc-log",
+      "host": "archive.fix.pcp",
+      "path": "documents/a.doc-log",
+      "kind": "archive-document",
+      "title": "Floor 2 printer maintenance log",
+      "body": "Floor 2 printer maintenance log\nFacilities office\nFloor 2 printer maintenance log\nOn 2026-10-28 the admin password of the floor 2 printer was rotated by Mara Voss (office manager).\nRelated repo: acme/notes (forge.fix.pcp/acme/notes).\nmaintenance sticker (c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77)",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "heading",
+            "depth": 1,
+            "children": [
+              {
+                "type": "text",
+                "value": "Floor 2 printer maintenance log"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "On 2026-10-28 the admin password of the floor 2 printer was rotated by Mara Voss (office manager)."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Related repo: "
+              },
+              {
+                "type": "link",
+                "url": "forge.fix.pcp/acme/notes",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "acme/notes"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "image",
+                "url": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+                "alt": "maintenance sticker"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "type": "report",
+        "date": "2026-10-28T16:00:00Z",
+        "source": "Facilities office",
+        "assets": "",
+        "redactions": "[]",
+        "room": "2B",
+        "cabinet": "C-3"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-003",
+      "host": "mail.fix.pcp",
+      "path": "a.mbox-jamie/inbox/a.m-003",
+      "kind": "mail-message",
+      "title": "ticket closed",
+      "body": "Subject: ticket closed\nFrom: it-desk@acme.pcp\nTo: jamie.fox@acme.pcp\nDate: 2026-10-30T09:00:00Z\nYour ticket was closed after the password rotation.",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Your ticket was closed after the password rotation."
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "a.mbox-jamie",
+        "folder": "inbox",
+        "from": "id.it-mail",
+        "to": "id.jamie-mail",
+        "date": "2026-10-30T09:00:00Z",
+        "attachments": "[]"
+      },
+      "collectible": true,
+      "visibility": {
+        "gateSolved": "g.files"
+      }
+    },
+    {
+      "id": "a.m-lie",
+      "host": "mail.fix.pcp",
+      "path": "a.mbox-jamie/inbox/a.m-lie",
+      "kind": "mail-message",
+      "title": "printer incident",
+      "body": "Subject: printer incident\nFrom: mara.voss@acme.pcp\nTo: jamie.fox@acme.pcp\nDate: 2026-10-29T08:05:00Z\nX-Mailer: DEADLETTER 1.0\nI saw jamiefox mess with the printer that morning.\n[REDACTED]",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "I saw "
+              },
+              {
+                "type": "strong",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "jamiefox"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " mess with the printer that morning."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "redaction",
+                "text": "HR case number",
+                "removable": true
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "a.mbox-jamie",
+        "folder": "inbox",
+        "from": "id.mara-mail",
+        "to": "id.jamie-mail",
+        "date": "2026-10-29T08:05:00Z",
+        "attachments": "[{\"asset\":\"c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77\",\"filename\":\"printer-sticker.png\",\"redactions\":[]}]",
+        "headers": "{\"X-Mailer\":\"DEADLETTER 1.0\"}"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-truth",
+      "host": "mail.fix.pcp",
+      "path": "a.mbox-jamie/sent/a.m-truth",
+      "kind": "mail-message",
+      "title": "printer reset on 2026-10-28",
+      "body": "Subject: printer reset on 2026-10-28\nFrom: jamie.fox@acme.pcp\nTo: mara.voss@acme.pcp\nDate: 2026-10-28T15:00:00Z\nConfirmed: the floor 2 printer admin password was reset on 2026-10-28.",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Confirmed: the floor 2 printer admin password was reset on 2026-10-28."
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "a.mbox-jamie",
+        "folder": "sent",
+        "from": "id.jamie-mail",
+        "to": "id.mara-mail",
+        "date": "2026-10-28T15:00:00Z",
+        "attachments": "[]"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.notes",
+      "host": "forge.fix.pcp",
+      "path": "acme/notes",
+      "kind": "repo",
+      "title": "acme/notes",
+      "body": "acme/notes\nOffice scripts and notes for Acme Office Co.\nacme/notes\nInternal notes for Acme Office Co.\nThe floor 2 printer admin password was rotated on 2026-10-28 after a support\nticket. See the maintenance log in the archive.\n[REDACTED]\nApproved by [signature K1 valid by id.mara-git].\n[stamp: ACME INTERNAL]",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "heading",
+            "depth": 1,
+            "children": [
+              {
+                "type": "text",
+                "value": "acme/notes"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Internal notes for Acme Office Co."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "The floor 2 printer admin password was rotated on 2026-10-28 after a support\nticket. See the maintenance log in the archive."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "redaction",
+                "text": "rotated by the vendor technician",
+                "removable": false
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Approved by "
+              },
+              {
+                "type": "signature",
+                "keyId": "K1",
+                "fingerprint": "9A:2C:44:1F",
+                "valid": true,
+                "signer": "id.mara-git"
+              },
+              {
+                "type": "text",
+                "value": "."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "stamp",
+                "text": "ACME INTERNAL"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "owner": "acme",
+        "name": "notes",
+        "defaultBranch": "main",
+        "description": "Office scripts and notes for Acme Office Co."
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.notes.issue.1",
+      "host": "forge.fix.pcp",
+      "path": "acme/notes/issues/1",
+      "kind": "issue",
+      "title": "Printer rejects new password",
+      "body": "Printer rejects new password\nThe floor 2 printer rejects the new password. [[stamp:TICKET-114]]\nMara Voss: Reset completed on 2026-10-28 by the office manager.",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "The floor 2 printer rejects the new password. "
+              },
+              {
+                "type": "stamp",
+                "text": "TICKET-114"
+              }
+            ]
+          },
+          {
+            "type": "blockquote",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "strong",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "@Mara Voss"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " 2026-10-29T10:00:00Z"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Reset completed on 2026-10-28 by the office manager."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.notes",
+        "number": 1,
+        "author": "id.jamie-git",
+        "date": "2026-10-29T09:30:00Z",
+        "state": "open"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.term.fix.pcp.etc-printers.conf",
+      "host": "term.fix.pcp",
+      "path": "etc/printers.conf",
+      "kind": "terminal-file",
+      "title": "etc/printers.conf",
+      "body": "# floor 2 printer\nadmin_password=papercut-7331\n",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "code",
+            "value": "# floor 2 printer\nadmin_password=papercut-7331\n"
+          }
+        ]
+      },
+      "meta": {
+        "host": "term.fix.pcp",
+        "motd": "NODE TERMINAL — authorized staff only"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.term.fix.pcp.home-jamie-readme.txt",
+      "host": "term.fix.pcp",
+      "path": "home/jamie/readme.txt",
+      "kind": "terminal-file",
+      "title": "home/jamie/readme.txt",
+      "body": "Welcome to the Acme node terminal.\nThe printer configuration lives in /etc/printers.conf.\n",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "code",
+            "value": "Welcome to the Acme node terminal.\nThe printer configuration lives in /etc/printers.conf.\n"
+          }
+        ]
+      },
+      "meta": {
+        "host": "term.fix.pcp",
+        "motd": "NODE TERMINAL — authorized staff only"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.user.jamiefox",
+      "host": "forge.fix.pcp",
+      "path": "users/jamiefox",
+      "kind": "user",
+      "title": "Jamie Fox",
+      "body": "jamiefox\nJamie Fox",
+      "ast": {
+        "type": "root",
+        "children": []
+      },
+      "meta": {
+        "login": "jamiefox",
+        "deleted": "false"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.user.mara.voss",
+      "host": "forge.fix.pcp",
+      "path": "users/mara.voss",
+      "kind": "user",
+      "title": "Mara Voss",
+      "body": "mara.voss\nMara Voss",
+      "ast": {
+        "type": "root",
+        "children": []
+      },
+      "meta": {
+        "login": "mara.voss",
+        "deleted": "false"
+      },
+      "collectible": false
+    }
+  ],
+  "gates": [
+    {
+      "id": "g.first-commit",
+      "title": "Find the reset commit",
+      "check": {
+        "kind": "answer",
+        "normalize": [
+          "nfkc",
+          "lower",
+          "trim",
+          "collapse"
+        ],
+        "answerHashes": [
+          "9dac94e02764e5f159cda5a0c2caeba56e65b1837e081ec19cef49b0bbe1c070"
+        ]
+      },
+      "unlocks": [
+        "mail.fix.pcp"
+      ],
+      "score": 100
+    },
+    {
+      "id": "g.files",
+      "title": "Read the printer config",
+      "requires": {
+        "gateSolved": "g.first-commit"
+      },
+      "check": {
+        "kind": "terminal",
+        "mustHaveRead": [
+          "etc/printers.conf"
+        ],
+        "host": "term.fix.pcp"
+      },
+      "unlocks": [
+        "archive.fix.pcp"
+      ],
+      "score": 50
+    },
+    {
+      "id": "g.report",
+      "title": "File the incident report",
+      "requires": {
+        "all": [
+          {
+            "gateSolved": "g.files"
+          }
+        ]
+      },
+      "check": {
+        "kind": "report",
+        "report": "r.final"
+      },
+      "unlocks": [],
+      "score": 200
+    }
+  ],
+  "reports": [
+    {
+      "id": "r.final",
+      "title": "Printer incident report",
+      "groups": [
+        {
+          "id": "grp.culprit",
+          "slots": [
+            {
+              "id": "slot.culprit",
+              "label": "Who reset the printer admin password?",
+              "type": "identity",
+              "fact": "f.reset-by",
+              "answerHashes": [
+                "5914deeb95eab2ca34940620a7a33d8041047ef4bac7c27089be7ebe3d5c4fb9",
+                "e9f39f4a048a566ddc6d8f77fe5711e893afa9cd6cb6720dcb08af5663bddf13"
+              ]
+            },
+            {
+              "id": "slot.when",
+              "label": "When did the reset happen?",
+              "type": "date",
+              "fact": "f.reset-date",
+              "answerHashes": [
+                "aa18ca450b31cf08b10fb724f8637d9d93ef43e5cb27a057a6e23eeb705a7350"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "hints": [
+    {
+      "gate": "g.first-commit",
+      "tier": 1,
+      "text": "Look at the recent commit history on acme/notes.",
+      "cost": 10
+    },
+    {
+      "gate": "g.first-commit",
+      "tier": 2,
+      "text": "One commit from 2026-10-28 touches the printer config.",
+      "cost": 25
+    },
+    {
+      "gate": "g.first-commit",
+      "tier": 3,
+      "text": "The answer is the full sha of that commit.",
+      "cost": 50
+    },
+    {
+      "gate": "g.files",
+      "tier": 1,
+      "text": "The terminal on term.fix.pcp can read files.",
+      "cost": 10
+    },
+    {
+      "gate": "g.files",
+      "tier": 2,
+      "text": "Printer configuration lives under /etc.",
+      "cost": 25
+    },
+    {
+      "gate": "g.files",
+      "tier": 3,
+      "text": "Read etc/printers.conf.",
+      "cost": 50
+    },
+    {
+      "gate": "g.report",
+      "tier": 1,
+      "text": "You need evidence naming the person and the date.",
+      "cost": 10
+    },
+    {
+      "gate": "g.report",
+      "tier": 2,
+      "text": "The commit message names who approved the rotation.",
+      "cost": 25
+    },
+    {
+      "gate": "g.report",
+      "tier": 3,
+      "text": "Culprit: Mara Voss. Date: 2026-10-28.",
+      "cost": 50
+    }
+  ],
+  "events": [
+    {
+      "id": "e.it-reply",
+      "trigger": {
+        "kind": "after",
+        "gateSolved": "g.files"
+      },
+      "effects": [
+        {
+          "kind": "deliverMail",
+          "mailbox": "a.mbox-jamie",
+          "message": "a.m-003"
+        }
+      ]
+    }
+  ],
+  "canon": {
+    "facts": [
+      {
+        "id": "f.reset-by",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "resetBy",
+          "object": "p.mara"
+        },
+        "required": true,
+        "secrecy": "hidden"
+      },
+      {
+        "id": "f.reset-date",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "resetAt",
+          "object": "2026-10-28"
+        },
+        "required": true,
+        "secrecy": "hidden"
+      },
+      {
+        "id": "f.printer-pass",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "adminPassword",
+          "object": "papercut-7331"
+        },
+        "required": true,
+        "secrecy": "hidden"
+      }
+    ],
+    "beliefs": [
+      {
+        "holder": "p.mara",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "resetBy",
+          "object": "p.jamie"
+        },
+        "stance": "lies_about",
+        "since": "2026-10-29T08:00:00Z"
+      },
+      {
+        "holder": "p.jamie",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "adminPassword",
+          "object": "hunter2"
+        },
+        "stance": "believes_false"
+      }
+    ],
+    "statements": [
+      {
+        "artifact": "a.m-lie",
+        "speaker": "p.mara",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "resetBy",
+          "object": "p.jamie"
+        },
+        "truthful": false
+      },
+      {
+        "artifact": "a.m-truth",
+        "speaker": "p.jamie",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "resetAt",
+          "object": "2026-10-28"
+        },
+        "truthful": true,
+        "fact": "f.reset-date"
+      }
+    ],
+    "proofs": [
+      {
+        "fact": "f.reset-by",
+        "artifacts": [
+          "a.5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b"
+        ],
+        "strength": "direct"
+      },
+      {
+        "fact": "f.reset-date",
+        "artifacts": [
+          "a.5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b"
+        ],
+        "strength": "direct"
+      },
+      {
+        "fact": "f.printer-pass",
+        "artifacts": [
+          "a.term.fix.pcp.etc-printers.conf"
+        ],
+        "strength": "direct"
+      }
+    ]
+  },
+  "assets": [
+    {
+      "id": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+      "sha256": "c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77",
+      "bytes": 70,
+      "contentType": "image/png"
+    }
+  ],
+  "bundleSalt": "0123456789abcdef0123456789abcdef",
+  "bundleHash": "15b0a16739ff71a47399fe05c64d40f694b48ee0d10a79330118ff3cb62ad568"
+}

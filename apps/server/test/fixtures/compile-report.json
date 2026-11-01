@@ -1,0 +1,159 @@
+{
+  "world": {
+    "id": "fixture",
+    "version": "0.1.0",
+    "title": "Fixture World",
+    "bundleHash": "15b0a16739ff71a47399fe05c64d40f694b48ee0d10a79330118ff3cb62ad568",
+    "bundleSalt": "0123456789abcdef0123456789abcdef"
+  },
+  "counts": {
+    "artifacts": 11,
+    "artifactsByKind": {
+      "commit": 1,
+      "archive-document": 1,
+      "mail-message": 3,
+      "repo": 1,
+      "issue": 1,
+      "terminal-file": 2,
+      "user": 2
+    },
+    "entities": 4,
+    "identities": 5,
+    "facts": 3,
+    "beliefs": 2,
+    "statements": 2,
+    "proofs": 3,
+    "gates": 3,
+    "reports": 1,
+    "hints": 9,
+    "events": 1,
+    "assets": 1
+  },
+  "reachability": {
+    "entry": "forge.fix.pcp/acme/notes",
+    "steps": [
+      {
+        "kind": "host",
+        "id": "forge.fix.pcp",
+        "reason": "available from the start"
+      },
+      {
+        "kind": "host",
+        "id": "term.fix.pcp",
+        "reason": "available from the start"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+        "reason": "visible on reachable host forge.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.notes",
+        "reason": "visible on reachable host forge.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.notes.issue.1",
+        "reason": "visible on reachable host forge.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.term.fix.pcp.etc-printers.conf",
+        "reason": "visible on reachable host term.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.term.fix.pcp.home-jamie-readme.txt",
+        "reason": "visible on reachable host term.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.user.jamiefox",
+        "reason": "visible on reachable host forge.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.user.mara.voss",
+        "reason": "visible on reachable host forge.fix.pcp"
+      },
+      {
+        "kind": "gate",
+        "id": "g.first-commit",
+        "reason": "solved by the simulated player"
+      },
+      {
+        "kind": "host",
+        "id": "mail.fix.pcp",
+        "reason": "unlocked by gate g.first-commit"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.m-lie",
+        "reason": "visible on reachable host mail.fix.pcp"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.m-truth",
+        "reason": "visible on reachable host mail.fix.pcp"
+      },
+      {
+        "kind": "gate",
+        "id": "g.files",
+        "reason": "solved by the simulated player"
+      },
+      {
+        "kind": "host",
+        "id": "archive.fix.pcp",
+        "reason": "unlocked by gate g.files"
+      },
+      {
+        "kind": "gate",
+        "id": "g.report",
+        "reason": "solved by the simulated player"
+      },
+      {
+        "kind": "event",
+        "id": "e.it-reply",
+        "reason": "trigger condition satisfied"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.m-003",
+        "reason": "revealed by event e.it-reply"
+      },
+      {
+        "kind": "artifact",
+        "id": "a.doc-log",
+        "reason": "visible on reachable host archive.fix.pcp"
+      }
+    ],
+    "solvedGates": [
+      "g.files",
+      "g.first-commit",
+      "g.report"
+    ],
+    "reachableHosts": [
+      "archive.fix.pcp",
+      "forge.fix.pcp",
+      "mail.fix.pcp",
+      "term.fix.pcp"
+    ],
+    "reachableArtifacts": [
+      "a.5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+      "a.doc-log",
+      "a.m-003",
+      "a.m-lie",
+      "a.m-truth",
+      "a.notes",
+      "a.notes.issue.1",
+      "a.term.fix.pcp.etc-printers.conf",
+      "a.term.fix.pcp.home-jamie-readme.txt",
+      "a.user.jamiefox",
+      "a.user.mara.voss"
+    ]
+  },
+  "warnings": [
+    "event e.it-reply delivers message a.m-003 which is also listed statically in its mailbox"
+  ]
+}
