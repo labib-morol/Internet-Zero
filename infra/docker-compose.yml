@@ -1,0 +1,43 @@
+# INTRANET ZERO local/self-hosting stack (master prompt §17.1).
+# Usage: copy .env.example to .env, then docker compose -f infra/docker-compose.yml up
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-intranet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-intranet}
+      POSTGRES_DB: ${POSTGRES_DB:-intranet_zero}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-intranet} -d ${POSTGRES_DB:-intranet_zero}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  app:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-intranet}:${POSTGRES_PASSWORD:-intranet}@db:5432/${POSTGRES_DB:-intranet_zero}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env (32+ random bytes)}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      WORLDS_DIR: /app/dist/worlds
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  pgdata:

@@ -2,5 +2,6 @@ packages:
   - apps/*
   - packages/*
 
-onlyBuiltDependencies:
-  - esbuild
+# pnpm 12: allow esbuild's postinstall (used by tsx/drizzle-kit toolchain).
+allowBuilds:
+  esbuild: true

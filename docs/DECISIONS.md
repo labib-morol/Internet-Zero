@@ -28,13 +28,25 @@ Pinned typescript 6.0.3 per owner decision. Verified compatible: tsc strict buil
 and typescript-eslint 8.72.1 + eslint 10.14.0 lint clean (2026-11-02). If a future tool
 rejects TS 6, fall back to the newest 5.x and record it here.
 
-### D9 — pnpm build scripts for esbuild
-pnpm's default policy ignored esbuild postinstall scripts, printing install errors.
-esbuild functions via its platform binary packages either way, but for a clean,
-reproducible install the postinstalls were allowed once with
-`pnpm install --dangerously-allow-all-builds` (project-local effect: runs esbuild's own
-postinstall; no other package in the tree has build scripts). `onlyBuiltDependencies:
-[esbuild]` is recorded in `pnpm-workspace.yaml` for CI parity.
+### D9 — pnpm build scripts for esbuild — RESOLVED
+pnpm 12's policy ignores postinstall scripts for packages not explicitly allowed and
+hard-errors on fresh installs. `onlyBuiltDependencies` did NOT satisfy pnpm 12.16.1
+(tested empirically); the mechanism that works is `allowBuilds: {esbuild: true}` in
+`pnpm-workspace.yaml` (equivalent to `pnpm approve-builds --all`). esbuild is the only
+package in the tree with build scripts; it is a required, trusted tool of the
+tsx/drizzle-kit/vitest toolchain. Docker and CI use a plain `pnpm install
+--frozen-lockfile`, which is now clean.
+
+### D10 — Docker daemon started
+Docker Desktop was launched once (owner-approved) and became ready in ~10 s (server
+29.6.1). Postgres via docker compose is available for M0 integration tests.
+
+### D12 — Docker runtime stage copies the full workspace node_modules
+`pnpm deploy --prod` was deferred: pnpm 12's deploy flow needs extra workspace
+configuration and the slim-runtime optimization is deferred to the M2 deploy task
+(master prompt §17.3). The M0 image is functional (multi-stage, non-root, compiled
+worlds baked in) but not yet minimal; image size recorded in the ledger when the
+build is proven end to end.
 
 ### D10 — Docker daemon started
 Docker Desktop was launched once (owner-approved) and became ready in ~10 s (server
