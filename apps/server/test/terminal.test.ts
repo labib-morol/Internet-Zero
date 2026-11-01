@@ -35,7 +35,6 @@ describe.skipIf(!pgUp)("tutorial over REST with the terminal as final stage", ()
       };
 
       // Stage 1: find the rotation commit the way a player would, collect it.
-      const commit = "rotate printer admin pass";
       const openRepo = await act({ type: "open", url: "forge.pinecone.pcp/pinecone/office-scripts" });
       expect(openRepo.rejection).toBeUndefined();
       const world = await env.app.inject({ method: "GET", url: "/api/worlds", headers: auth });

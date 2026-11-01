@@ -310,7 +310,7 @@ export function apply(
         return { events, rejection: { code: "invalid_input", message: "No hint is defined for this tier." } };
       }
       events.push({ type: "HintRequested", gateId: gate.id, tier: action.tier, cost: hint.cost, ...nextBase() });
-      return { events, result: { gateId: gate.id, tier: action.tier, cost: hint.cost } };
+      return { events, result: { gateId: gate.id, tier: action.tier, text: hint.text, cost: hint.cost } };
     }
 
     case "terminal": {

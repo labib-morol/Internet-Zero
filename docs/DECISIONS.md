@@ -133,3 +133,9 @@ pnpm 12's minimum-release-age supply-chain policy refused the already-pinned
 foundation install. The web agent added a narrow exclusion for exactly those two
 versions to pnpm-workspace.yaml (integrator-reviewed: both versions were verified
 on npm during the M0 planning audit). Recorded rather than silently accepted.
+
+### D23 — Hint text rides the requestHint result; GET /api/case serves report definitions
+requestHint's result now includes the hint `text` (revealed only to the requesting
+team via their own action result). The case-file panel needs report slot definitions
+(labels, types, options — never answers), served by GET /api/case for gates visible to
+the team. Both are additive contract changes recorded per §19.3.

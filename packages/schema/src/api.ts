@@ -69,3 +69,29 @@ export const ReadyResponse = z.strictObject({
   bundlesLoaded: z.number().int().min(0),
 });
 export type ReadyResponse = z.infer<typeof ReadyResponse>;
+
+/** GET /api/case (M1): visible case-file data for the desktop shell's side panel. */
+export const CaseFileResponse = z.strictObject({
+  openGates: z.array(z.strictObject({ gateId: z.string(), title: z.string() })),
+  reports: z.array(
+    z.strictObject({
+      reportId: z.string(),
+      title: z.string(),
+      groups: z.array(
+        z.strictObject({
+          id: z.string(),
+          slots: z.array(
+            z.strictObject({
+              id: z.string(),
+              label: z.string(),
+              type: z.enum(["identity", "date", "choice", "text"]),
+              options: z.array(z.string()).optional(),
+              fact: z.string(),
+            })
+          ),
+        })
+      ),
+    })
+  ),
+});
+export type CaseFileResponse = z.infer<typeof CaseFileResponse>;
