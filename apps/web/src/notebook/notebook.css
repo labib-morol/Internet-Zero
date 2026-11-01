@@ -1,0 +1,179 @@
+/* Notebook (§11.2) — a paper-trail case log on the investigator's desktop.
+   Uses the shared token layer from @iz/ui/styles.css. */
+
+.iz-nb {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--iz-bg2);
+  color: var(--iz-ink);
+}
+
+/* Tabs */
+.iz-nb__tabs {
+  display: flex;
+  gap: 2px;
+  flex: none;
+  padding: 6px 10px 0;
+  background: var(--iz-bg0);
+  border-bottom: 1px solid var(--iz-line);
+}
+.iz-nb__tab {
+  padding: 6px 14px 5px;
+  border: 1px solid var(--iz-line);
+  border-bottom: none;
+  border-radius: var(--iz-radius) var(--iz-radius) 0 0;
+  background: var(--iz-bg1);
+  color: var(--iz-dim);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color var(--iz-fast), background var(--iz-fast);
+}
+.iz-nb__tab:hover { color: var(--iz-ink); }
+.iz-nb__tab[aria-selected="true"] {
+  background: var(--iz-bg2);
+  color: var(--iz-ink);
+  font-weight: 600;
+  border-color: var(--iz-line2);
+  /* Merges with the panel below. */
+  margin-bottom: -1px;
+  padding-bottom: 6px;
+}
+
+/* Toolbar: search, type segment, host filter */
+.iz-nb__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--iz-line);
+  background: var(--iz-bg1);
+}
+.iz-nb__search { flex: 1; min-width: 0; }
+.iz-nb__seg {
+  display: inline-flex;
+  border: 1px solid var(--iz-line2);
+  border-radius: var(--iz-radius);
+  overflow: hidden;
+  flex: none;
+}
+.iz-nb__segbtn {
+  padding: 4px 10px;
+  border: none;
+  border-right: 1px solid var(--iz-line);
+  background: var(--iz-bg2);
+  color: var(--iz-dim);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background var(--iz-fast), color var(--iz-fast);
+}
+.iz-nb__segbtn:last-child { border-right: none; }
+.iz-nb__segbtn:hover { color: var(--iz-ink); background: var(--iz-bg3); }
+.iz-nb__segbtn[aria-pressed="true"] {
+  background: var(--iz-accent-dim);
+  color: var(--iz-ink);
+  font-weight: 600;
+}
+.iz-nb__host { flex: none; max-width: 200px; }
+
+/* Sync notice (private notes tab) */
+.iz-nb__sync {
+  flex: none;
+  margin: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--iz-line);
+  background: var(--iz-bg1);
+  color: var(--iz-dim);
+  font-size: 12.5px;
+}
+
+/* Entry list */
+.iz-nb__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 10px 12px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.iz-nb__item { min-width: 0; }
+
+/* Evidence: document card — a filed paper, not a chat bubble (§7) */
+.iz-nb__doc {
+  border: 1px solid var(--iz-line);
+  border-left: 3px solid var(--iz-accent-dim);
+  border-radius: var(--iz-radius);
+  background: var(--iz-bg1);
+  padding: 10px 12px;
+}
+.iz-nb__doc-title {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.iz-nb__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0 0 6px;
+}
+.iz-nb__meta {
+  margin: 0 0 8px;
+  color: var(--iz-faint);
+  font-size: 12px;
+}
+.iz-nb__mono { font-family: var(--iz-font-mono); font-size: 11.5px; }
+.iz-nb__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Claims: note — visibly not a document (§7) */
+.iz-nb__note {
+  border: 1px solid #4a4030;
+  border-radius: var(--iz-radius);
+  background: #221e15;
+  padding: 10px 12px;
+}
+.iz-nb__note--private {
+  border-color: var(--iz-line2);
+  background: var(--iz-bg1);
+  border-left: 3px solid var(--iz-faint);
+}
+.iz-nb__note-text {
+  margin: 0 0 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+/* Empty + status */
+.iz-nb__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--iz-faint);
+  text-align: center;
+}
+.iz-nb__empty p { margin: 0; }
+.iz-nb__status {
+  flex: none;
+  margin: 0;
+  padding: 6px 12px;
+  border-top: 1px solid var(--iz-line);
+  background: var(--iz-bg1);
+  color: var(--iz-faint);
+  font-size: 12px;
+  font-family: var(--iz-font-mono);
+}

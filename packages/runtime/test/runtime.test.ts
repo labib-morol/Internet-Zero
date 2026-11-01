@@ -455,7 +455,7 @@ describe("hints (§8)", () => {
 
     const t1 = step(state, log, { type: "requestHint", gateId: "g.welcome", tier: 1 }, clock);
     expect(t1.result.rejection).toBeUndefined();
-    expect(t1.result.result).toEqual({ gateId: "g.welcome", tier: 1, cost: 10 });
+    expect(t1.result.result).toEqual({ gateId: "g.welcome", tier: 1, text: expect.any(String), cost: 10 });
     expect(t1.state.hintsUsed).toEqual({ "g.welcome": 1 });
     expect(t1.state.score).toBe(-10);
     state = t1.state;

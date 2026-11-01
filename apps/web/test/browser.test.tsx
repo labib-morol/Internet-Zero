@@ -153,7 +153,8 @@ describe("view rendering", () => {
         onCollect={onCollect}
       />
     );
-    const collect = screen.getByRole("button", { name: "+ README" });
+    // M1 task 4+: the per-service masthead Collect button (aria-label carries the collectible label).
+    const collect = screen.getByRole("button", { name: "Collect evidence: README" });
     fireEvent.click(collect);
     expect(onCollect).toHaveBeenCalledWith("a.readme", "README");
 

@@ -2,9 +2,12 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LiveRegion, MenuBar, Window, announce, teamSocket, useSessionStore } from "@iz/ui";
 import { BrowserWindow } from "../browser/BrowserWindow.js";
 import { parseAddress, useBrowserStore } from "../browser/store.js";
+import { TerminalWindow } from "../services/index.js";
+import { NotebookWindow } from "../notebook/index.js";
+import { BoardWindow } from "../board/index.js";
 import { NetworkDirectory } from "../network/NetworkDirectory.js";
 import { CaseFilePanel } from "./CaseFilePanel.js";
-import { HelpContent, NotBuiltSurface } from "./HelpContent.js";
+import { HelpContent } from "./HelpContent.js";
 import { DOCK_ORDER, activateByHotkey, useWindowsStore, type AppId, type ManagedWindow } from "./windows.js";
 import { Dock } from "@iz/ui";
 import { RecoveryModal } from "../shared/RecoveryModal.js";
@@ -43,11 +46,11 @@ function WindowSurface({ win }: { win: ManagedWindow }): ReactNode {
         </div>
       );
     case "terminal":
-      return <NotBuiltSurface app="Terminal" task="the NODE TERMINAL UI is M1 task 7" />;
+      return <TerminalWindow />;
     case "notebook":
-      return <NotBuiltSurface app="Notebook" task="the notebook UI is M1 task 9" />;
+      return <NotebookWindow />;
     case "board":
-      return <NotBuiltSurface app="Board" task="the evidence board is M1 task 9" />;
+      return <BoardWindow />;
     default:
       return <p>Unknown app.</p>;
   }
