@@ -121,6 +121,6 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
 | Dockerfile + compose + CI workflow files | done | image builds 589 MB; compose config valid; ci.yml mirrors local runs (2026-11-02) | full compose-up proof logged separately |
 | CI green on a PR | partial | identical commands run locally and green: lint, typecheck, build, unit+integration, worlds:build, test:integration | blocked: awaiting push auth (D5) — never pushed per owner directive |
 | packages/terminal interpreter (M1 groundwork) | done | 18 tests: parser, vfs, all §10.5 commands, pipes, redirect caps, events (2026-11-02) | commit 3ee90f5 |
-| M0 gate (§19.1) | in progress | conditions 1+2 pass; compose-up proof running | final record in MORNING_REPORT |
+| M0 gate (§19.1) | done | 1) `iz build worlds/tutorial` zero errors; 2) playthrough test completes tutorial by actions only (3/3); 3) determinism property tests green (fold==apply, chunked replay) — all in the final CI-equivalent local run: lint PASS, typecheck PASS, build PASS, 193 package tests + 7 root integration tests green, `docker compose up` serves /readyz {database:true, bundlesLoaded:1} (2026-11-02, commits up to 93e16d9) | CI-on-PR partial (D5: awaiting push auth); NODE_17-free per owner |
 | M1 (desktop shell, services UI, NODE_17 stages) | not started | M1 plan appended to docs/PLAN.md | NODE_17 blocked on private repo (owner) |
 | M2 (MCP, teams live sync, forum, deploy) | not started | | MCP SDK v2 packages verified (D4) |

@@ -69,6 +69,15 @@ can resume with it repeatedly). api.ts's "only way back into a guest account" re
 `connect` is intercepted by the server (gate-checked host operation, not a filesystem
 one); `clear`/`history`/`logout` are accepted client-side no-ops.
 
+### D17 — Postgres 18 volume layout + compose context bug on this machine
+Postgres 18 images expect the volume at `/var/lib/postgresql` (single mount); the
+legacy `.../data` mount makes the container exit. Separately, `docker compose` v5.2
+on this Windows machine fails to resolve the build context when the repo path
+contains a space ("GetFileAttributesEx C:\Users\T14S\infra" — path mangling) even
+with absolute `-f`/short paths; plain `docker build` is unaffected. Workaround
+committed as `infra/compose.prebuilt.yml` (build with docker build, run compose with
+the prebuilt image). Revisit when compose fixes the resolution.
+
 ### D10 — Docker daemon started
 Docker Desktop was launched once (owner-approved) and became ready in ~10 s (server
 29.6.1). Postgres via docker compose is available for M0 integration tests.
