@@ -1,1 +1,1 @@
-export const PACKAGE_NAME = "agent-runner";
+export { scoreRun, type ScoreReport } from "./scorer.js";

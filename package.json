@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@iz/agent-runner": "workspace:*",
     "@iz/runtime": "workspace:*",
     "@iz/schema": "workspace:*",
     "@iz/services": "workspace:*",
