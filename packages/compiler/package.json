@@ -1,0 +1,19 @@
+{
+  "name": "@iz/compiler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": { "@iz/schema": "workspace:*", "@iz/runtime": "workspace:*", "yaml": "2.9.1", "unified": "11.0.5", "remark-parse": "11.0.0", "remark-gfm": "4.0.1" },
+  "devDependencies": { "typescript": "6.0.3",  "@types/mdast": "4.0.4", "vitest": "5.0.5" }
+}

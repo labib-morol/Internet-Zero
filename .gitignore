@@ -1,0 +1,18 @@
+# PRIVATE PROJECT DOCUMENTS — NEVER COMMIT (public repo: labib-morol/Internet-Zero)
+# INTRANET_ZERO_GLM_MASTER_PROMPT.md contains Appendix C, the NODE_17 answer key.
+INTRANET_ZERO_GLM_MASTER_PROMPT.md
+INTRANET ZERO Product and Engineering Spec.md
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build artifacts and dependencies
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
