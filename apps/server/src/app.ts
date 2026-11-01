@@ -17,6 +17,7 @@ import { registerSessionRoutes } from "./routes/sessions.js";
 import { registerWorldsRoutes } from "./routes/worlds.js";
 import { registerStateRoutes } from "./routes/state.js";
 import { registerActionRoutes } from "./routes/actions.js";
+import { registerViewRoutes } from "./routes/views.js";
 
 export interface BuildAppOptions {
   config: ServerConfig;
@@ -105,6 +106,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     registerWorldsRoutes(api, ctx);
     registerStateRoutes(api, ctx);
     registerActionRoutes(api, ctx);
+    registerViewRoutes(api, ctx);
   });
 
   await registerWebsocket(app, {

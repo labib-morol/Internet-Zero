@@ -18,7 +18,11 @@ function loginAddress(ctx: LoadContext, identityId: string): string {
  * canonicalized to content-addressed ids; attachment redaction blocks are kept
  * (JSON-encoded) in artifact meta for the "inspect layers" tool.
  */
+import { mailView, mailCollectibles } from "./views.js";
+
 export const MAIL_SERVICE: ServiceModule = {
+  view: mailView,
+  collectibles: mailCollectibles,
   id: "mail",
   routes: ["/", "/:mailbox", "/:mailbox/:folder/:messageId"],
   load(rawSource, ctx: LoadContext): Artifact[] {

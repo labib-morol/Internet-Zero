@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Artifact, Identity, Person, Org, ServiceId, WorldSource } from "@iz/schema";
+import type { Artifact, Collectible, Identity, NotFound, Person, Org, RuntimeState, ServiceId, ViewModel, WorldBundle, WorldSource } from "@iz/schema";
 
 /**
  * Frozen service contract (master prompt section 10, section 19.3).
@@ -22,6 +22,12 @@ export interface ServiceModule {
   load(source: unknown, ctx: LoadContext): Artifact[];
   /** In-game route patterns served by this service. */
   routes: string[];
+  /** Play time: the visible view model for host+path (§10). The server has
+   * already checked the page artifact's host reachability; aggregating views
+   * filter their members by visibility themselves. `now` comes from the server clock. */
+  view(bundle: WorldBundle, state: RuntimeState, host: string, path: string, now: string): ViewModel | NotFound;
+  /** Collectible items offered by a view model. */
+  collectibles(view: ViewModel): Collectible[];
 }
 
 /**

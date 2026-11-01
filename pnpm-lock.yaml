@@ -175,6 +175,9 @@ importers:
       '@iz/schema':
         specifier: workspace:*
         version: link:packages/schema
+      '@iz/services':
+        specifier: workspace:*
+        version: link:packages/services
       '@types/node':
         specifier: 24.19.2
         version: 24.19.2
@@ -214,6 +217,9 @@ importers:
       '@iz/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@iz/services':
+        specifier: workspace:*
+        version: link:../../packages/services
       drizzle-orm:
         specifier: 0.45.4
         version: 0.45.4(@types/pg@8.23.1)(pg@8.23.1)
@@ -339,6 +345,9 @@ importers:
 
   packages/services:
     dependencies:
+      '@iz/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       '@iz/schema':
         specifier: workspace:*
         version: link:../schema

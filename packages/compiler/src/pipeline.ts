@@ -178,6 +178,8 @@ function assembleBundle(source: WorldSourceFiles, artifacts: ReturnType<typeof a
       proofs: source.proofs,
     },
     assets: assetRecords,
+    forge: source.forge.map((f) => f.repo),
+    mailboxes: source.mail.map((m) => m.mailbox),
     bundleSalt: salt,
     bundleHash: "",
   };

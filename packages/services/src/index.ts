@@ -4,8 +4,8 @@
  * artifacts at build time. This package never touches node builtins: it runs
  * on already-parsed objects and the asset index from the LoadContext.
  *
- * M1 note: `view()` and `collectibles()` from the full ServiceModule contract
- * arrive in M1 and are intentionally omitted (not stubbed).
+ * Since M1: each ServiceModule also carries view()/collectibles() (§10). The
+ * standalone view builders are re-exported for the server's /api/view route.
  */
 export type { AssetRecord, LoadContext, ServiceModule } from "./context.js";
 export {
@@ -28,3 +28,4 @@ export { FORGE_SERVICE } from "./forge.js";
 export { MAIL_SERVICE } from "./mail.js";
 export { ARCHIVE_SERVICE } from "./archive.js";
 export { TERMINAL_SERVICE } from "./terminal.js";
+export * from "./views.js";

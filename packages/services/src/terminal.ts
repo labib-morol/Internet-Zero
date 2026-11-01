@@ -16,7 +16,11 @@ export type TerminalSource = z.infer<typeof TerminalSource>;
  * Terminal may run on multiple hosts; the compiler assigns files by fs tree
  * directory, so no single-host restriction applies here.
  */
+import { terminalView, terminalCollectibles } from "./views.js";
+
 export const TERMINAL_SERVICE: ServiceModule = {
+  view: terminalView,
+  collectibles: terminalCollectibles,
   id: "terminal",
   routes: ["/", "/:host"],
   load(rawSource, ctx: LoadContext): Artifact[] {

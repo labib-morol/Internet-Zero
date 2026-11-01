@@ -14,7 +14,11 @@ export type ArchiveSource = z.infer<typeof ArchiveSource>;
  * canonicalized to content-addressed ids; EXIF-like meta fields and redaction
  * blocks travel in artifact meta.
  */
+import { archiveView, archiveCollectibles } from "./views.js";
+
 export const ARCHIVE_SERVICE: ServiceModule = {
+  view: archiveView,
+  collectibles: archiveCollectibles,
   id: "archive",
   routes: ["/", "/search", "/documents/:id"],
   load(rawSource, ctx: LoadContext): Artifact[] {

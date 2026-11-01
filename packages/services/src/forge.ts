@@ -42,7 +42,11 @@ function renderChange(kind: string, path: string, before: string | undefined, af
  * GIT//FORGE loader (section 10.2): one repo artifact, one artifact per commit,
  * issue and user profile, all on the forge host.
  */
+import { forgeView, forgeCollectibles } from "./views.js";
+
 export const FORGE_SERVICE: ServiceModule = {
+  view: forgeView,
+  collectibles: forgeCollectibles,
   id: "forge",
   routes: [
     "/",
