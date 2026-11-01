@@ -466,7 +466,7 @@ describe("hints (§8)", () => {
     expect(skip2.rejection?.code).toBe("invalid_input");
 
     const t2 = step(state, log, { type: "requestHint", gateId: "g.welcome", tier: 2 }, clock);
-    expect(t2.result.result).toEqual({ gateId: "g.welcome", tier: 2, cost: 25 });
+    expect(t2.result.result).toEqual({ gateId: "g.welcome", tier: 2, text: expect.any(String), cost: 25 });
     expect(t2.state.hintsUsed).toEqual({ "g.welcome": 2 });
     expect(t2.state.score).toBe(-35);
     state = t2.state;
