@@ -69,6 +69,18 @@ can resume with it repeatedly). api.ts's "only way back into a guest account" re
 `connect` is intercepted by the server (gate-checked host operation, not a filesystem
 one); `clear`/`history`/`logout` are accepted client-side no-ops.
 
+### D18 — view() takes an injected `now`
+§10's view signature is `view(bundle, state, host, path)`; the implementation adds a
+5th parameter `now: string` so time-based visibility conditions are evaluated with the
+server's clock (the same pattern as the runtime's injected Clock). Recorded per §19.3's
+contract-change rule.
+
+### D19 — WorldBundle carries structured forge/mail sources
+View building needs structured data (commit changes, mail metadata) that artifact
+bodies/ASTs cannot carry losslessly. WorldBundle gains server-side `forge: ForgeRepo[]`
+and `mailboxes: Mailbox[]` (with `.default([])` for compatibility). These sections are
+world content, not canon, and are still never sent raw to clients — only projected into
+view models.
 ### D17 — Postgres 18 volume layout + compose context bug on this machine
 Postgres 18 images expect the volume at `/var/lib/postgresql` (single mount); the
 legacy `.../data` mount makes the container exit. Separately, `docker compose` v5.2
