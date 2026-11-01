@@ -1,0 +1,20 @@
+- id: r.who-holds
+  title: "Who holds the hint?"
+  groups:
+    - id: A
+      slots:
+        - id: s.holder
+          label: "Who holds the hint?"
+          type: identity
+          fact: f.hint-holder
+          answers: ["id.odile-mail", "Odile Brandt"]
+        - id: s.clue-kind
+          label: "What kind of clue is it?"
+          type: choice
+          options:
+            - "two facts combined"
+            - "a password written down"
+            - "a riddle from Rowan"
+            - "the passphrase itself"
+          fact: f.hint-kind
+          answers: ["two facts combined"]

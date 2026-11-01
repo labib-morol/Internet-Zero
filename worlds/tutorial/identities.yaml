@@ -1,0 +1,33 @@
+# GIT//FORGE accounts
+- id: id.rowan-git
+  service: forge
+  login: rowan.hale
+  displayName: "Rowan Hale"
+  person: p.rowan
+- id: id.odile-git
+  service: forge
+  login: odile.brandt
+  displayName: "Odile Brandt"
+  person: p.odile
+
+# DEADLETTER accounts
+- id: id.rowan-mail
+  service: mail
+  login: "rowan.hale@pinecone.pcp"
+  displayName: "Rowan Hale"
+  person: p.rowan
+- id: id.odile-mail
+  service: mail
+  login: "odile.brandt@pinecone.pcp"
+  displayName: "Odile Brandt"
+  person: p.odile
+- id: id.alder-vet-mail
+  service: mail
+  login: "reception@aldervet.pcp"
+  displayName: "Alder Lane Veterinary Clinic"
+  org: o.alder-vet
+- id: id.cobble-mail
+  service: mail
+  login: "orders@cobble.pcp"
+  displayName: "Cobble Office Supply"
+  org: o.cobble

@@ -169,6 +169,12 @@ importers:
       '@eslint/js':
         specifier: 10.0.1
         version: 10.0.1(eslint@10.14.0)
+      '@iz/runtime':
+        specifier: workspace:*
+        version: link:packages/runtime
+      '@iz/schema':
+        specifier: workspace:*
+        version: link:packages/schema
       '@types/node':
         specifier: 24.19.2
         version: 24.19.2

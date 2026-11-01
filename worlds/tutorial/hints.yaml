@@ -1,0 +1,37 @@
+# Three tiers per gate; tier n requires tier n-1. Costs 10 / 25 / 50.
+- gate: g.first-commit
+  tier: 1
+  text: "Everything starts on GIT//FORGE. Open the commit history of pinecone/office-scripts and look at what changed most recently."
+  cost: 10
+- gate: g.first-commit
+  tier: 2
+  text: "The newest commit is by Rowan Hale on their last day, and it touches the printer admin notes. Open that commit's own page."
+  cost: 25
+- gate: g.first-commit
+  tier: 3
+  text: "Collect the commit titled 'rotate printer admin pass, see note to Odile' as evidence. That collected commit is what this gate checks."
+  cost: 50
+- gate: g.mailbox
+  tier: 1
+  text: "DEADLETTER is unlocked now. Open Odile Brandt's mailbox and look for mail from Rowan's last day."
+  cost: 10
+- gate: g.mailbox
+  tier: 2
+  text: "This gate is a report, not an answer box. File report r.who-holds: it asks who ended up holding Rowan's hint, and what kind of clue it is."
+  cost: 25
+- gate: g.mailbox
+  tier: 3
+  text: "Rowan left the hint with Odile Brandt (id.odile-mail). The clue is 'two facts combined': it names two true things instead of writing the passphrase down."
+  cost: 50
+- gate: g.printer
+  tier: 1
+  text: "The printer node answers on printer.pinecone.pcp. Its connect prompt wants the admin passphrase you have been reconstructing."
+  cost: 10
+- gate: g.printer
+  tier: 2
+  text: "Rowan's email gives the shape of it: the shop cat's name, then the year in Rowan's email signature — the same year as the copyright header on the repo's LICENSE."
+  cost: 25
+- gate: g.printer
+  tier: 3
+  text: "Cat's name first, founding year second, nothing between them, all lowercase. Both halves sit in plain sight in the mail and on the forge."
+  cost: 50

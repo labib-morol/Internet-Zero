@@ -1,0 +1,32 @@
+# Canon truth for "Lost and Found" (Appendix B). The four required facts each carry
+# a direct proof plus a corroborating proof from a different service (see proofs.yaml).
+- id: f.rotation
+  proposition: { subject: p.rowan, predicate: rotatedPrinterAdminPass, object: o.printer }
+  required: true
+  secrecy: hidden
+  note: "Rowan changed the printer admin passphrase on their last day (2026-10-30). Direct: forge rotation commit. Corroborating: Rowan's same-day email on the mail host."
+- id: f.hint
+  proposition: { subject: p.rowan, predicate: emailedHintTo, object: id.odile-mail }
+  required: true
+  secrecy: hidden
+  note: "Rowan emailed Odile a hint instead of the passphrase: 'It's the name of the shop cat plus the year we opened'. Direct: the mail message. Corroborating: the rotation commit's message ('see note to Odile') on the forge host."
+- id: f.cat
+  proposition: { subject: o.pinecone, predicate: shopCatName, object: "Biscuit" }
+  required: true
+  secrecy: hidden
+  note: "The shop cat is called Biscuit. Direct: forge README photo caption. Corroborating: the vet appointment mail thread."
+- id: f.year
+  proposition: { subject: o.pinecone, predicate: foundedYear, object: 2009 }
+  required: true
+  secrecy: hidden
+  note: "The shop opened in 2009. Direct: forge commit adding LICENSE with the copyright header. Corroborating: the 'est. 2009' line in Rowan's email signature."
+
+# Report-slot facts (established when the r.who-holds group is accepted).
+- id: f.hint-holder
+  proposition: { subject: p.rowan, predicate: entrustedHintTo, object: id.odile-mail }
+  secrecy: hidden
+  note: "Odile holds the hint: Rowan left it with Odile Brandt. The object is the identity id.odile-mail so both report answers ('id.odile-mail' and 'Odile Brandt') match."
+- id: f.hint-kind
+  proposition: { subject: id.rowan-mail, predicate: hintIsKind, object: "two facts combined" }
+  secrecy: hidden
+  note: "The clue is two facts combined (cat name + founding year), not a written password."

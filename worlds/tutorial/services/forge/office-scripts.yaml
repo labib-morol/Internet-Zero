@@ -1,0 +1,178 @@
+# GIT//FORGE source: pinecone/office-scripts (the tutorial's entry repo).
+# Commit artifact ids are a.<sha>; this repo's rotation commit is
+# a.47e5a182496203c773d6f8ee9162ec549974865f (mustCollect of g.first-commit).
+id: a.office-scripts
+owner: pinecone
+name: office-scripts
+description: "Office scripts and floor notes for Pinecone Print Co. Maintained by whoever draws the short straw."
+defaultBranch: main
+readme: |
+  # pinecone/office-scripts
+
+  Small scripts and floor notes for Pinecone Print Co. Maintained by whoever
+  draws the short straw — currently Odile Brandt, office manager.
+
+  ## What lives here
+
+  - `toner-reorder.sh` — mails Cobble Office Supply when black runs low
+  - `printer-status.sh` — one-line health check for the front desk printer
+  - `backup.sh` — nightly copy of the job logs to the back office PC
+  - `printer-admin.txt` — notes for the printer admin passphrase (no pass in here, ever)
+  - `LICENSE` — added 2026, backdated to the shop's real age
+
+  ## The shop
+
+  Pinned to the noticeboard by the time clock, under a photo of the shop cat:
+
+  > Biscuit, quality control, asleep in the warm paper drawer again.
+  > She has held this position since 2019 and has accepted no reorganizations.
+
+  ## House rules
+
+  1. The printer admin passphrase is rotated by hand and never written into this repo.
+  2. If the printer's web admin locks you out, ask the office manager — the hint
+     for the current pass lives with them.
+  3. Toner dust is not a food group.
+
+  [[stamp:PINECONE PRINT CO. — INTERNAL NOTES]]
+branches: [main]
+users:
+  - login: rowan.hale
+    name: "Rowan Hale"
+    identity: id.rowan-git
+    deleted: true
+  - login: odile.brandt
+    name: "Odile Brandt"
+    identity: id.odile-git
+commits:
+  - sha: 6bc2f235acceeeff1542ec5b7c5e3d8bf0293659
+    parents: []
+    author: { name: "Odile Brandt", email: "odile.brandt@pinecone.pcp", identity: id.odile-git }
+    committer: { name: "Odile Brandt", email: "odile.brandt@pinecone.pcp", host: forge.pinecone.pcp }
+    date: "2026-09-14T10:20:00Z"
+    message: "initial import: toner reorder script"
+    changes:
+      - kind: add
+        path: toner-reorder.sh
+        after: |
+          #!/bin/sh
+          # email Cobble Office Supply when the black cartridge runs low
+          level=$(snmpget -v1 -c public printer.pinecone.pcp .1.3.6.1.2.1.43.11.1.1.9.1.1 | awk '{print $NF}')
+          if [ "$level" -lt 15 ]; then
+            mail -s "reorder: black toner" orders@cobble.pcp < toner-order.txt
+          fi
+  - sha: 9656b4ecb5933f8e3d0488db09af88ec30f12e5a
+    parents: [6bc2f235acceeeff1542ec5b7c5e3d8bf0293659]
+    author: { name: "Rowan Hale", email: "rowan.hale@pinecone.pcp", identity: id.rowan-git }
+    committer: { name: "Rowan Hale", email: "rowan.hale@pinecone.pcp", host: forge.pinecone.pcp }
+    date: "2026-09-21T15:03:00Z"
+    message: "add printer status check script"
+    changes:
+      - kind: add
+        path: printer-status.sh
+        after: |
+          #!/bin/sh
+          # one-line health check for the front desk printer
+          curl -fs http://printer.pinecone.pcp/status | grep -E 'ready|jam|toner' || echo "no response"
+  - sha: 8731796d4558abe163d810bac0e0e8c09bb39d1a
+    parents: [9656b4ecb5933f8e3d0488db09af88ec30f12e5a]
+    author: { name: "Odile Brandt", email: "odile.brandt@pinecone.pcp", identity: id.odile-git }
+    committer: { name: "Odile Brandt", email: "odile.brandt@pinecone.pcp", host: forge.pinecone.pcp }
+    date: "2026-09-28T09:47:00Z"
+    message: "README: document the scripts, pin the shop photo caption"
+    changes:
+      - kind: add
+        path: README.md
+        after: |
+          # pinecone/office-scripts
+
+          Small scripts and floor notes for Pinecone Print Co. Maintained by whoever
+          draws the short straw — currently Odile Brandt, office manager.
+
+          ## What lives here
+
+          - `toner-reorder.sh` — mails Cobble Office Supply when black runs low
+          - `printer-status.sh` — one-line health check for the front desk printer
+          - `backup.sh` — nightly copy of the job logs to the back office PC
+          - `printer-admin.txt` — notes for the printer admin passphrase (no pass in here, ever)
+          - `LICENSE` — added 2026, backdated to the shop's real age
+
+          ## The shop
+
+          Pinned to the noticeboard by the time clock, under a photo of the shop cat:
+
+          > Biscuit, quality control, asleep in the warm paper drawer again.
+          > She has held this position since 2019 and has accepted no reorganizations.
+
+          ## House rules
+
+          1. The printer admin passphrase is rotated by hand and never written into this repo.
+          2. If the printer's web admin locks you out, ask the office manager — the hint
+             for the current pass lives with them.
+          3. Toner dust is not a food group.
+  - sha: 1692bb4c3428499837c9b8d578d00462a48e4fca
+    parents: [8731796d4558abe163d810bac0e0e8c09bb39d1a]
+    author: { name: "Odile Brandt", email: "odile.brandt@pinecone.pcp", identity: id.odile-git }
+    committer: { name: "Odile Brandt", email: "odile.brandt@pinecone.pcp", host: forge.pinecone.pcp }
+    date: "2026-10-05T11:12:00Z"
+    message: "add LICENSE (the shop predates every script in here)"
+    changes:
+      - kind: add
+        path: LICENSE
+        after: |
+          PINECONE PRINT CO. — INTERNAL TOOLS LICENSE
+
+          Copyright (c) 2009 Pinecone Print Co.
+
+          Permission is granted, free of charge, to any current member of staff
+          to use, copy, modify and distribute these scripts for shop business.
+          The only accepted payment is one (1) headbutt from the shop cat per
+          quarter.
+
+          THE SCRIPTS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          EXPRESS OR IMPLIED. IN NO EVENT SHALL THE SHOP BE LIABLE FOR A
+          JAMMED MONDAY.
+  - sha: 1df64bdc2cd9c6c55ba3d662af45e081030e597e
+    parents: [1692bb4c3428499837c9b8d578d00462a48e4fca]
+    author: { name: "Rowan Hale", email: "rowan.hale@pinecone.pcp", identity: id.rowan-git }
+    committer: { name: "Rowan Hale", email: "rowan.hale@pinecone.pcp", host: forge.pinecone.pcp }
+    date: "2026-10-12T16:30:00Z"
+    message: "backup.sh: point it at the folder the job logs actually live in"
+    changes:
+      - kind: modify
+        path: backup.sh
+        before: "SRC=/var/log/printjobs   # job logs (moved in the 2019 tidy-up, script never told)"
+        after: "SRC=/var/spool/cups/joblogs   # job logs"
+  - sha: 47e5a182496203c773d6f8ee9162ec549974865f
+    parents: [1df64bdc2cd9c6c55ba3d662af45e081030e597e]
+    author: { name: "Rowan Hale", email: "rowan.hale@pinecone.pcp", identity: id.rowan-git }
+    committer: { name: "Rowan Hale", email: "rowan.hale@pinecone.pcp", host: forge.pinecone.pcp }
+    date: "2026-10-30T09:15:00Z"
+    message: "rotate printer admin pass, see note to Odile"
+    changes:
+      - kind: modify
+        path: printer-admin.txt
+        before: |
+          front desk printer admin passphrase
+          unchanged since the 2011 firmware install
+          (written on the tape inside the toner cabinet)
+        after: |
+          front desk printer admin passphrase
+          rotated 2026-10-30 (Rowan's last day) at Odile's request
+          NOT written down anywhere in this repo
+          hint left with Odile Brandt by email, same morning
+issues:
+  - number: 1
+    title: "Printer web admin login stopped working"
+    body: |
+      Nobody can log into the front desk printer's web admin since Rowan's
+      last day. Printing still works fine — it is only the admin page.
+
+      Did we lose the passphrase? The notes file in the repo does not have it.
+    author: id.odile-git
+    date: "2026-11-02T08:40:00Z"
+    state: open
+    comments:
+      - author: id.odile-git
+        date: "2026-11-02T08:55:00Z"
+        body: "The new IT volunteer starts at nine. Leaving it with them. The hint is safe, because I already forgot I have it."

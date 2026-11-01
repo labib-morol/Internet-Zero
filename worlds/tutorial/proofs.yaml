@@ -1,0 +1,26 @@
+# Each required fact: one direct proof plus one corroborating proof on a different service.
+# Commit artifact ids are a.<40-hex sha>; mail message artifacts keep their message id.
+- fact: f.rotation
+  artifacts: [a.47e5a182496203c773d6f8ee9162ec549974865f]   # forge commit "rotate printer admin pass, see note to Odile"
+  strength: direct
+- fact: f.rotation
+  artifacts: [a.m-hint]                                     # mail: Rowan's same-day email admits the rotation
+  strength: corroborating
+- fact: f.hint
+  artifacts: [a.m-hint]                                     # mail: the hint email
+  strength: direct
+- fact: f.hint
+  artifacts: [a.47e5a182496203c773d6f8ee9162ec549974865f]   # forge: "see note to Odile" points at the email
+  strength: corroborating
+- fact: f.cat
+  artifacts: [a.office-scripts]                             # forge README photo caption
+  strength: direct
+- fact: f.cat
+  artifacts: [a.m-vet-1, a.m-vet-2]                         # mail: vet appointment thread
+  strength: corroborating
+- fact: f.year
+  artifacts: [a.1692bb4c3428499837c9b8d578d00462a48e4fca]   # forge commit adding LICENSE (copyright header)
+  strength: direct
+- fact: f.year
+  artifacts: [a.m-hint]                                     # mail: signature "Pinecone Print Co. — est. 2009"
+  strength: corroborating

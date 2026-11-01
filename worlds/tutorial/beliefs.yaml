@@ -1,0 +1,21 @@
+# What the characters know. The tutorial has no authored falsehoods.
+- holder: p.odile
+  proposition: { subject: p.rowan, predicate: rotatedPrinterAdminPass, object: o.printer }
+  stance: knows
+  since: "2026-10-30T09:20:00Z"
+- holder: p.odile
+  proposition: { subject: p.rowan, predicate: emailedHintTo, object: id.odile-mail }
+  stance: knows
+  since: "2026-10-30T16:46:00Z"
+- holder: p.odile
+  proposition: { subject: o.printer, predicate: adminPassWrittenDown, object: false }
+  stance: knows
+  since: "2026-10-30T16:50:00Z"
+- holder: p.rowan
+  proposition: { subject: o.pinecone, predicate: shopCatName, object: "Biscuit" }
+  stance: knows
+  since: "2026-09-14T10:00:00Z"
+- holder: p.rowan
+  proposition: { subject: o.pinecone, predicate: foundedYear, object: 2009 }
+  stance: knows
+  since: "2026-09-14T10:00:00Z"

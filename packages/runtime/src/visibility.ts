@@ -89,7 +89,11 @@ export function visibleArtifacts(bundle: WorldBundle, state: RuntimeState, now: 
   return bundle.artifacts.filter((a) => artifactVisible(bundle, a, state, isUnlocked, now));
 }
 
-/** First artifact published at (host, path) in bundle order. */
+/** First artifact published at (host, path) in bundle order. Paths are
+ * compared without leading/trailing slashes: in-game URLs carry a leading
+ * slash ("host/path", §10.1) while compiled artifact paths do not. */
 export function findArtifactAt(bundle: WorldBundle, host: string, path: string): Artifact | undefined {
-  return bundle.artifacts.find((a) => a.host === host && a.path === path);
+  const normalize = (p: string): string => p.replace(/^\/+|\/+$/g, "");
+  const target = normalize(path);
+  return bundle.artifacts.find((a) => a.host === host && normalize(a.path) === target);
 }

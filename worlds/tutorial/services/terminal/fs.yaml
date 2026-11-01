@@ -1,0 +1,6 @@
+# NODE TERMINAL host metadata. The connect passphrase is checked by g.printer
+# (kind: answer); reading etc/motd on this host is the tutorial's closing beat.
+hosts:
+  - host: printer.pinecone.pcp
+    motd: "PINECONE PRINT CO. — front desk printer node. Authorized staff only. Passphrase required for connect."
+    connectGate: g.printer

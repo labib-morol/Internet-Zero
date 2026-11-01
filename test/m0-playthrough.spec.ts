@@ -2,7 +2,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { WorldBundle, type Clock, type Actor, type Action, type GameEvent, type RuntimeState } from "@iz/schema";
-import { apply, fold, isWorldComplete } from "@iz/runtime";
+import { apply, fold, isWorldComplete, sessionStartEvent } from "@iz/runtime";
 
 /**
  * M0 gate condition 2 (§19.1): a test plays the tutorial headless, by
@@ -28,7 +28,7 @@ const actor: Actor = { userId: "user-test", kind: "human" };
 /** Drive the tutorial by actions only; throws on any rejection. */
 function playthrough(): { bundle: WorldBundle; log: GameEvent[]; final: RuntimeState } {
   const bundle = loadBundle();
-  const log: GameEvent[] = [];
+  const log: GameEvent[] = [sessionStartEvent(bundle, "team-test", at(0), actor)];
   let seq = 1;
   let state = fold(bundle, log);
 
@@ -45,11 +45,13 @@ function playthrough(): { bundle: WorldBundle; log: GameEvent[]; final: RuntimeS
   // 1. Open the entry repo. Nothing is solved yet.
   run({ type: "open", url: bundle.world.entry }, at(0));
 
-  // 2. Find the rotation commit artifact, open and collect it.
-  //    The evidenceSet gate g.first-commit solves implicitly.
-  const commit = bundle.artifacts.find((a) => a.kind === "commit");
+  // 2. Find the rotation commit the way a player would — by reading — then
+  //    open and collect it. The evidenceSet gate g.first-commit solves implicitly.
+  const commit = bundle.artifacts.find(
+    (a) => a.kind === "commit" && a.body.includes("rotate printer admin pass")
+  );
   expect(commit, "tutorial has a rotation commit artifact").toBeTruthy();
-  run({ type: "open", url: `${commit!.host}${commit!.path}` }, at(1));
+  run({ type: "open", url: `${commit!.host}/${commit!.path}` }, at(1));
   run({ type: "collect", artifactId: commit!.id }, at(2));
   expect(state.solvedGates["g.first-commit"]).toBeDefined();
 
@@ -104,7 +106,7 @@ describe("M0 headless tutorial playthrough (actions only)", () => {
 
   it("rejects a wrong answer, then accepts an equivalent one", () => {
     const bundle = loadBundle();
-    const log: GameEvent[] = [];
+    const log: GameEvent[] = [sessionStartEvent(bundle, "team-test-2", at(0), actor)];
     let seq = 1;
     let state = fold(bundle, log);
     const run = (action: Action, t: string) => {
@@ -113,12 +115,29 @@ describe("M0 headless tutorial playthrough (actions only)", () => {
       state = fold(bundle, log);
       return r;
     };
-    const commit = bundle.artifacts.find((a) => a.kind === "commit")!;
+    const commit = bundle.artifacts.find(
+      (a) => a.kind === "commit" && a.body.includes("rotate printer admin pass")
+    )!;
+    const mailHost = bundle.world.hosts.find((h) => h.service === "mail")!.host;
     run({ type: "open", url: bundle.world.entry }, at(0));
     run({ type: "collect", artifactId: commit.id }, at(1));
-    const wrong = run({ type: "submitAnswer", gateId: "g.printer", answer: "letmein" }, at(2));
+    // g.printer requires g.mailbox: before that, the gate is locked, not wrong.
+    const early = run({ type: "submitAnswer", gateId: "g.printer", answer: "biscuit2009" }, at(2));
+    expect(early.rejection?.code).toBe("locked");
+    run({ type: "open", url: `${mailHost}/` }, at(3));
+    const hintMail = bundle.artifacts.find((a) => a.kind === "mail-message")!;
+    run({ type: "collect", artifactId: hintMail.id }, at(4));
+    const report = bundle.reports.find((r) => r.id === "r.who-holds")!;
+    const group = report.groups[0]!;
+    const slots: Record<string, string> = {};
+    for (const slot of group.slots) {
+      if (slot.type === "choice") slots[slot.id] = slot.options?.[0] ?? "";
+      else slots[slot.id] = "Odile Brandt";
+    }
+    run({ type: "submitReport", reportId: report.id, groupId: group.id, slots }, at(5));
+    const wrong = run({ type: "submitAnswer", gateId: "g.printer", answer: "letmein" }, at(6));
     expect(wrong.rejection?.code).toBe("invalid_input");
-    const right = run({ type: "submitAnswer", gateId: "g.printer", answer: "Biscuit-2009!" }, at(3));
+    const right = run({ type: "submitAnswer", gateId: "g.printer", answer: "  Biscuit2009  " }, at(7));
     expect(right.rejection).toBeUndefined();
     expect(state.solvedGates["g.printer"]).toBeDefined();
   });

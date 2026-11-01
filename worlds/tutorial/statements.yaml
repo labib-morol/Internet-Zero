@@ -1,0 +1,16 @@
+# Truthful statements tied to their mail artifacts (each matches its fact's proposition).
+- artifact: a.m-hint
+  speaker: p.rowan
+  proposition: { subject: p.rowan, predicate: emailedHintTo, object: id.odile-mail }
+  truthful: true
+  fact: f.hint
+- artifact: a.m-vet-1
+  speaker: p.odile
+  proposition: { subject: o.pinecone, predicate: shopCatName, object: "Biscuit" }
+  truthful: true
+  fact: f.cat
+- artifact: a.m-hint
+  speaker: p.rowan
+  proposition: { subject: o.pinecone, predicate: foundedYear, object: 2009 }
+  truthful: true
+  fact: f.year

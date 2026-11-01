@@ -1,0 +1,23 @@
+# Progression for the tutorial (Appendix B). Host unlocks live in world.yaml
+# requires clauses: mail needs g.first-commit, the printer node needs g.mailbox.
+- id: g.first-commit
+  title: "First Find"
+  check:
+    kind: evidenceSet
+    mustCollect: [a.47e5a182496203c773d6f8ee9162ec549974865f]   # Rowan's rotation commit
+  unlocks: []
+  score: 100
+- id: g.mailbox
+  title: "The Mailbox"
+  requires: { gateSolved: g.first-commit }
+  check:
+    kind: report
+    report: r.who-holds
+  score: 100
+- id: g.printer
+  title: "The Printer Node"
+  requires: { gateSolved: g.mailbox }
+  check:
+    kind: answer
+    answers: ["biscuit2009"]
+  score: 100

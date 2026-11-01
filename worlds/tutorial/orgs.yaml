@@ -1,0 +1,16 @@
+- id: o.pinecone
+  name: "Pinecone Print Co."
+  kind: "print shop"
+  description: "A small neighborhood print shop: copying, binding, laminating, one very opinionated shop cat. Open since 2009."
+- id: o.printer
+  name: "Front Desk Printer"
+  kind: device
+  description: "The shop's workhorse multifunction printer. Its admin web UI shares a passphrase with the printer node's connect prompt."
+- id: o.alder-vet
+  name: "Alder Lane Veterinary Clinic"
+  kind: "veterinary clinic"
+  description: "The clinic two streets over that keeps Biscuit's vaccination booklet on file. Or says it does."
+- id: o.cobble
+  name: "Cobble Office Supply"
+  kind: "office supplier"
+  description: "The toner supplier on standing order. Ships Tuesdays, invoices Thursdays."
