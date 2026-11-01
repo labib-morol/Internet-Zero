@@ -95,6 +95,10 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
 - 2026-11-02 — `pnpm lint` — eslint 10.14.0 + typescript-eslint 8.72.1 clean on stubs.
 - 2026-11-02 — `pnpm --filter @iz/schema test` — 6 files, 50 tests passed (ids, conditions, gates, safe AST, world/bundle sources, actions/events/WS/REST/MCP contracts, JSON Schema export).
 - 2026-11-02 — `pnpm build && pnpm test && pnpm lint` — full workspace green with schema implemented.
+- 2026-11-02 — compiler/services/runtime wave: `pnpm test` 152 tests green; `pnpm lint` clean; committed 780aa11.
+- 2026-11-02 — `pnpm run worlds:build` — tutorial@1.0.0 compiled: 17 artifacts, 3 gates, bundleHash 3fe80d44…, zero warnings.
+- 2026-11-02 — `pnpm run test:integration` — M0 headless playthrough 3/3 passed (completes tutorial by actions only, score 300, deterministic replay, no answer/canon leak); runtime path-matching fix included; committed cffbe9c.
+- 2026-11-02 — docker build (infra/Dockerfile) — install + pnpm -r build clean in container; world-compile step proven after tutorial landed (final proof pending at M0 gate).
 
 ## Feature ledger (§19.5 format)
 
