@@ -1,0 +1,25 @@
+- id: id.jamie-git
+  service: forge
+  login: jamiefox
+  displayName: "Jamie Fox"
+  person: p.jamie
+- id: id.mara-git
+  service: forge
+  login: mara.voss
+  displayName: "Mara Voss"
+  person: p.mara
+- id: id.jamie-mail
+  service: mail
+  login: "jamie.fox@acme.pcp"
+  displayName: "Jamie Fox"
+  person: p.jamie
+- id: id.mara-mail
+  service: mail
+  login: "mara.voss@acme.pcp"
+  displayName: "Mara Voss"
+  person: p.mara
+- id: id.it-mail
+  service: mail
+  login: "it-desk@acme.pcp"
+  displayName: "IT Desk"
+  org: o.acme

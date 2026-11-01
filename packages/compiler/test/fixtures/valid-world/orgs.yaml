@@ -1,0 +1,7 @@
+- id: o.acme
+  name: "Acme Office Co"
+  kind: company
+  description: "A mid-sized office supply company."
+- id: o.printer
+  name: "Floor 2 Printer"
+  kind: device

@@ -1,0 +1,6 @@
+- id: e.it-reply
+  trigger: { kind: after, gateSolved: g.files }
+  effects:
+    - kind: deliverMail
+      mailbox: a.mbox-jamie
+      message: a.m-003

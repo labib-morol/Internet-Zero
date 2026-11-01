@@ -1,0 +1,17 @@
+id: fixture
+version: 0.1.0
+format: iz/1
+title: "Fixture World"
+summary: "A minimal valid world covering forge, mail, archive and terminal for compiler tests."
+license: CC-BY-4.0
+hostSuffix: pcp
+clock:
+  mode: session
+  epoch: "2026-11-02T09:00:00Z"
+hosts:
+  - { host: forge.fix.pcp, service: forge }
+  - { host: mail.fix.pcp, service: mail, requires: { gateSolved: g.first-commit } }
+  - { host: term.fix.pcp, service: terminal }
+  - { host: archive.fix.pcp, service: archive, requires: { gateSolved: g.files } }
+entry: "forge.fix.pcp/acme/notes"
+reports: [r.final]

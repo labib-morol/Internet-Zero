@@ -1,0 +1,10 @@
+- id: f.reset-by
+  proposition: { subject: o.printer, predicate: resetBy, object: p.mara }
+  required: true
+  secrecy: hidden
+- id: f.reset-date
+  proposition: { subject: o.printer, predicate: resetAt, object: "2026-10-28" }
+  required: true
+- id: f.printer-pass
+  proposition: { subject: o.printer, predicate: adminPassword, object: "papercut-7331" }
+  required: true

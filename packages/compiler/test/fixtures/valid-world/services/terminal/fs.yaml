@@ -1,0 +1,3 @@
+hosts:
+  - host: term.fix.pcp
+    motd: "NODE TERMINAL — authorized staff only"

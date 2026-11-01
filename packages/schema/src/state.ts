@@ -61,6 +61,8 @@ export const RuntimeState = z.strictObject({
   firedEvents: z.set(z.string()),
   /** Player-created terminal files, host+path -> content. */
   overlayFs: z.record(z.string(), z.string()),
+  /** Terminal files the team has read, host -> set of paths (terminal gates). */
+  readPaths: z.record(z.string(), z.set(z.string())),
   attempts: z.record(z.string(), z.array(Attempt)),
   score: z.number().int(),
 });

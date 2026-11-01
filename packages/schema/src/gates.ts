@@ -103,6 +103,14 @@ export const Hint = z.strictObject({
 });
 export type Hint = z.infer<typeof Hint>;
 
+/** Normalization chain per report slot type — the compiler and runtime must use the same one. */
+export const SlotNormalizers: Record<"identity" | "date" | "choice" | "text", Normalizer[]> = {
+  identity: ["nfkc", "lower", "trim", "collapse"],
+  date: ["nfkc", "trim"],
+  choice: ["nfkc", "lower", "trim", "collapse"],
+  text: ["nfkc", "lower", "trim", "collapse"],
+};
+
 /** Answer-check inputs the runtime needs at submission time. */
 export type AnswerCheckContext = {
   normalize: Normalizer[];

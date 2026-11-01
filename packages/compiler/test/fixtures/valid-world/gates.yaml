@@ -1,0 +1,23 @@
+- id: g.first-commit
+  title: "Find the reset commit"
+  check:
+    kind: answer
+    answers: ["5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b"]
+  unlocks: [mail.fix.pcp]
+  score: 100
+- id: g.files
+  title: "Read the printer config"
+  requires: { gateSolved: g.first-commit }
+  check:
+    kind: terminal
+    mustHaveRead: ["etc/printers.conf"]
+    host: term.fix.pcp
+  unlocks: [archive.fix.pcp]
+  score: 50
+- id: g.report
+  title: "File the incident report"
+  requires: { all: [{ gateSolved: g.files }] }
+  check:
+    kind: report
+    report: r.final
+  score: 200

@@ -9,11 +9,23 @@
       "default": "./dist/index.js"
     }
   },
+  "bin": {
+    "iz": "./dist/cli.js"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/sync-tlds.mjs",
     "typecheck": "tsc -p tsconfig.test.json",
     "test": "vitest run"
   },
-  "dependencies": { "@iz/schema": "workspace:*", "@iz/runtime": "workspace:*", "yaml": "2.9.1", "unified": "11.0.5", "remark-parse": "11.0.0", "remark-gfm": "4.0.1" },
-  "devDependencies": { "typescript": "6.0.3",  "@types/mdast": "4.0.4", "vitest": "5.0.5" }
+  "dependencies": {
+    "@iz/runtime": "workspace:*",
+    "@iz/schema": "workspace:*",
+    "@iz/services": "workspace:*",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
 }

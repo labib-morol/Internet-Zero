@@ -38,5 +38,22 @@ export default tseslint.config(
   {
     files: ["packages/{runtime,services,terminal,mcp}/**/*.ts"],
     rules: gameLogicBans
+  },
+  {
+    // Determinism (§9): the runtime never reads wall-clock time or randomness.
+    files: ["packages/runtime/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "MemberExpression[object.name='Date'][property.name='now']",
+          message: "Runtime is deterministic: receive time via the injected Clock, never Date.now()."
+        },
+        {
+          selector: "MemberExpression[object.name='Math'][property.name='random']",
+          message: "Runtime is deterministic: never use Math.random()."
+        }
+      ]
+    }
   }
 );

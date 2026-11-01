@@ -1,0 +1,7 @@
+- id: p.jamie
+  displayName: "Jamie Fox"
+  role: intern
+  bio: "First week at Acme."
+- id: p.mara
+  displayName: "Mara Voss"
+  role: "office manager"

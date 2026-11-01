@@ -1,0 +1,36 @@
+- gate: g.first-commit
+  tier: 1
+  text: "Look at the recent commit history on acme/notes."
+  cost: 10
+- gate: g.first-commit
+  tier: 2
+  text: "One commit from 2026-10-28 touches the printer config."
+  cost: 25
+- gate: g.first-commit
+  tier: 3
+  text: "The answer is the full sha of that commit."
+  cost: 50
+- gate: g.files
+  tier: 1
+  text: "The terminal on term.fix.pcp can read files."
+  cost: 10
+- gate: g.files
+  tier: 2
+  text: "Printer configuration lives under /etc."
+  cost: 25
+- gate: g.files
+  tier: 3
+  text: "Read etc/printers.conf."
+  cost: 50
+- gate: g.report
+  tier: 1
+  text: "You need evidence naming the person and the date."
+  cost: 10
+- gate: g.report
+  tier: 2
+  text: "The commit message names who approved the rotation."
+  cost: 25
+- gate: g.report
+  tier: 3
+  text: "Culprit: Mara Voss. Date: 2026-10-28."
+  cost: 50

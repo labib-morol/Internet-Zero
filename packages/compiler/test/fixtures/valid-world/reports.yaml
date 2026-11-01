@@ -1,0 +1,15 @@
+- id: r.final
+  title: "Printer incident report"
+  groups:
+    - id: grp.culprit
+      slots:
+        - id: slot.culprit
+          label: "Who reset the printer admin password?"
+          type: identity
+          fact: f.reset-by
+          answers: ["p.mara", "Mara Voss"]
+        - id: slot.when
+          label: "When did the reset happen?"
+          type: date
+          fact: f.reset-date
+          answers: ["2026-10-28"]

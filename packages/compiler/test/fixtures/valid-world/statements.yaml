@@ -1,0 +1,9 @@
+- artifact: a.m-lie
+  speaker: p.mara
+  proposition: { subject: o.printer, predicate: resetBy, object: p.jamie }
+  truthful: false
+- artifact: a.m-truth
+  speaker: p.jamie
+  proposition: { subject: o.printer, predicate: resetAt, object: "2026-10-28" }
+  truthful: true
+  fact: f.reset-date

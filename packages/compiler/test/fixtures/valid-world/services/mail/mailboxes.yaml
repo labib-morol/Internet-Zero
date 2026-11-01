@@ -1,0 +1,35 @@
+- id: a.mbox-jamie
+  owner: p.jamie
+  messages:
+    - id: a.m-lie
+      mailbox: a.mbox-jamie
+      folder: inbox
+      from: id.mara-mail
+      to: [id.jamie-mail]
+      date: "2026-10-29T08:05:00Z"
+      subject: "printer incident"
+      body: |
+        I saw **jamiefox** mess with the printer that morning.
+
+        [[redaction:HR case number|removable]]
+      headers:
+        X-Mailer: "DEADLETTER 1.0"
+      attachments:
+        - asset: assets/sticker.png
+          filename: "printer-sticker.png"
+    - id: a.m-truth
+      mailbox: a.mbox-jamie
+      folder: sent
+      from: id.jamie-mail
+      to: [id.mara-mail]
+      date: "2026-10-28T15:00:00Z"
+      subject: "printer reset on 2026-10-28"
+      body: "Confirmed: the floor 2 printer admin password was reset on 2026-10-28."
+    - id: a.m-003
+      mailbox: a.mbox-jamie
+      folder: inbox
+      from: id.it-mail
+      to: [id.jamie-mail]
+      date: "2026-10-30T09:00:00Z"
+      subject: "ticket closed"
+      body: "Your ticket was closed after the password rotation."

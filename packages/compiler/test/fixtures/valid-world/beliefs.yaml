@@ -1,0 +1,7 @@
+- holder: p.mara
+  proposition: { subject: o.printer, predicate: resetBy, object: p.jamie }
+  stance: lies_about
+  since: "2026-10-29T08:00:00Z"
+- holder: p.jamie
+  proposition: { subject: o.printer, predicate: adminPassword, object: "hunter2" }
+  stance: believes_false

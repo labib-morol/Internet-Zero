@@ -1,0 +1,50 @@
+id: a.notes
+owner: acme
+name: notes
+description: "Office scripts and notes for Acme Office Co."
+defaultBranch: main
+readme: |
+  # acme/notes
+
+  Internal notes for Acme Office Co.
+
+  The floor 2 printer admin password was rotated on 2026-10-28 after a support
+  ticket. See the maintenance log in the archive.
+
+  [[redaction:rotated by the vendor technician|fixed]]
+
+  Approved by [[signature:K1|9A:2C:44:1F|valid|id.mara-git]].
+
+  [[stamp:ACME INTERNAL]]
+branches: [main]
+users:
+  - login: jamiefox
+    name: "Jamie Fox"
+    identity: id.jamie-git
+  - login: mara.voss
+    name: "Mara Voss"
+    identity: id.mara-git
+commits:
+  - sha: 5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b
+    parents: []
+    author: { name: "Mara Voss", email: "mara.voss@acme.pcp", identity: id.mara-git }
+    committer: { name: "Acme CI", email: "ci@acme.pcp", host: forge.fix.pcp }
+    date: "2026-10-28T14:12:00Z"
+    message: "Rotate floor-2 printer admin password (approved by Mara Voss)"
+    signature: { keyId: K1, fingerprint: "9A:2C:44:1F", valid: true, signer: id.mara-git }
+    changes:
+      - kind: modify
+        path: printer.conf
+        before: "admin_password=hunter2"
+        after: "admin_password=papercut-7331"
+issues:
+  - number: 1
+    title: "Printer rejects new password"
+    body: "The floor 2 printer rejects the new password. [[stamp:TICKET-114]]"
+    author: id.jamie-git
+    date: "2026-10-29T09:30:00Z"
+    state: open
+    comments:
+      - author: id.mara-git
+        date: "2026-10-29T10:00:00Z"
+        body: "Reset completed on 2026-10-28 by the office manager."

@@ -14,6 +14,15 @@ const base = {
 };
 
 export const GameEvent = z.discriminatedUnion("type", [
+  /** Always the first event of a team stream; fold() derives identity fields from it. */
+  z.strictObject({
+    type: z.literal("SessionStarted"),
+    teamId: z.string(),
+    worldId: z.string(),
+    bundleHash: z.string(),
+    startedAt: IsoTime,
+    ...base,
+  }),
   z.strictObject({ type: z.literal("GateSolved"), gateId: Id, score: z.number().int(), ...base }),
   z.strictObject({ type: z.literal("ArtifactViewed"), artifactId: Id, ...base }),
   z.strictObject({
