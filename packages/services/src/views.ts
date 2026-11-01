@@ -410,13 +410,15 @@ export function archiveCollectibles(view: ViewModel): Collectible[] {
 // ---------------------------------------------------------------------------
 
 export function terminalView(bundle: WorldBundle, state: RuntimeState, host: string, rawPath: string, _now: string): TerminalView | NotFound {
-  void bundle;
-  void state;
   void _now;
   if (rawPath !== "/" && rawPath !== "") return notFound(host, rawPath);
   const terminalFile = bundle.artifacts.find((a) => a.host === host && a.kind === "terminal-file");
   const motd = typeof terminalFile?.meta.motd === "string" ? terminalFile.meta.motd : null;
-  return { view: "terminal", host, cwd: "/", motd, lines: [], passphrasePrompt: false };
+  // A passphrase prompt is an answer gate bound to this host (§10.5): while it
+  // is unsolved the terminal only offers the prompt.
+  const connectGate = typeof terminalFile?.meta.connectGate === "string" ? terminalFile.meta.connectGate : undefined;
+  const passphrasePrompt = connectGate !== undefined && state.solvedGates[connectGate] === undefined;
+  return { view: "terminal", host, cwd: "/", motd, lines: [], passphrasePrompt };
 }
 
 export function terminalCollectibles(_view: ViewModel): Collectible[] {

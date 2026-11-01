@@ -1,5 +1,6 @@
-import type { Action, Actor, Clock, GameEvent, Rejection, WorldBundle } from "@iz/schema";
+import type { Action, Actor, Clock, GameEvent, Rejection, RuntimeState, WorldBundle } from "@iz/schema";
 import { apply, fold, initialState, type ApplyResult } from "@iz/runtime";
+import { runTerminalCommand } from "./terminal-run.js";
 import type { Db } from "./db/client.js";
 import { append, readAll } from "./db/events.js";
 import type { EventEnvelope } from "./db/events.js";
@@ -82,7 +83,7 @@ export interface SubmitActionOptions {
 export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOutcome> {
   const { db, bundle, teamId, action, actor, clock, locks } = opts;
   return locks.run(teamId, async () => {
-    const attempt = async (): Promise<{ lastSeq: number; applied: ApplyResult }> => {
+    const attempt = async (): Promise<{ lastSeq: number; applied: ApplyResult; state: RuntimeState }> => {
       const envelopes = await readAll(db, teamId);
       const lastSeq = envelopes.length === 0 ? 0 : envelopes[envelopes.length - 1]!.seq;
       const state =
@@ -94,16 +95,40 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
             );
       // eventSeq = events already in the log; seeds deterministic ids (§9).
       const applied = apply(bundle, state, action, actor, clock, lastSeq);
-      return { lastSeq, applied };
+      return { lastSeq, applied, state };
     };
 
-    let { lastSeq, applied } = await attempt();
-    if (applied.events.length > 0) {
-      let outcome = await append(db, teamId, lastSeq + 1, applied.events);
+    let { lastSeq, applied, state } = await attempt();
+
+    // Terminal commands are interpreted server-side (M1 task 7): the runtime
+    // gates the action; packages/terminal runs it against the world fs and
+    // returns the events to append.
+    let terminalResult: ReturnType<typeof runTerminalCommand> | undefined;
+    if (action.type === "terminal" && applied.rejection === undefined) {
+      terminalResult = runTerminalCommand(bundle, state, action.host, action.cwd, action.line, actor.userId, clock.now());
+      if (!terminalResult.ok) {
+        return { rejection: { code: terminalResult.code, message: terminalResult.message }, events: [] };
+      }
+    }
+    const gameEvents: GameEvent[] =
+      terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events;
+    if (gameEvents.length > 0) {
+      let outcome = await append(db, teamId, lastSeq + 1, gameEvents);
       if (!outcome.ok) {
         // Optimistic version check failed: fresh fold, re-apply, retry once.
-        ({ lastSeq, applied } = await attempt());
-        outcome = await append(db, teamId, lastSeq + 1, applied.events);
+        const retried = await attempt();
+        lastSeq = retried.lastSeq;
+        applied = retried.applied;
+        state = retried.state;
+        if (action.type === "terminal" && applied.rejection === undefined) {
+          terminalResult = runTerminalCommand(bundle, state, action.host, action.cwd, action.line, actor.userId, clock.now());
+          if (!terminalResult.ok) {
+            return { rejection: { code: terminalResult.code, message: terminalResult.message }, events: [] };
+          }
+        }
+        const retriedEvents: GameEvent[] =
+          terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events;
+        outcome = await append(db, teamId, lastSeq + 1, retriedEvents);
         if (!outcome.ok) {
           return {
             rejection: {
@@ -116,13 +141,25 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
       }
     }
 
-    const envelopes: EventEnvelope[] = applied.events.map((event: GameEvent, i: number) => ({
+    const envelopes: EventEnvelope[] = gameEvents.map((event: GameEvent, i: number) => ({
       seq: lastSeq + 1 + i,
       event,
     }));
     if (envelopes.length > 0) opts.onBroadcast?.(teamId, envelopes);
+    const terminalPayload =
+      terminalResult !== undefined && terminalResult.ok
+        ? {
+            output: terminalResult.output,
+            cwd: terminalResult.cwd,
+            ...(terminalResult.connect !== undefined ? { connect: terminalResult.connect } : {}),
+          }
+        : undefined;
     return {
-      ...(applied.result !== undefined ? { result: applied.result } : {}),
+      ...(terminalPayload !== undefined
+        ? { result: terminalPayload }
+        : applied.result !== undefined
+          ? { result: applied.result }
+          : {}),
       ...(applied.rejection !== undefined ? { rejection: applied.rejection } : {}),
       events: envelopes,
     };

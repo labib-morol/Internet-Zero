@@ -57,7 +57,7 @@ export const GameEvent = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("ReportRejected"), reportId: Id, groupId: z.string(), retryAfterSeconds: z.number().int().optional(), ...base }),
   z.strictObject({ type: z.literal("ReportGroupAccepted"), reportId: Id, groupId: z.string(), ...base }),
   z.strictObject({ type: z.literal("TerminalRead"), host: z.string(), path: z.string(), ...base }),
-  z.strictObject({ type: z.literal("TerminalOverlayWrite"), host: z.string(), path: z.string(), ...base }),
+  z.strictObject({ type: z.literal("TerminalOverlayWrite"), host: z.string(), path: z.string(), content: z.string().optional(), ...base }),
   z.strictObject({ type: z.literal("WorldEventFired"), eventId: Id, ...base }),
 ]);
 export type GameEvent = z.infer<typeof GameEvent>;

@@ -1,0 +1,1703 @@
+{
+  "world": {
+    "id": "tutorial",
+    "version": "1.0.0",
+    "format": "iz/1",
+    "title": "Lost and Found",
+    "summary": "An intern lost the office printer password. Find it.",
+    "license": "CC-BY-4.0",
+    "hostSuffix": "pcp",
+    "clock": {
+      "mode": "session",
+      "epoch": "2026-11-02T09:00:00Z"
+    },
+    "hosts": [
+      {
+        "host": "forge.pinecone.pcp",
+        "service": "forge",
+        "title": "GIT//FORGE"
+      },
+      {
+        "host": "mail.pinecone.pcp",
+        "service": "mail",
+        "title": "DEADLETTER",
+        "requires": {
+          "gateSolved": "g.first-commit"
+        }
+      },
+      {
+        "host": "printer.pinecone.pcp",
+        "service": "terminal",
+        "title": "NODE TERMINAL",
+        "requires": {
+          "gateSolved": "g.mailbox"
+        }
+      }
+    ],
+    "entry": "forge.pinecone.pcp/pinecone/office-scripts",
+    "reports": [
+      "r.who-holds"
+    ]
+  },
+  "entities": [
+    {
+      "id": "p.rowan",
+      "displayName": "Rowan Hale",
+      "role": "print intern (departed)",
+      "bio": "Spent eight weeks at Pinecone Print Co. as the autumn print intern. Left on 2026-10-30. Kept the commit log tidy and the jam ledger tidier."
+    },
+    {
+      "id": "p.odile",
+      "displayName": "Odile Brandt",
+      "role": "office manager",
+      "bio": "Runs the front desk, the toner budget and, unofficially, the shop cat's calendar. Has worked at Pinecone since 2014."
+    },
+    {
+      "id": "o.pinecone",
+      "name": "Pinecone Print Co.",
+      "kind": "print shop",
+      "description": "A small neighborhood print shop: copying, binding, laminating, one very opinionated shop cat. Open since 2009."
+    },
+    {
+      "id": "o.printer",
+      "name": "Front Desk Printer",
+      "kind": "device",
+      "description": "The shop's workhorse multifunction printer. Its admin web UI shares a passphrase with the printer node's connect prompt."
+    },
+    {
+      "id": "o.alder-vet",
+      "name": "Alder Lane Veterinary Clinic",
+      "kind": "veterinary clinic",
+      "description": "The clinic two streets over that keeps Biscuit's vaccination booklet on file. Or says it does."
+    },
+    {
+      "id": "o.cobble",
+      "name": "Cobble Office Supply",
+      "kind": "office supplier",
+      "description": "The toner supplier on standing order. Ships Tuesdays, invoices Thursdays."
+    }
+  ],
+  "identities": [
+    {
+      "id": "id.rowan-git",
+      "service": "forge",
+      "login": "rowan.hale",
+      "displayName": "Rowan Hale",
+      "person": "p.rowan",
+      "deleted": false
+    },
+    {
+      "id": "id.odile-git",
+      "service": "forge",
+      "login": "odile.brandt",
+      "displayName": "Odile Brandt",
+      "person": "p.odile",
+      "deleted": false
+    },
+    {
+      "id": "id.rowan-mail",
+      "service": "mail",
+      "login": "rowan.hale@pinecone.pcp",
+      "displayName": "Rowan Hale",
+      "person": "p.rowan",
+      "deleted": false
+    },
+    {
+      "id": "id.odile-mail",
+      "service": "mail",
+      "login": "odile.brandt@pinecone.pcp",
+      "displayName": "Odile Brandt",
+      "person": "p.odile",
+      "deleted": false
+    },
+    {
+      "id": "id.alder-vet-mail",
+      "service": "mail",
+      "login": "reception@aldervet.pcp",
+      "displayName": "Alder Lane Veterinary Clinic",
+      "org": "o.alder-vet",
+      "deleted": false
+    },
+    {
+      "id": "id.cobble-mail",
+      "service": "mail",
+      "login": "orders@cobble.pcp",
+      "displayName": "Cobble Office Supply",
+      "org": "o.cobble",
+      "deleted": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "a.1692bb4c3428499837c9b8d578d00462a48e4fca",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/commit/1692bb4c3428499837c9b8d578d00462a48e4fca",
+      "kind": "commit",
+      "title": "add LICENSE (the shop predates every script in here)",
+      "body": "add LICENSE (the shop predates every script in here)\nadd: LICENSE\n- \n+ PINECONE PRINT CO. — INTERNAL TOOLS LICENSE\n+ \n+ Copyright (c) 2009 Pinecone Print Co.\n+ \n+ Permission is granted, free of charge, to any current member of staff\n+ to use, copy, modify and distribute these scripts for shop business.\n+ The only accepted payment is one (1) headbutt from the shop cat per\n+ quarter.\n+ \n+ THE SCRIPTS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n+ EXPRESS OR IMPLIED. IN NO EVENT SHALL THE SHOP BE LIABLE FOR A\n+ JAMMED MONDAY.\n+ ",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "add LICENSE (the shop predates every script in here)"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "add: LICENSE\n- \n+ PINECONE PRINT CO. — INTERNAL TOOLS LICENSE\n+ \n+ Copyright (c) 2009 Pinecone Print Co.\n+ \n+ Permission is granted, free of charge, to any current member of staff\n+ to use, copy, modify and distribute these scripts for shop business.\n+ The only accepted payment is one (1) headbutt from the shop cat per\n+ quarter.\n+ \n+ THE SCRIPTS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n+ EXPRESS OR IMPLIED. IN NO EVENT SHALL THE SHOP BE LIABLE FOR A\n+ JAMMED MONDAY.\n+ "
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "sha": "1692bb4c3428499837c9b8d578d00462a48e4fca",
+        "authorName": "Odile Brandt",
+        "authorEmail": "odile.brandt@pinecone.pcp",
+        "committerEmail": "odile.brandt@pinecone.pcp",
+        "date": "2026-10-05T11:12:00Z",
+        "signed": "false"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.1df64bdc2cd9c6c55ba3d662af45e081030e597e",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/commit/1df64bdc2cd9c6c55ba3d662af45e081030e597e",
+      "kind": "commit",
+      "title": "backup.sh: point it at the folder the job logs actually live in",
+      "body": "backup.sh: point it at the folder the job logs actually live in\nmodify: backup.sh\n- SRC=/var/log/printjobs   # job logs (moved in the 2019 tidy-up, script never told)\n+ SRC=/var/spool/cups/joblogs   # job logs",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "backup.sh: point it at the folder the job logs actually live in"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "modify: backup.sh\n- SRC=/var/log/printjobs   # job logs (moved in the 2019 tidy-up, script never told)\n+ SRC=/var/spool/cups/joblogs   # job logs"
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "sha": "1df64bdc2cd9c6c55ba3d662af45e081030e597e",
+        "authorName": "Rowan Hale",
+        "authorEmail": "rowan.hale@pinecone.pcp",
+        "committerEmail": "rowan.hale@pinecone.pcp",
+        "date": "2026-10-12T16:30:00Z",
+        "signed": "false"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.47e5a182496203c773d6f8ee9162ec549974865f",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/commit/47e5a182496203c773d6f8ee9162ec549974865f",
+      "kind": "commit",
+      "title": "rotate printer admin pass, see note to Odile",
+      "body": "rotate printer admin pass, see note to Odile\nmodify: printer-admin.txt\n- front desk printer admin passphrase\n- unchanged since the 2011 firmware install\n- (written on the tape inside the toner cabinet)\n- \n+ front desk printer admin passphrase\n+ rotated 2026-10-30 (Rowan's last day) at Odile's request\n+ NOT written down anywhere in this repo\n+ hint left with Odile Brandt by email, same morning\n+ ",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "rotate printer admin pass, see note to Odile"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "modify: printer-admin.txt\n- front desk printer admin passphrase\n- unchanged since the 2011 firmware install\n- (written on the tape inside the toner cabinet)\n- \n+ front desk printer admin passphrase\n+ rotated 2026-10-30 (Rowan's last day) at Odile's request\n+ NOT written down anywhere in this repo\n+ hint left with Odile Brandt by email, same morning\n+ "
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "sha": "47e5a182496203c773d6f8ee9162ec549974865f",
+        "authorName": "Rowan Hale",
+        "authorEmail": "rowan.hale@pinecone.pcp",
+        "committerEmail": "rowan.hale@pinecone.pcp",
+        "date": "2026-10-30T09:15:00Z",
+        "signed": "false"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.6bc2f235acceeeff1542ec5b7c5e3d8bf0293659",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/commit/6bc2f235acceeeff1542ec5b7c5e3d8bf0293659",
+      "kind": "commit",
+      "title": "initial import: toner reorder script",
+      "body": "initial import: toner reorder script\nadd: toner-reorder.sh\n- \n+ #!/bin/sh\n+ # email Cobble Office Supply when the black cartridge runs low\n+ level=$(snmpget -v1 -c public printer.pinecone.pcp .1.3.6.1.2.1.43.11.1.1.9.1.1 | awk '{print $NF}')\n+ if [ \"$level\" -lt 15 ]; then\n+   mail -s \"reorder: black toner\" orders@cobble.pcp < toner-order.txt\n+ fi\n+ ",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "initial import: toner reorder script"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "add: toner-reorder.sh\n- \n+ #!/bin/sh\n+ # email Cobble Office Supply when the black cartridge runs low\n+ level=$(snmpget -v1 -c public printer.pinecone.pcp .1.3.6.1.2.1.43.11.1.1.9.1.1 | awk '{print $NF}')\n+ if [ \"$level\" -lt 15 ]; then\n+   mail -s \"reorder: black toner\" orders@cobble.pcp < toner-order.txt\n+ fi\n+ "
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "sha": "6bc2f235acceeeff1542ec5b7c5e3d8bf0293659",
+        "authorName": "Odile Brandt",
+        "authorEmail": "odile.brandt@pinecone.pcp",
+        "committerEmail": "odile.brandt@pinecone.pcp",
+        "date": "2026-09-14T10:20:00Z",
+        "signed": "false"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.8731796d4558abe163d810bac0e0e8c09bb39d1a",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/commit/8731796d4558abe163d810bac0e0e8c09bb39d1a",
+      "kind": "commit",
+      "title": "README: document the scripts, pin the shop photo caption",
+      "body": "README: document the scripts, pin the shop photo caption\nadd: README.md\n- \n+ # pinecone/office-scripts\n+ \n+ Small scripts and floor notes for Pinecone Print Co. Maintained by whoever\n+ draws the short straw — currently Odile Brandt, office manager.\n+ \n+ ## What lives here\n+ \n+ - `toner-reorder.sh` — mails Cobble Office Supply when black runs low\n+ - `printer-status.sh` — one-line health check for the front desk printer\n+ - `backup.sh` — nightly copy of the job logs to the back office PC\n+ - `printer-admin.txt` — notes for the printer admin passphrase (no pass in here, ever)\n+ - `LICENSE` — added 2026, backdated to the shop's real age\n+ \n+ ## The shop\n+ \n+ Pinned to the noticeboard by the time clock, under a photo of the shop cat:\n+ \n+ > Biscuit, quality control, asleep in the warm paper drawer again.\n+ > She has held this position since 2019 and has accepted no reorganizations.\n+ \n+ ## House rules\n+ \n+ 1. The printer admin passphrase is rotated by hand and never written into this repo.\n+ 2. If the printer's web admin locks you out, ask the office manager — the hint\n+    for the current pass lives with them.\n+ 3. Toner dust is not a food group.\n+ ",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "README: document the scripts, pin the shop photo caption"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "add: README.md\n- \n+ # pinecone/office-scripts\n+ \n+ Small scripts and floor notes for Pinecone Print Co. Maintained by whoever\n+ draws the short straw — currently Odile Brandt, office manager.\n+ \n+ ## What lives here\n+ \n+ - `toner-reorder.sh` — mails Cobble Office Supply when black runs low\n+ - `printer-status.sh` — one-line health check for the front desk printer\n+ - `backup.sh` — nightly copy of the job logs to the back office PC\n+ - `printer-admin.txt` — notes for the printer admin passphrase (no pass in here, ever)\n+ - `LICENSE` — added 2026, backdated to the shop's real age\n+ \n+ ## The shop\n+ \n+ Pinned to the noticeboard by the time clock, under a photo of the shop cat:\n+ \n+ > Biscuit, quality control, asleep in the warm paper drawer again.\n+ > She has held this position since 2019 and has accepted no reorganizations.\n+ \n+ ## House rules\n+ \n+ 1. The printer admin passphrase is rotated by hand and never written into this repo.\n+ 2. If the printer's web admin locks you out, ask the office manager — the hint\n+    for the current pass lives with them.\n+ 3. Toner dust is not a food group.\n+ "
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "sha": "8731796d4558abe163d810bac0e0e8c09bb39d1a",
+        "authorName": "Odile Brandt",
+        "authorEmail": "odile.brandt@pinecone.pcp",
+        "committerEmail": "odile.brandt@pinecone.pcp",
+        "date": "2026-09-28T09:47:00Z",
+        "signed": "false"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.9656b4ecb5933f8e3d0488db09af88ec30f12e5a",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/commit/9656b4ecb5933f8e3d0488db09af88ec30f12e5a",
+      "kind": "commit",
+      "title": "add printer status check script",
+      "body": "add printer status check script\nadd: printer-status.sh\n- \n+ #!/bin/sh\n+ # one-line health check for the front desk printer\n+ curl -fs http://printer.pinecone.pcp/status | grep -E 'ready|jam|toner' || echo \"no response\"\n+ ",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "add printer status check script"
+              }
+            ]
+          },
+          {
+            "type": "code",
+            "lang": "diff",
+            "value": "add: printer-status.sh\n- \n+ #!/bin/sh\n+ # one-line health check for the front desk printer\n+ curl -fs http://printer.pinecone.pcp/status | grep -E 'ready|jam|toner' || echo \"no response\"\n+ "
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "sha": "9656b4ecb5933f8e3d0488db09af88ec30f12e5a",
+        "authorName": "Rowan Hale",
+        "authorEmail": "rowan.hale@pinecone.pcp",
+        "committerEmail": "rowan.hale@pinecone.pcp",
+        "date": "2026-09-21T15:03:00Z",
+        "signed": "false"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-hint",
+      "host": "mail.pinecone.pcp",
+      "path": "mb.odile/inbox/a.m-hint",
+      "kind": "mail-message",
+      "title": "the printer pass — no attachment, on purpose",
+      "body": "Subject: the printer pass — no attachment, on purpose\nFrom: rowan.hale@pinecone.pcp\nTo: odile.brandt@pinecone.pcp\nDate: 2026-10-30T16:45:00Z\nOdile,\nIt's the name of the shop cat plus the year we opened.\nThat is all you get in writing. I rotated the pass this morning like\nwe agreed, and I am not putting the new one in a file, a drawer, or\nan email — you always say the important things should be things you\nalready know.\nIt was a good eight weeks. Tell the queue I am sorry about the cancel\nbutton. Somebody has to be.\nRowan\n--\nRowan Hale\nPrint intern, Pinecone Print Co. — est. 2009\nrowan.hale@pinecone.pcp",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Odile,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "It's the name of the shop cat plus the year we opened."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "That is all you get in writing. I rotated the pass this morning like\nwe agreed, and I am not putting the new one in a file, a drawer, or\nan email — you always say the important things should be things you\nalready know."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "It was a good eight weeks. Tell the queue I am sorry about the cancel\nbutton. Somebody has to be."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Rowan"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "--"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Rowan Hale\nPrint intern, Pinecone Print Co. — est. 2009\n"
+              },
+              {
+                "type": "inlineCode",
+                "value": "rowan.hale@pinecone.pcp"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "mb.odile",
+        "folder": "inbox",
+        "from": "id.rowan-mail",
+        "to": "id.odile-mail",
+        "date": "2026-10-30T16:45:00Z",
+        "attachments": "[]",
+        "thread": "th.printer"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-reply",
+      "host": "mail.pinecone.pcp",
+      "path": "mb.odile/sent/a.m-reply",
+      "kind": "mail-message",
+      "title": "Re: the printer pass — no attachment, on purpose",
+      "body": "Subject: Re: the printer pass — no attachment, on purpose\nFrom: odile.brandt@pinecone.pcp\nTo: rowan.hale@pinecone.pcp\nDate: 2026-10-30T17:12:00Z\nReceived, and already half forgotten, exactly as instructed.\nThe Friday slot works. Do not be a stranger — the cat asks about you,\nby which I mean she sits on your old chair.\n— O.",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Received, and already half forgotten, exactly as instructed."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "The Friday slot works. Do not be a stranger — the cat asks about you,\nby which I mean she sits on your old chair."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "— O."
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "mb.odile",
+        "folder": "sent",
+        "from": "id.odile-mail",
+        "to": "id.rowan-mail",
+        "date": "2026-10-30T17:12:00Z",
+        "attachments": "[]",
+        "thread": "th.printer"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-toner",
+      "host": "mail.pinecone.pcp",
+      "path": "mb.odile/inbox/a.m-toner",
+      "kind": "mail-message",
+      "title": "Order 4021 confirmed — two black toner cartridges",
+      "body": "Subject: Order 4021 confirmed — two black toner cartridges\nFrom: orders@cobble.pcp\nTo: odile.brandt@pinecone.pcp\nDate: 2026-11-02T08:05:00Z\nX-Mailer: DEADLETTER 1.0\nOrder 4021 is confirmed and ships today.\n2x compatible black toner cartridge, front desk printer\nAccount: [REDACTED]\nDelivery: Tuesday before noon\nCobble Office Supply — orders desk",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Order 4021 is confirmed and ships today."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "2x compatible black toner cartridge, front desk printer\nAccount: "
+              },
+              {
+                "type": "redaction",
+                "text": "account no. 88-2214",
+                "removable": true
+              },
+              {
+                "type": "text",
+                "value": "\nDelivery: Tuesday before noon"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Cobble Office Supply — orders desk"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "mb.odile",
+        "folder": "inbox",
+        "from": "id.cobble-mail",
+        "to": "id.odile-mail",
+        "date": "2026-11-02T08:05:00Z",
+        "attachments": "[]",
+        "headers": "{\"X-Mailer\":\"DEADLETTER 1.0\"}"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-vet-1",
+      "host": "mail.pinecone.pcp",
+      "path": "mb.odile/sent/a.m-vet-1",
+      "kind": "mail-message",
+      "title": "Biscuit — moving her annual check-up",
+      "body": "Subject: Biscuit — moving her annual check-up\nFrom: odile.brandt@pinecone.pcp\nTo: reception@aldervet.pcp\nDate: 2026-10-21T11:26:00Z\nHello,\nCould we move Biscuit's annual check-up from Thursday to Friday\nafternoon? She is the shop cat at Pinecone Print Co. — brown tabby,\nseven years old, extremely loud about her carrier.\nThe Thursday slot collides with the big binding job, and she insists\non supervising it.\nThank you!\nOdile Brandt\nPinecone Print Co., 14 Alder Lane",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Hello,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Could we move Biscuit's annual check-up from Thursday to Friday\nafternoon? She is the shop cat at Pinecone Print Co. — brown tabby,\nseven years old, extremely loud about her carrier."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "The Thursday slot collides with the big binding job, and she insists\non supervising it."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Thank you!\nOdile Brandt\nPinecone Print Co., 14 Alder Lane"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "mb.odile",
+        "folder": "sent",
+        "from": "id.odile-mail",
+        "to": "id.alder-vet-mail",
+        "date": "2026-10-21T11:26:00Z",
+        "attachments": "[]",
+        "thread": "th.vet"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.m-vet-2",
+      "host": "mail.pinecone.pcp",
+      "path": "mb.odile/inbox/a.m-vet-2",
+      "kind": "mail-message",
+      "title": "Re: Biscuit — moving her annual check-up",
+      "body": "Subject: Re: Biscuit — moving her annual check-up\nFrom: reception@aldervet.pcp\nTo: odile.brandt@pinecone.pcp\nDate: 2026-10-22T09:02:00Z\nGood morning Odile,\nDone — Biscuit is moved to Friday at 15:30 with Dr. Prasad. Bring her\nvaccination booklet if you can find it; we seem to have lent ours to\nthe drawer at your shop.\nReception\nAlder Lane Veterinary Clinic",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Good morning Odile,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Done — Biscuit is moved to Friday at 15:30 with Dr. Prasad. Bring her\nvaccination booklet if you can find it; we seem to have lent ours to\nthe drawer at your shop."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Reception\nAlder Lane Veterinary Clinic"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "mailbox": "mb.odile",
+        "folder": "inbox",
+        "from": "id.alder-vet-mail",
+        "to": "id.odile-mail",
+        "date": "2026-10-22T09:02:00Z",
+        "attachments": "[]",
+        "thread": "th.vet"
+      },
+      "collectible": true
+    },
+    {
+      "id": "a.office-scripts",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts",
+      "kind": "repo",
+      "title": "pinecone/office-scripts",
+      "body": "pinecone/office-scripts\nOffice scripts and floor notes for Pinecone Print Co. Maintained by whoever draws the short straw.\npinecone/office-scripts\nSmall scripts and floor notes for Pinecone Print Co. Maintained by whoever\ndraws the short straw — currently Odile Brandt, office manager.\nWhat lives here\n- toner-reorder.sh — mails Cobble Office Supply when black runs low\n- printer-status.sh — one-line health check for the front desk printer\n- backup.sh — nightly copy of the job logs to the back office PC\n- printer-admin.txt — notes for the printer admin passphrase (no pass in here, ever)\n- LICENSE — added 2026, backdated to the shop's real age\nThe shop\nPinned to the noticeboard by the time clock, under a photo of the shop cat:\n> Biscuit, quality control, asleep in the warm paper drawer again.\n> She has held this position since 2019 and has accepted no reorganizations.\nHouse rules\n- The printer admin passphrase is rotated by hand and never written into this repo.\n- If the printer's web admin locks you out, ask the office manager — the hint\nfor the current pass lives with them.\n- Toner dust is not a food group.\n[stamp: PINECONE PRINT CO. — INTERNAL NOTES]",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "heading",
+            "depth": 1,
+            "children": [
+              {
+                "type": "text",
+                "value": "pinecone/office-scripts"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Small scripts and floor notes for Pinecone Print Co. Maintained by whoever\ndraws the short straw — currently Odile Brandt, office manager."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "What lives here"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": false,
+            "children": [
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "inlineCode",
+                        "value": "toner-reorder.sh"
+                      },
+                      {
+                        "type": "text",
+                        "value": " — mails Cobble Office Supply when black runs low"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "inlineCode",
+                        "value": "printer-status.sh"
+                      },
+                      {
+                        "type": "text",
+                        "value": " — one-line health check for the front desk printer"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "inlineCode",
+                        "value": "backup.sh"
+                      },
+                      {
+                        "type": "text",
+                        "value": " — nightly copy of the job logs to the back office PC"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "inlineCode",
+                        "value": "printer-admin.txt"
+                      },
+                      {
+                        "type": "text",
+                        "value": " — notes for the printer admin passphrase (no pass in here, ever)"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "inlineCode",
+                        "value": "LICENSE"
+                      },
+                      {
+                        "type": "text",
+                        "value": " — added 2026, backdated to the shop's real age"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "The shop"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Pinned to the noticeboard by the time clock, under a photo of the shop cat:"
+              }
+            ]
+          },
+          {
+            "type": "blockquote",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Biscuit, quality control, asleep in the warm paper drawer again.\nShe has held this position since 2019 and has accepted no reorganizations."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "House rules"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "ordered": true,
+            "start": 1,
+            "children": [
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "The printer admin passphrase is rotated by hand and never written into this repo."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "If the printer's web admin locks you out, ask the office manager — the hint\nfor the current pass lives with them."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Toner dust is not a food group."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "stamp",
+                "text": "PINECONE PRINT CO. — INTERNAL NOTES"
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "owner": "pinecone",
+        "name": "office-scripts",
+        "defaultBranch": "main",
+        "description": "Office scripts and floor notes for Pinecone Print Co. Maintained by whoever draws the short straw."
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.office-scripts.issue.1",
+      "host": "forge.pinecone.pcp",
+      "path": "pinecone/office-scripts/issues/1",
+      "kind": "issue",
+      "title": "Printer web admin login stopped working",
+      "body": "Printer web admin login stopped working\nNobody can log into the front desk printer's web admin since Rowan's\nlast day. Printing still works fine — it is only the admin page.\n\nDid we lose the passphrase? The notes file in the repo does not have it.\n\nOdile Brandt: The new IT volunteer starts at nine. Leaving it with them. The hint is safe, because I already forgot I have it.",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Nobody can log into the front desk printer's web admin since Rowan's\nlast day. Printing still works fine — it is only the admin page."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Did we lose the passphrase? The notes file in the repo does not have it."
+              }
+            ]
+          },
+          {
+            "type": "blockquote",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "strong",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "@Odile Brandt"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " 2026-11-02T08:55:00Z"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The new IT volunteer starts at nine. Leaving it with them. The hint is safe, because I already forgot I have it."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "meta": {
+        "repo": "a.office-scripts",
+        "number": 1,
+        "author": "id.odile-git",
+        "date": "2026-11-02T08:40:00Z",
+        "state": "open"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.printer.pinecone.pcp.etc-motd",
+      "host": "printer.pinecone.pcp",
+      "path": "etc/motd",
+      "kind": "terminal-file",
+      "title": "etc/motd",
+      "body": "PINECONE PRINT CO. — FRONT DESK PRINTER NODE\nConnected as: it-volunteer\nNode up since the 2011 firmware install. Jam-free streak: 6 days.\n\nThe printer's admin web UI shares this passphrase.\n\nTaped inside the toner cabinet, in Rowan's handwriting:\n\n    \"You got in. Told you it was memorable.\n\n     Two things I'll miss: this shop, and its cat.\n\n     If the queue ever eats another Monday of yours, go looking next\n     door. The old hands on this network whisper about a machine they\n     call NODE_17. Start where I started: the forge.\"\n\n                                        — R.H., last day\n",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "code",
+            "value": "PINECONE PRINT CO. — FRONT DESK PRINTER NODE\nConnected as: it-volunteer\nNode up since the 2011 firmware install. Jam-free streak: 6 days.\n\nThe printer's admin web UI shares this passphrase.\n\nTaped inside the toner cabinet, in Rowan's handwriting:\n\n    \"You got in. Told you it was memorable.\n\n     Two things I'll miss: this shop, and its cat.\n\n     If the queue ever eats another Monday of yours, go looking next\n     door. The old hands on this network whisper about a machine they\n     call NODE_17. Start where I started: the forge.\"\n\n                                        — R.H., last day\n"
+          }
+        ]
+      },
+      "meta": {
+        "host": "printer.pinecone.pcp",
+        "motd": "PINECONE PRINT CO. — front desk printer node. Authorized staff only. Passphrase required for connect.",
+        "connectGate": "g.printer"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.printer.pinecone.pcp.var-log-jobs.log",
+      "host": "printer.pinecone.pcp",
+      "path": "var/log/jobs.log",
+      "kind": "terminal-file",
+      "title": "var/log/jobs.log",
+      "body": "2026-11-02 08:12  job 4471  copier    12 pages  OK\n2026-11-02 08:31  job 4472  laser-a    2 pages  OK\n2026-11-02 08:44  job 4473  laser-a    1 page   JAM  tray 2, cleared by o.brandt\n2026-11-02 09:07  job 4474  copier    40 pages  OK\n2026-11-02 09:22  job 4475  copier     3 pages  OK\n",
+      "ast": {
+        "type": "root",
+        "children": [
+          {
+            "type": "code",
+            "value": "2026-11-02 08:12  job 4471  copier    12 pages  OK\n2026-11-02 08:31  job 4472  laser-a    2 pages  OK\n2026-11-02 08:44  job 4473  laser-a    1 page   JAM  tray 2, cleared by o.brandt\n2026-11-02 09:07  job 4474  copier    40 pages  OK\n2026-11-02 09:22  job 4475  copier     3 pages  OK\n"
+          }
+        ]
+      },
+      "meta": {
+        "host": "printer.pinecone.pcp",
+        "motd": "PINECONE PRINT CO. — front desk printer node. Authorized staff only. Passphrase required for connect.",
+        "connectGate": "g.printer"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.user.odile.brandt",
+      "host": "forge.pinecone.pcp",
+      "path": "users/odile.brandt",
+      "kind": "user",
+      "title": "Odile Brandt",
+      "body": "odile.brandt\nOdile Brandt",
+      "ast": {
+        "type": "root",
+        "children": []
+      },
+      "meta": {
+        "login": "odile.brandt",
+        "deleted": "false"
+      },
+      "collectible": false
+    },
+    {
+      "id": "a.user.rowan.hale",
+      "host": "forge.pinecone.pcp",
+      "path": "users/rowan.hale",
+      "kind": "user",
+      "title": "Rowan Hale",
+      "body": "rowan.hale\nRowan Hale\naccount deleted",
+      "ast": {
+        "type": "root",
+        "children": []
+      },
+      "meta": {
+        "login": "rowan.hale",
+        "deleted": "true"
+      },
+      "collectible": false
+    }
+  ],
+  "gates": [
+    {
+      "id": "g.first-commit",
+      "title": "First Find",
+      "check": {
+        "kind": "evidenceSet",
+        "mustCollect": [
+          "a.47e5a182496203c773d6f8ee9162ec549974865f"
+        ],
+        "mustLink": []
+      },
+      "unlocks": [],
+      "score": 100
+    },
+    {
+      "id": "g.mailbox",
+      "title": "The Mailbox",
+      "requires": {
+        "gateSolved": "g.first-commit"
+      },
+      "check": {
+        "kind": "report",
+        "report": "r.who-holds"
+      },
+      "unlocks": [],
+      "score": 100
+    },
+    {
+      "id": "g.printer",
+      "title": "The Printer Node",
+      "requires": {
+        "gateSolved": "g.mailbox"
+      },
+      "check": {
+        "kind": "answer",
+        "normalize": [
+          "nfkc",
+          "lower",
+          "trim",
+          "collapse"
+        ],
+        "answerHashes": [
+          "8d01e63af9754c877024de747a41be693328814b8222cc9ad7d4125d12ca0dc5"
+        ]
+      },
+      "unlocks": [],
+      "score": 100
+    }
+  ],
+  "reports": [
+    {
+      "id": "r.who-holds",
+      "title": "Who holds the hint?",
+      "groups": [
+        {
+          "id": "A",
+          "slots": [
+            {
+              "id": "s.holder",
+              "label": "Who holds the hint?",
+              "type": "identity",
+              "fact": "f.hint-holder",
+              "answerHashes": [
+                "bd38ba9d5522a3c4c7f7164a76f3833ce5d775caff3815ffd2866d69f6eb916a",
+                "e064a675cf310d5057a013311e9d21c5c22d713851a70f89e3833a4d14bc9151"
+              ]
+            },
+            {
+              "id": "s.clue-kind",
+              "label": "What kind of clue is it?",
+              "type": "choice",
+              "options": [
+                "two facts combined",
+                "a password written down",
+                "a riddle from Rowan",
+                "the passphrase itself"
+              ],
+              "fact": "f.hint-kind",
+              "answerHashes": [
+                "1e9200d7f389f112ac3c171c0991dd9b115ddbac3ad3f7d64e9a8c7c3fb821dd"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "hints": [
+    {
+      "gate": "g.first-commit",
+      "tier": 1,
+      "text": "Everything starts on GIT//FORGE. Open the commit history of pinecone/office-scripts and look at what changed most recently.",
+      "cost": 10
+    },
+    {
+      "gate": "g.first-commit",
+      "tier": 2,
+      "text": "The newest commit is by Rowan Hale on their last day, and it touches the printer admin notes. Open that commit's own page.",
+      "cost": 25
+    },
+    {
+      "gate": "g.first-commit",
+      "tier": 3,
+      "text": "Collect the commit titled 'rotate printer admin pass, see note to Odile' as evidence. That collected commit is what this gate checks.",
+      "cost": 50
+    },
+    {
+      "gate": "g.mailbox",
+      "tier": 1,
+      "text": "DEADLETTER is unlocked now. Open Odile Brandt's mailbox and look for mail from Rowan's last day.",
+      "cost": 10
+    },
+    {
+      "gate": "g.mailbox",
+      "tier": 2,
+      "text": "This gate is a report, not an answer box. File report r.who-holds: it asks who ended up holding Rowan's hint, and what kind of clue it is.",
+      "cost": 25
+    },
+    {
+      "gate": "g.mailbox",
+      "tier": 3,
+      "text": "Rowan left the hint with Odile Brandt (id.odile-mail). The clue is 'two facts combined': it names two true things instead of writing the passphrase down.",
+      "cost": 50
+    },
+    {
+      "gate": "g.printer",
+      "tier": 1,
+      "text": "The printer node answers on printer.pinecone.pcp. Its connect prompt wants the admin passphrase you have been reconstructing.",
+      "cost": 10
+    },
+    {
+      "gate": "g.printer",
+      "tier": 2,
+      "text": "Rowan's email gives the shape of it: the shop cat's name, then the year in Rowan's email signature — the same year as the copyright header on the repo's LICENSE.",
+      "cost": 25
+    },
+    {
+      "gate": "g.printer",
+      "tier": 3,
+      "text": "Cat's name first, founding year second, nothing between them, all lowercase. Both halves sit in plain sight in the mail and on the forge.",
+      "cost": 50
+    }
+  ],
+  "events": [],
+  "canon": {
+    "facts": [
+      {
+        "id": "f.rotation",
+        "proposition": {
+          "subject": "p.rowan",
+          "predicate": "rotatedPrinterAdminPass",
+          "object": "o.printer"
+        },
+        "required": true,
+        "secrecy": "hidden",
+        "note": "Rowan changed the printer admin passphrase on their last day (2026-10-30). Direct: forge rotation commit. Corroborating: Rowan's same-day email on the mail host."
+      },
+      {
+        "id": "f.hint",
+        "proposition": {
+          "subject": "p.rowan",
+          "predicate": "emailedHintTo",
+          "object": "id.odile-mail"
+        },
+        "required": true,
+        "secrecy": "hidden",
+        "note": "Rowan emailed Odile a hint instead of the passphrase: 'It's the name of the shop cat plus the year we opened'. Direct: the mail message. Corroborating: the rotation commit's message ('see note to Odile') on the forge host."
+      },
+      {
+        "id": "f.cat",
+        "proposition": {
+          "subject": "o.pinecone",
+          "predicate": "shopCatName",
+          "object": "Biscuit"
+        },
+        "required": true,
+        "secrecy": "hidden",
+        "note": "The shop cat is called Biscuit. Direct: forge README photo caption. Corroborating: the vet appointment mail thread."
+      },
+      {
+        "id": "f.year",
+        "proposition": {
+          "subject": "o.pinecone",
+          "predicate": "foundedYear",
+          "object": 2009
+        },
+        "required": true,
+        "secrecy": "hidden",
+        "note": "The shop opened in 2009. Direct: forge commit adding LICENSE with the copyright header. Corroborating: the 'est. 2009' line in Rowan's email signature."
+      },
+      {
+        "id": "f.hint-holder",
+        "proposition": {
+          "subject": "p.rowan",
+          "predicate": "entrustedHintTo",
+          "object": "id.odile-mail"
+        },
+        "required": false,
+        "secrecy": "hidden",
+        "note": "Odile holds the hint: Rowan left it with Odile Brandt. The object is the identity id.odile-mail so both report answers ('id.odile-mail' and 'Odile Brandt') match."
+      },
+      {
+        "id": "f.hint-kind",
+        "proposition": {
+          "subject": "id.rowan-mail",
+          "predicate": "hintIsKind",
+          "object": "two facts combined"
+        },
+        "required": false,
+        "secrecy": "hidden",
+        "note": "The clue is two facts combined (cat name + founding year), not a written password."
+      }
+    ],
+    "beliefs": [
+      {
+        "holder": "p.odile",
+        "proposition": {
+          "subject": "p.rowan",
+          "predicate": "rotatedPrinterAdminPass",
+          "object": "o.printer"
+        },
+        "stance": "knows",
+        "since": "2026-10-30T09:20:00Z"
+      },
+      {
+        "holder": "p.odile",
+        "proposition": {
+          "subject": "p.rowan",
+          "predicate": "emailedHintTo",
+          "object": "id.odile-mail"
+        },
+        "stance": "knows",
+        "since": "2026-10-30T16:46:00Z"
+      },
+      {
+        "holder": "p.odile",
+        "proposition": {
+          "subject": "o.printer",
+          "predicate": "adminPassWrittenDown",
+          "object": false
+        },
+        "stance": "knows",
+        "since": "2026-10-30T16:50:00Z"
+      },
+      {
+        "holder": "p.rowan",
+        "proposition": {
+          "subject": "o.pinecone",
+          "predicate": "shopCatName",
+          "object": "Biscuit"
+        },
+        "stance": "knows",
+        "since": "2026-09-14T10:00:00Z"
+      },
+      {
+        "holder": "p.rowan",
+        "proposition": {
+          "subject": "o.pinecone",
+          "predicate": "foundedYear",
+          "object": 2009
+        },
+        "stance": "knows",
+        "since": "2026-09-14T10:00:00Z"
+      }
+    ],
+    "statements": [
+      {
+        "artifact": "a.m-hint",
+        "speaker": "p.rowan",
+        "proposition": {
+          "subject": "p.rowan",
+          "predicate": "emailedHintTo",
+          "object": "id.odile-mail"
+        },
+        "truthful": true,
+        "fact": "f.hint"
+      },
+      {
+        "artifact": "a.m-vet-1",
+        "speaker": "p.odile",
+        "proposition": {
+          "subject": "o.pinecone",
+          "predicate": "shopCatName",
+          "object": "Biscuit"
+        },
+        "truthful": true,
+        "fact": "f.cat"
+      },
+      {
+        "artifact": "a.m-hint",
+        "speaker": "p.rowan",
+        "proposition": {
+          "subject": "o.pinecone",
+          "predicate": "foundedYear",
+          "object": 2009
+        },
+        "truthful": true,
+        "fact": "f.year"
+      }
+    ],
+    "proofs": [
+      {
+        "fact": "f.rotation",
+        "artifacts": [
+          "a.47e5a182496203c773d6f8ee9162ec549974865f"
+        ],
+        "strength": "direct"
+      },
+      {
+        "fact": "f.rotation",
+        "artifacts": [
+          "a.m-hint"
+        ],
+        "strength": "corroborating"
+      },
+      {
+        "fact": "f.hint",
+        "artifacts": [
+          "a.m-hint"
+        ],
+        "strength": "direct"
+      },
+      {
+        "fact": "f.hint",
+        "artifacts": [
+          "a.47e5a182496203c773d6f8ee9162ec549974865f"
+        ],
+        "strength": "corroborating"
+      },
+      {
+        "fact": "f.cat",
+        "artifacts": [
+          "a.office-scripts"
+        ],
+        "strength": "direct"
+      },
+      {
+        "fact": "f.cat",
+        "artifacts": [
+          "a.m-vet-1",
+          "a.m-vet-2"
+        ],
+        "strength": "corroborating"
+      },
+      {
+        "fact": "f.year",
+        "artifacts": [
+          "a.1692bb4c3428499837c9b8d578d00462a48e4fca"
+        ],
+        "strength": "direct"
+      },
+      {
+        "fact": "f.year",
+        "artifacts": [
+          "a.m-hint"
+        ],
+        "strength": "corroborating"
+      }
+    ]
+  },
+  "assets": [],
+  "forge": [
+    {
+      "id": "a.office-scripts",
+      "owner": "pinecone",
+      "name": "office-scripts",
+      "description": "Office scripts and floor notes for Pinecone Print Co. Maintained by whoever draws the short straw.",
+      "defaultBranch": "main",
+      "readme": "# pinecone/office-scripts\n\nSmall scripts and floor notes for Pinecone Print Co. Maintained by whoever\ndraws the short straw — currently Odile Brandt, office manager.\n\n## What lives here\n\n- `toner-reorder.sh` — mails Cobble Office Supply when black runs low\n- `printer-status.sh` — one-line health check for the front desk printer\n- `backup.sh` — nightly copy of the job logs to the back office PC\n- `printer-admin.txt` — notes for the printer admin passphrase (no pass in here, ever)\n- `LICENSE` — added 2026, backdated to the shop's real age\n\n## The shop\n\nPinned to the noticeboard by the time clock, under a photo of the shop cat:\n\n> Biscuit, quality control, asleep in the warm paper drawer again.\n> She has held this position since 2019 and has accepted no reorganizations.\n\n## House rules\n\n1. The printer admin passphrase is rotated by hand and never written into this repo.\n2. If the printer's web admin locks you out, ask the office manager — the hint\n   for the current pass lives with them.\n3. Toner dust is not a food group.\n\n[[stamp:PINECONE PRINT CO. — INTERNAL NOTES]]\n",
+      "branches": [
+        "main"
+      ],
+      "users": [
+        {
+          "login": "rowan.hale",
+          "name": "Rowan Hale",
+          "identity": "id.rowan-git",
+          "deleted": true
+        },
+        {
+          "login": "odile.brandt",
+          "name": "Odile Brandt",
+          "identity": "id.odile-git",
+          "deleted": false
+        }
+      ],
+      "commits": [
+        {
+          "sha": "6bc2f235acceeeff1542ec5b7c5e3d8bf0293659",
+          "parents": [],
+          "author": {
+            "name": "Odile Brandt",
+            "email": "odile.brandt@pinecone.pcp",
+            "identity": "id.odile-git"
+          },
+          "committer": {
+            "name": "Odile Brandt",
+            "email": "odile.brandt@pinecone.pcp",
+            "host": "forge.pinecone.pcp"
+          },
+          "date": "2026-09-14T10:20:00Z",
+          "message": "initial import: toner reorder script",
+          "changes": [
+            {
+              "kind": "add",
+              "path": "toner-reorder.sh",
+              "after": "#!/bin/sh\n# email Cobble Office Supply when the black cartridge runs low\nlevel=$(snmpget -v1 -c public printer.pinecone.pcp .1.3.6.1.2.1.43.11.1.1.9.1.1 | awk '{print $NF}')\nif [ \"$level\" -lt 15 ]; then\n  mail -s \"reorder: black toner\" orders@cobble.pcp < toner-order.txt\nfi\n"
+            }
+          ]
+        },
+        {
+          "sha": "9656b4ecb5933f8e3d0488db09af88ec30f12e5a",
+          "parents": [
+            "6bc2f235acceeeff1542ec5b7c5e3d8bf0293659"
+          ],
+          "author": {
+            "name": "Rowan Hale",
+            "email": "rowan.hale@pinecone.pcp",
+            "identity": "id.rowan-git"
+          },
+          "committer": {
+            "name": "Rowan Hale",
+            "email": "rowan.hale@pinecone.pcp",
+            "host": "forge.pinecone.pcp"
+          },
+          "date": "2026-09-21T15:03:00Z",
+          "message": "add printer status check script",
+          "changes": [
+            {
+              "kind": "add",
+              "path": "printer-status.sh",
+              "after": "#!/bin/sh\n# one-line health check for the front desk printer\ncurl -fs http://printer.pinecone.pcp/status | grep -E 'ready|jam|toner' || echo \"no response\"\n"
+            }
+          ]
+        },
+        {
+          "sha": "8731796d4558abe163d810bac0e0e8c09bb39d1a",
+          "parents": [
+            "9656b4ecb5933f8e3d0488db09af88ec30f12e5a"
+          ],
+          "author": {
+            "name": "Odile Brandt",
+            "email": "odile.brandt@pinecone.pcp",
+            "identity": "id.odile-git"
+          },
+          "committer": {
+            "name": "Odile Brandt",
+            "email": "odile.brandt@pinecone.pcp",
+            "host": "forge.pinecone.pcp"
+          },
+          "date": "2026-09-28T09:47:00Z",
+          "message": "README: document the scripts, pin the shop photo caption",
+          "changes": [
+            {
+              "kind": "add",
+              "path": "README.md",
+              "after": "# pinecone/office-scripts\n\nSmall scripts and floor notes for Pinecone Print Co. Maintained by whoever\ndraws the short straw — currently Odile Brandt, office manager.\n\n## What lives here\n\n- `toner-reorder.sh` — mails Cobble Office Supply when black runs low\n- `printer-status.sh` — one-line health check for the front desk printer\n- `backup.sh` — nightly copy of the job logs to the back office PC\n- `printer-admin.txt` — notes for the printer admin passphrase (no pass in here, ever)\n- `LICENSE` — added 2026, backdated to the shop's real age\n\n## The shop\n\nPinned to the noticeboard by the time clock, under a photo of the shop cat:\n\n> Biscuit, quality control, asleep in the warm paper drawer again.\n> She has held this position since 2019 and has accepted no reorganizations.\n\n## House rules\n\n1. The printer admin passphrase is rotated by hand and never written into this repo.\n2. If the printer's web admin locks you out, ask the office manager — the hint\n   for the current pass lives with them.\n3. Toner dust is not a food group.\n"
+            }
+          ]
+        },
+        {
+          "sha": "1692bb4c3428499837c9b8d578d00462a48e4fca",
+          "parents": [
+            "8731796d4558abe163d810bac0e0e8c09bb39d1a"
+          ],
+          "author": {
+            "name": "Odile Brandt",
+            "email": "odile.brandt@pinecone.pcp",
+            "identity": "id.odile-git"
+          },
+          "committer": {
+            "name": "Odile Brandt",
+            "email": "odile.brandt@pinecone.pcp",
+            "host": "forge.pinecone.pcp"
+          },
+          "date": "2026-10-05T11:12:00Z",
+          "message": "add LICENSE (the shop predates every script in here)",
+          "changes": [
+            {
+              "kind": "add",
+              "path": "LICENSE",
+              "after": "PINECONE PRINT CO. — INTERNAL TOOLS LICENSE\n\nCopyright (c) 2009 Pinecone Print Co.\n\nPermission is granted, free of charge, to any current member of staff\nto use, copy, modify and distribute these scripts for shop business.\nThe only accepted payment is one (1) headbutt from the shop cat per\nquarter.\n\nTHE SCRIPTS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED. IN NO EVENT SHALL THE SHOP BE LIABLE FOR A\nJAMMED MONDAY.\n"
+            }
+          ]
+        },
+        {
+          "sha": "1df64bdc2cd9c6c55ba3d662af45e081030e597e",
+          "parents": [
+            "1692bb4c3428499837c9b8d578d00462a48e4fca"
+          ],
+          "author": {
+            "name": "Rowan Hale",
+            "email": "rowan.hale@pinecone.pcp",
+            "identity": "id.rowan-git"
+          },
+          "committer": {
+            "name": "Rowan Hale",
+            "email": "rowan.hale@pinecone.pcp",
+            "host": "forge.pinecone.pcp"
+          },
+          "date": "2026-10-12T16:30:00Z",
+          "message": "backup.sh: point it at the folder the job logs actually live in",
+          "changes": [
+            {
+              "kind": "modify",
+              "path": "backup.sh",
+              "before": "SRC=/var/log/printjobs   # job logs (moved in the 2019 tidy-up, script never told)",
+              "after": "SRC=/var/spool/cups/joblogs   # job logs"
+            }
+          ]
+        },
+        {
+          "sha": "47e5a182496203c773d6f8ee9162ec549974865f",
+          "parents": [
+            "1df64bdc2cd9c6c55ba3d662af45e081030e597e"
+          ],
+          "author": {
+            "name": "Rowan Hale",
+            "email": "rowan.hale@pinecone.pcp",
+            "identity": "id.rowan-git"
+          },
+          "committer": {
+            "name": "Rowan Hale",
+            "email": "rowan.hale@pinecone.pcp",
+            "host": "forge.pinecone.pcp"
+          },
+          "date": "2026-10-30T09:15:00Z",
+          "message": "rotate printer admin pass, see note to Odile",
+          "changes": [
+            {
+              "kind": "modify",
+              "path": "printer-admin.txt",
+              "before": "front desk printer admin passphrase\nunchanged since the 2011 firmware install\n(written on the tape inside the toner cabinet)\n",
+              "after": "front desk printer admin passphrase\nrotated 2026-10-30 (Rowan's last day) at Odile's request\nNOT written down anywhere in this repo\nhint left with Odile Brandt by email, same morning\n"
+            }
+          ]
+        }
+      ],
+      "issues": [
+        {
+          "number": 1,
+          "title": "Printer web admin login stopped working",
+          "body": "Nobody can log into the front desk printer's web admin since Rowan's\nlast day. Printing still works fine — it is only the admin page.\n\nDid we lose the passphrase? The notes file in the repo does not have it.\n",
+          "author": "id.odile-git",
+          "date": "2026-11-02T08:40:00Z",
+          "state": "open",
+          "comments": [
+            {
+              "author": "id.odile-git",
+              "date": "2026-11-02T08:55:00Z",
+              "body": "The new IT volunteer starts at nine. Leaving it with them. The hint is safe, because I already forgot I have it."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "mailboxes": [
+    {
+      "id": "mb.odile",
+      "owner": "id.odile-mail",
+      "messages": [
+        {
+          "id": "a.m-vet-1",
+          "mailbox": "mb.odile",
+          "folder": "sent",
+          "thread": "th.vet",
+          "from": "id.odile-mail",
+          "to": [
+            "id.alder-vet-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-21T11:26:00Z",
+          "subject": "Biscuit — moving her annual check-up",
+          "body": "Hello,\n\nCould we move Biscuit's annual check-up from Thursday to Friday\nafternoon? She is the shop cat at Pinecone Print Co. — brown tabby,\nseven years old, extremely loud about her carrier.\n\nThe Thursday slot collides with the big binding job, and she insists\non supervising it.\n\nThank you!\nOdile Brandt\nPinecone Print Co., 14 Alder Lane\n",
+          "attachments": []
+        },
+        {
+          "id": "a.m-vet-2",
+          "mailbox": "mb.odile",
+          "folder": "inbox",
+          "thread": "th.vet",
+          "from": "id.alder-vet-mail",
+          "to": [
+            "id.odile-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-22T09:02:00Z",
+          "subject": "Re: Biscuit — moving her annual check-up",
+          "body": "Good morning Odile,\n\nDone — Biscuit is moved to Friday at 15:30 with Dr. Prasad. Bring her\nvaccination booklet if you can find it; we seem to have lent ours to\nthe drawer at your shop.\n\nReception\nAlder Lane Veterinary Clinic\n",
+          "attachments": []
+        },
+        {
+          "id": "a.m-hint",
+          "mailbox": "mb.odile",
+          "folder": "inbox",
+          "thread": "th.printer",
+          "from": "id.rowan-mail",
+          "to": [
+            "id.odile-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-30T16:45:00Z",
+          "subject": "the printer pass — no attachment, on purpose",
+          "body": "Odile,\n\nIt's the name of the shop cat plus the year we opened.\n\nThat is all you get in writing. I rotated the pass this morning like\nwe agreed, and I am not putting the new one in a file, a drawer, or\nan email — you always say the important things should be things you\nalready know.\n\nIt was a good eight weeks. Tell the queue I am sorry about the cancel\nbutton. Somebody has to be.\n\nRowan\n\n--\n\nRowan Hale\nPrint intern, Pinecone Print Co. — est. 2009\n`rowan.hale@pinecone.pcp`\n",
+          "attachments": []
+        },
+        {
+          "id": "a.m-reply",
+          "mailbox": "mb.odile",
+          "folder": "sent",
+          "thread": "th.printer",
+          "from": "id.odile-mail",
+          "to": [
+            "id.rowan-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-30T17:12:00Z",
+          "subject": "Re: the printer pass — no attachment, on purpose",
+          "body": "Received, and already half forgotten, exactly as instructed.\n\nThe Friday slot works. Do not be a stranger — the cat asks about you,\nby which I mean she sits on your old chair.\n\n— O.\n",
+          "attachments": []
+        },
+        {
+          "id": "a.m-toner",
+          "mailbox": "mb.odile",
+          "folder": "inbox",
+          "from": "id.cobble-mail",
+          "to": [
+            "id.odile-mail"
+          ],
+          "cc": [],
+          "date": "2026-11-02T08:05:00Z",
+          "subject": "Order 4021 confirmed — two black toner cartridges",
+          "body": "Order 4021 is confirmed and ships today.\n\n2x compatible black toner cartridge, front desk printer\nAccount: [[redaction:account no. 88-2214|removable]]\nDelivery: Tuesday before noon\n\nCobble Office Supply — orders desk\n",
+          "attachments": [],
+          "headers": {
+            "X-Mailer": "DEADLETTER 1.0"
+          }
+        }
+      ]
+    }
+  ],
+  "bundleSalt": "0123456789abcdef0123456789abcdef",
+  "bundleHash": "b8379ab8d83017a378c6a3562f0681caa3d5207a4a4e151a9c10f95587bb21d8"
+}

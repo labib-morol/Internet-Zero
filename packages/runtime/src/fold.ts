@@ -155,14 +155,11 @@ export function replayEvents(bundle: WorldBundle, state: RuntimeState, events: r
       }
 
       case "TerminalOverlayWrite":
-        // The frozen GameEvent carries no file content, so fold can only mark
-        // file EXISTENCE. Authoritative overlay content lives with the server
-        // (packages/terminal exec returns the overlayPatch; the server keeps
-        // it alongside the folded state).
-        state.overlayFs[overlayKey(event.host, event.path)] = "";
+        // Overlay content now rides on the event (DECISIONS D22); older
+        // events without content mark existence only.
+        state.overlayFs[overlayKey(event.host, event.path)] = event.content ?? "";
         break;
-
-      case "WorldEventFired": {
+case "WorldEventFired": {
         state.firedEvents.add(event.eventId);
         const def = bundle.events.find((d) => d.id === event.eventId);
         if (def !== undefined) {

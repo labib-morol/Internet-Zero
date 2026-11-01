@@ -1,1 +1,3 @@
-export const PACKAGE_NAME = "terminal";
+export { ParseError, parseLine, MAX_LINE_LENGTH, type Pipeline } from "./parser.js";
+export * from "./vfs.js";
+export * from "./exec.js";
