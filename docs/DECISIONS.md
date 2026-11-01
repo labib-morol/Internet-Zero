@@ -121,3 +121,8 @@ Read as headless-playable via runtime actions (§19.1 M0 gate: "a test plays the
 headless by actions only"), plus a persisting server. Browser UI playability is M1 per the
 master prompt's milestone table and the owner's "no M1 features yet" instruction. Recorded
 in docs/PLAN.md; flag if the owner intended otherwise.
+
+### D20 — WorldSummary carries host metadata
+The Network directory (§11.1) needs the world's hosts client-side without the whole
+bundle. `WorldSummary.hosts` (additive, defaulted `[]`) exposes `{host, service, title}`
+— world metadata a player sees in-game anyway; no canon, no gates, no visibility data.

@@ -13,6 +13,11 @@ export function registerWorldsRoutes(app: FastifyInstance, ctx: AppContext): voi
         version: bundle.world.version,
         bundleHash: bundle.bundleHash,
         entry: bundle.world.entry,
+        hosts: bundle.world.hosts.map((h) => ({
+          host: h.host,
+          service: h.service,
+          title: h.title ?? h.host,
+        })),
       }))
     );
     return ListWorldsResponse.parse({ worlds });

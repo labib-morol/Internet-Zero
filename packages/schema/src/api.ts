@@ -36,6 +36,10 @@ export const WorldSummary = z.strictObject({
   version: z.string(),
   bundleHash: z.string(),
   entry: z.string(),
+  /** Host metadata for the in-game network directory (DECISIONS D20). */
+  hosts: z
+    .array(z.strictObject({ host: z.string(), service: z.string(), title: z.string() }))
+    .default([]),
 });
 export type WorldSummary = z.infer<typeof WorldSummary>;
 

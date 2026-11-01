@@ -104,6 +104,7 @@ describe.skipIf(!pgUp)("security: rate limit, body limit, headers", () => {
       expect(Object.keys(world).sort()).toEqual([
         "bundleHash",
         "entry",
+        "hosts",
         "summary",
         "title",
         "version",
