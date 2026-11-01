@@ -6,18 +6,18 @@ owner-final (docs/DECISIONS.md). No NODE_17 content ever.
 
 ## Current state
 
-- M0 tasks 1–4 done and committed (toolchain, scaffold, skills, schema).
-- M0 T5–T8 done and committed (780aa11): compiler (iz CLI, 12 checks, safe AST,
-  hashing), services loaders, runtime (apply/fold/initialState, gates, rate
-  limits, events, deterministic ids, property tests). Root: 152 tests green.
-- In progress on background agents: tutorial world content (worlds/tutorial),
-  server skeleton (apps/server). Infra (Dockerfile/compose/CI) written by the
-  lead engineer; image build validating in background.
-- Next steps: integrate tutorial (compile + headless playthrough test), server
-  integration against iz-dev-pg, compose up, M0 gate, then M1.
-- Project skills (§20 six files) and THIRD_PARTY notices: third-party skills
-  done; the six project skills were lost to a subagent concurrency limit and
-  will be retried or written by the lead engineer.
+- M0 COMPLETE (gate passed 2026-11-02, commits through dd76258). See the
+  docs/STATUS.md ledger for evidence.
+- M1 in progress: view models end to end (bundle forge/mail sections,
+  ServiceModule.view/collectibles, GET /api/view, leak sweep) — 25 root
+  integration tests. apps/web scaffolded; Playwright harness configured with
+  the system Edge channel. WorldSummary serves hosts (D20).
+- A background agent is building the web foundation (packages/ui kit, desktop
+  shell, in-game browser, landing) — it added two narrow pnpm
+  minimumReleaseAgeExclude entries for the pinned @tanstack packages
+  (integrator-reviewed, see DECISIONS).
+- Next: integrate foundation → service-UI agents → Playwright e2e (M1 gate) →
+  M2 engine parts (MCP server, tools, scorer, benchmark vs tutorial).
 
 ## Verify
 

@@ -126,3 +126,10 @@ in docs/PLAN.md; flag if the owner intended otherwise.
 The Network directory (§11.1) needs the world's hosts client-side without the whole
 bundle. `WorldSummary.hosts` (additive, defaulted `[]`) exposes `{host, service, title}`
 — world metadata a player sees in-game anyway; no canon, no gates, no visibility data.
+
+### D21 — pnpm minimumReleaseAgeExclude for two pinned @tanstack packages
+pnpm 12's minimum-release-age supply-chain policy refused the already-pinned
+@tanstack/react-query 5.105.1 / @tanstack/query-core 5.105.1 during the web
+foundation install. The web agent added a narrow exclusion for exactly those two
+versions to pnpm-workspace.yaml (integrator-reviewed: both versions were verified
+on npm during the M0 planning audit). Recorded rather than silently accepted.
