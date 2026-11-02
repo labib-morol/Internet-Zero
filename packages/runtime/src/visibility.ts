@@ -76,6 +76,7 @@ export function artifactVisible(
   const hostDef = bundle.world.hosts.find((h) => h.host === artifact.host);
   if (hostDef === undefined) return false;
   if (!hostReachable(bundle, hostDef, state, isUnlocked, now)) return false;
+  if (artifact.kind === 'terminal-file' && typeof artifact.meta.connectGate === 'string' && state.solvedGates[artifact.meta.connectGate] === undefined) return false;
   const unlocked = isUnlocked(artifact.id);
   if (artifact.visibility === undefined) {
     return !unlockGatedArtifactIds(bundle).has(artifact.id) || unlocked;

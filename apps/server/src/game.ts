@@ -94,6 +94,13 @@ export interface SubmitActionOptions {
  */
 export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOutcome> {
   const { db, bundle, teamId, action, actor, clock, locks } = opts;
+  if (action.type === 'claim' && action.private) {
+    return { events: [], rejection: { code: 'invalid_input', message: 'Use private notes for confidential observations.' } };
+  }
+  if (action.type === 'editClaim') {
+    const { state } = await loadTeamState(db, bundle, teamId);
+    if (state.claims[action.claimId]?.private) return { events: [], rejection: { code: 'invalid_input', message: 'Private claims are not shared.' } };
+  }
   return locks.run(teamId, async () => {
     const attempt = async (): Promise<{ lastSeq: number; applied: ApplyResult; state: RuntimeState }> => {
       const { state, lastSeq } = await loadTeamState(db, bundle, teamId);
@@ -109,13 +116,14 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
     // returns the events to append.
     let terminalResult: ReturnType<typeof runTerminalCommand> | undefined;
     if (action.type === "terminal" && applied.rejection === undefined) {
-      terminalResult = runTerminalCommand(bundle, state, action.host, action.cwd, action.line, actor.userId, clock.now());
+      terminalResult = runTerminalCommand(bundle, replayEvents(bundle, structuredClone(state), applied.events), action.host, action.cwd, action.line, actor.userId, clock.now());
       if (!terminalResult.ok) {
-        return { rejection: { code: terminalResult.code, message: terminalResult.message }, events: [] };
+        applied = { ...applied, rejection: { code: terminalResult.code, message: terminalResult.message } };
+        terminalResult = undefined;
       }
     }
     let gameEvents: GameEvent[] = settleEvents(bundle, state,
-      terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events,
+      terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events.map((event) => ({ ...event, actorKind: actor.kind }))] : applied.events,
       actor, clock);
     if (gameEvents.length > 0) {
       let outcome = await append(db, teamId, lastSeq + 1, gameEvents);
@@ -126,13 +134,14 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
         applied = retried.applied;
         state = retried.state;
         if (action.type === "terminal" && applied.rejection === undefined) {
-          terminalResult = runTerminalCommand(bundle, state, action.host, action.cwd, action.line, actor.userId, clock.now());
+          terminalResult = runTerminalCommand(bundle, replayEvents(bundle, structuredClone(state), applied.events), action.host, action.cwd, action.line, actor.userId, clock.now());
           if (!terminalResult.ok) {
-            return { rejection: { code: terminalResult.code, message: terminalResult.message }, events: [] };
+            applied = { ...applied, rejection: { code: terminalResult.code, message: terminalResult.message } };
+        terminalResult = undefined;
           }
         }
         gameEvents = settleEvents(bundle, state,
-          terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events,
+          terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events.map((event) => ({ ...event, actorKind: actor.kind }))] : applied.events,
           actor, clock);
         outcome = await append(db, teamId, lastSeq + 1, gameEvents);
         if (!outcome.ok) {

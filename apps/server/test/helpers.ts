@@ -64,7 +64,7 @@ export interface TestEnv {
  * Builds an app against a freshly created, uniquely named database; close()
  * drops the database again. Migrations run inside buildApp (as at boot).
  */
-export async function createTestApp(opts: { publicOrigin?: string; requestsPerMinute?: number } = {}): Promise<TestEnv> {
+export async function createTestApp(opts: { publicOrigin?: string; requestsPerMinute?: number; worldsDir?: string } = {}): Promise<TestEnv> {
   const dbName = `iz_test_${randomBytes(6).toString("hex")}`;
   const admin = new Client({ connectionString: ADMIN_URL });
   await admin.connect();
@@ -72,7 +72,10 @@ export async function createTestApp(opts: { publicOrigin?: string; requestsPerMi
   await admin.end();
 
   const databaseUrl = `postgres://intranet:intranet@localhost:5432/${dbName}`;
-  const config = testConfig(databaseUrl, opts.publicOrigin === undefined ? {} : { publicOrigin: opts.publicOrigin });
+  const config = testConfig(databaseUrl, {
+    ...(opts.publicOrigin === undefined ? {} : { publicOrigin: opts.publicOrigin }),
+    ...(opts.worldsDir === undefined ? {} : { worldsDir: opts.worldsDir }),
+  });
   const app = await buildApp({
     config,
     ...(opts.requestsPerMinute === undefined ? {} : { requestsPerMinute: opts.requestsPerMinute }),

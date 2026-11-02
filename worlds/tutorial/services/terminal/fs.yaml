@@ -4,3 +4,4 @@ hosts:
   - host: printer.pinecone.pcp
     motd: "PINECONE PRINT CO. — front desk printer node. Authorized staff only. Passphrase required for connect."
     connectGate: g.printer
+    completionFiles: [/etc/motd]

@@ -27,30 +27,20 @@ export async function append(
   gameEvents: GameEvent[]
 ): Promise<AppendResult> {
   if (gameEvents.length === 0) return { ok: true, appended: [] };
-  const rows = await db
-    .insert(events)
-    .values(
-      gameEvents.map((event, i) => ({
-        teamId,
-        seq: expectedNextSeq + i,
-        type: event.type,
-        payload: event,
-        actorUserId: event.by,
-        actorKind: event.actorKind,
-      }))
-    )
-    .onConflictDoNothing({ target: [events.teamId, events.seq] })
-    .returning({ seq: events.seq });
-
-  if (rows.length !== gameEvents.length) {
-    // Unique violation on (team_id, seq): a concurrent writer won the race.
-    return { ok: false, appended: [] };
+  class AppendConflict extends Error {}
+  try {
+    return await db.transaction(async (transaction) => {
+      const rows = await transaction.insert(events).values(gameEvents.map((event, i) => ({
+        teamId, seq: expectedNextSeq + i, type: event.type, payload: event,
+        actorUserId: event.by, actorKind: event.actorKind,
+      }))).onConflictDoNothing({ target: [events.teamId, events.seq] }).returning({ seq: events.seq });
+      if (rows.length !== gameEvents.length) throw new AppendConflict();
+      return { ok: true, appended: gameEvents.map((event, i) => ({ seq: expectedNextSeq + i, event })) };
+    });
+  } catch (error) {
+    if (error instanceof AppendConflict) return { ok: false, appended: [] };
+    throw error;
   }
-  const appended: EventEnvelope[] = gameEvents.map((event, i) => ({
-    seq: rows[i]!.seq,
-    event,
-  }));
-  return { ok: true, appended };
 }
 
 /** All events of one team ordered by seq (repository: teamId always in WHERE). */

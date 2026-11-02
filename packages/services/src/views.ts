@@ -390,7 +390,7 @@ export function archiveView(bundle: WorldBundle, state: RuntimeState, host: stri
         date: String(doc.meta.date ?? ""),
         source: String(doc.meta.source ?? ""),
         ast: doc.ast,
-        meta: Object.fromEntries(Object.entries(doc.meta).map(([k, v]) => [k, String(v)])),
+        meta: Object.fromEntries(Object.entries(doc.meta).filter(([key]) => key !== 'redactions').map(([k, v]) => [k, String(v)])),
         assets: [],
         removableRedactions,
       },

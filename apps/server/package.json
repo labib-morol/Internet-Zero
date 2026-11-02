@@ -14,6 +14,7 @@
     "@fastify/cookie": "11.1.5",
     "@fastify/static": "10.1.8",
     "@fastify/websocket": "11.3.6",
+    "@iz/agent-runner": "workspace:*",
     "@iz/mcp": "workspace:*",
     "@iz/runtime": "workspace:*",
     "@iz/schema": "workspace:*",

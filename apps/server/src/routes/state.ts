@@ -20,6 +20,9 @@ export function registerStateRoutes(app: FastifyInstance, ctx: AppContext): void
     // Validate the in-memory state against the frozen contract, then convert
     // Sets to arrays for the JSON wire form (state-wire.ts).
     const validated = GetStateResponse.parse({ state });
+    validated.state.claims = Object.fromEntries(Object.entries(validated.state.claims).filter(([, claim]) => !claim.private || claim.createdBy === auth.user.id));
+    validated.state.links = Object.fromEntries(Object.entries(validated.state.links).filter(([, link]) =>
+      (validated.state.evidence[link.from] || validated.state.claims[link.from]) && (validated.state.evidence[link.to] || validated.state.claims[link.to])));
     return { state: stateToWire(validated.state) };
   });
 }

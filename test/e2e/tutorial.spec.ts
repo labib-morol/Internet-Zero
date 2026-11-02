@@ -69,6 +69,37 @@ test('player completes tutorial through visible browser controls and terminal', 
   await checkAccessibility(page);
 });
 
+test('keyboard-only player can complete the tutorial', async ({ page }) => {
+  await page.goto('/');
+  const activate = async (locator: ReturnType<Page['getByRole']>) => { await locator.focus(); await locator.press('Enter'); };
+  await activate(page.getByRole('button', { name: 'Open the case', exact: true }));
+  await activate(page.getByRole('button', { name: "I've saved it — open the desktop" }));
+  await expect(page.getByRole('heading', { name: 'office-scripts', exact: true })).toBeVisible();
+  const cat = /^([A-Za-z]+),/.exec(await page.getByRole('blockquote').innerText())?.[1];
+  await activate(page.getByRole('link', { name: 'files', exact: true }));
+  await activate(page.getByRole('link', { name: 'LICENSE', exact: true }));
+  const year = /\b(19|20)\d{2}\b/.exec(await page.getByText(/Copyright \(c\)/).innerText())?.[0];
+  await navigate(page, 'forge.pinecone.pcp/pinecone/office-scripts/commits');
+  await activate(page.getByRole('link', { name: /Commit .*rotate printer admin pass/ }));
+  await activate(page.getByRole('button', { name: /^Collect evidence:/ }));
+  await activate(page.getByRole('button', { name: 'Case file', exact: true }));
+  const panel = page.getByRole('complementary', { name: 'Case file' });
+  const holder = panel.getByRole('textbox', { name: 'Who holds the hint?', exact: true });
+  await holder.focus(); await holder.pressSequentially('Odile Brandt');
+  const choice = panel.getByRole('combobox', { name: 'What kind of clue is it?' });
+  await choice.focus(); await choice.press('ArrowDown'); await choice.press('Enter');
+  await activate(panel.getByRole('button', { name: 'Submit group A' }));
+  await expect(panel.getByText('g.mailbox', { exact: true })).toBeVisible();
+  await activate(panel.getByRole('button', { name: 'Close case file panel' }));
+  await navigate(page, 'printer.pinecone.pcp/');
+  await activate(page.getByRole('button', { name: 'Screen reader', exact: true }));
+  const pass = page.getByLabel('Passphrase', { exact: true });
+  await pass.focus(); await pass.pressSequentially(`${cat}${year}`); await pass.press('Enter');
+  const command = page.getByLabel('Command for printer.pinecone.pcp');
+  await expect(command).toBeEnabled(); await command.focus(); await command.pressSequentially('cat /etc/motd'); await command.press('Enter');
+  await expect(page.getByRole('list', { name: 'Terminal transcript' })).toContainText(/Rowan/);
+});
+
 test('compact desktop can open all apps without dragging', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await startTutorial(page);

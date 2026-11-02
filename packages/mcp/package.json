@@ -14,6 +14,14 @@
     "typecheck": "tsc -p tsconfig.test.json",
     "test": "vitest run"
   },
-  "dependencies": { "@iz/schema": "workspace:*", "@iz/runtime": "workspace:*" },
-  "devDependencies": { "typescript": "6.0.3",  "vitest": "5.0.5" }
+  "dependencies": {
+    "@iz/runtime": "workspace:*",
+    "@iz/schema": "workspace:*",
+    "@modelcontextprotocol/server": "2.4.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
 }

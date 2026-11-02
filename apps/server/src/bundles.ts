@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { WorldBundle, type WorldBundle as WorldBundleType } from "@iz/schema";
+import { verifyBundle } from './verify-bundle.js';
 
 /**
  * Bundle registry (§6.4): every *.json in WORLDS_DIR must be a valid
@@ -31,6 +32,7 @@ export async function loadBundles(worldsDir: string): Promise<BundleRegistry> {
     } catch (error) {
       throw new Error(`Cannot read bundle ${fileName}: ${String(error)}`, { cause: error });
     }
+    if (Buffer.byteLength(raw) > 50 * 1024 * 1024) throw new Error('Oversize world bundle');
     let parsed: unknown;
     try {
       parsed = JSON.parse(raw);
@@ -46,6 +48,7 @@ export async function loadBundles(worldsDir: string): Promise<BundleRegistry> {
       throw new Error(`Invalid world bundle ${fileName}: ${detail}`);
     }
     const bundle = result.data;
+    verifyBundle(bundle, parsed);
     const existing = byId.get(bundle.world.id);
     if (existing !== undefined) {
       throw new Error(

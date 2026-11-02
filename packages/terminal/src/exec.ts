@@ -66,6 +66,14 @@ function cmdOf(argv: string[]): string {
   return argv[0] ?? "";
 }
 
+function boundedPattern(pattern: string, ignoreCase: boolean): RegExp {
+  if (pattern.length > 256 || /[()*+?{}|]|\\[1-9]/.test(pattern)) {
+    throw new ExecError('grep: unsupported pattern; repetition, groups and alternation are not supported');
+  }
+  try { return new RegExp(pattern, ignoreCase ? 'i' : ''); }
+  catch { throw new ExecError('grep: invalid pattern'); }
+}
+
 /** Apply the allowed trailing filters (§10.5: only | grep, | head, | tail). */
 function applyFilters(text: string, pipeline: Pipeline): string {
   let lines = text.split("\n");
@@ -75,12 +83,7 @@ function applyFilters(text: string, pipeline: Pipeline): string {
       const ignoreCase = f.argv.includes("-i");
       const pattern = args[0];
       if (pattern === undefined) throw new ExecError("usage: grep [-i] PATTERN");
-      let re: RegExp;
-      try {
-        re = new RegExp(pattern, ignoreCase ? "i" : "");
-      } catch {
-        throw new ExecError(`grep: invalid pattern: ${pattern}`);
-      }
+      const re = boundedPattern(pattern, ignoreCase);
       lines = lines.filter((l) => re.test(l));
     } else if (f.cmd === "head") {
       lines = splitLines(lines.join("\n")).slice(0, numericArg(f.argv, "-n", 10));
@@ -147,7 +150,7 @@ export function exec(
     const p = pathArg(arg);
     const r = readForCommand(fs, view, p);
     if (!r.found) throw new ExecError(`${arg ?? ""}: no such file`);
-    events.push({ type: "TerminalRead", host: ctx.host, path: p });
+    if (!r.fromOverlay) events.push({ type: "TerminalRead", host: ctx.host, path: p });
     return { path: p, content: r.content };
   };
 
@@ -163,7 +166,7 @@ export function exec(
       if (!isDir(fs, view, target)) {
         const r = readForCommand(fs, view, target);
         text = r.found ? argv[1]! : `ls: ${argv[1]}: no such file or directory`;
-        if (r.found) events.push({ type: "TerminalRead", host: ctx.host, path: target });
+        if (r.found && !r.fromOverlay) events.push({ type: "TerminalRead", host: ctx.host, path: target });
         break;
       }
       const entries = listDir(fs, view, target);
@@ -203,12 +206,7 @@ export function exec(
       const rest = argv.slice(1).filter((a) => a !== "-i");
       const pattern = rest[0];
       if (pattern === undefined) throw new ExecError("usage: grep [-i] PATTERN [FILE...]");
-      let re: RegExp;
-      try {
-        re = new RegExp(pattern, ignoreCase ? "i" : "");
-      } catch {
-        throw new ExecError(`grep: invalid pattern: ${pattern}`);
-      }
+      const re = boundedPattern(pattern, ignoreCase);
       const files = rest.slice(1);
       if (files.length === 0) throw new ExecError("grep: no input (pipe from a command or name a file)");
       const chunks: string[] = [];
@@ -271,7 +269,7 @@ export function exec(
       const p = pathArg(argv[1]);
       const r = readForCommand(fs, view, p);
       if (r.found) {
-        events.push({ type: "TerminalRead", host: ctx.host, path: p });
+        if (!r.fromOverlay) events.push({ type: "TerminalRead", host: ctx.host, path: p });
         text = `  File: ${p}\n  Size: ${r.content.length}\n Type: ${r.fromOverlay ? "overlay file" : "world file"}`;
       } else if (isDir(fs, view, p)) {
         text = `  File: ${p}\n Type: directory`;

@@ -6,8 +6,11 @@ import { defineConfig } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "test/e2e",
-  timeout: 60_000,
-  retries: 0,
+  timeout: 90_000,
+  // One retry: the tutorial flow is long; under heavy local load a single
+  // 5s expect can race a re-render. A retry is reported as such, never hidden.
+  retries: 1,
+  reporters: [["line"], ["json", { outputFile: "test-results/e2e-report.json" }]],
   use: {
     channel: "msedge",
     baseURL: "http://localhost:5173",

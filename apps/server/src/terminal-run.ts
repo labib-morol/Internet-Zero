@@ -1,6 +1,6 @@
 import { exec as terminalExec, type ExecContext, type ForgeRepoIndex } from "@iz/terminal";
 import type { GameEvent, RuntimeState, WorldBundle } from "@iz/schema";
-import { hostReachable } from "@iz/runtime";
+import { hostReachable, visibleArtifacts } from "@iz/runtime";
 
 /**
  * Server-side terminal command execution (M1 task 7, server half). The
@@ -48,7 +48,7 @@ function forgeIndex(bundle: WorldBundle): ForgeRepoIndex[] {
     owner: repo.owner,
     name: repo.name,
     path: `/${repo.owner}/${repo.name}`,
-    commits: repo.commits.map((c) => ({
+    commits: repo.commits.filter((c) => bundle.artifacts.some((a) => a.id === `a.${c.sha}`)).map((c) => ({
       sha: c.sha,
       date: c.date,
       message: c.message,
@@ -127,44 +127,22 @@ passphrase: `,
     const target = connectMatch[1]!;
     const targetDef = bundle.world.hosts.find((h) => h.host === target && h.service === "terminal");
     const targetUnlocked = targetDef !== undefined && hostReachable(bundle, targetDef, state, isUnlocked, now);
-    const targetTerminalArtifact = bundle.artifacts.find((a) => a.host === target && a.kind === "terminal-file");
-    const gateId = typeof targetTerminalArtifact?.meta.connectGate === "string" ? targetTerminalArtifact.meta.connectGate : undefined;
     if (targetDef === undefined || targetDef.host === host) {
       return { ok: false, code: "not_found", message: "Host not found." };
     }
-    if (!targetUnlocked) {
-      if (gateId === undefined) {
-        return { ok: false, code: "locked", message: "This host is not available." };
-      }
-      const gateSolved = state.solvedGates[gateId] !== undefined;
-      if (!gateSolved) {
-        return {
-          ok: true,
-          output: `connecting to ${target}…\npassphrase: `,
-          cwd,
-          events: [],
-          connect: { target, gateId, connected: false },
-        };
-      }
-      return {
-        ok: true,
-        output: `connected to ${target}`,
-        cwd: "/",
-        events: [],
-        connect: { target, connected: true },
-      };
-    }
+    if (!targetUnlocked) return { ok: false, code: "not_found", message: "Host not found." };
     return { ok: true, output: `already connected to ${target}`, cwd, events: [], connect: { target, connected: true } };
   }
 
-  const fs = buildWorldFs(bundle, host);
+  const visibleBundle = { ...bundle, artifacts: visibleArtifacts(bundle, state, now) };
+  const fs = buildWorldFs(visibleBundle, host);
   const overlay = overlayForHost(state, host);
   const ctx: ExecContext = {
     host,
     user: actorUserId,
     now,
-    forge: forgeIndex(bundle),
-    verify: verifier(bundle),
+    forge: forgeIndex(visibleBundle),
+    verify: verifier(visibleBundle),
   };
 
   let result;
