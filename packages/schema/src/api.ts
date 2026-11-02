@@ -86,7 +86,6 @@ export const CaseFileResponse = z.strictObject({
               label: z.string(),
               type: z.enum(["identity", "date", "choice", "text"]),
               options: z.array(z.string()).optional(),
-              fact: z.string(),
             })
           ),
         })

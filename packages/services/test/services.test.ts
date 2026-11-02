@@ -68,6 +68,7 @@ describe("FORGE_SERVICE", () => {
     expect(issue.id).toBe("a.notes.issue.1");
     expect(issue.path).toBe("acme/notes/issues/1");
     expect(issue.body).toContain("Jamie Fox: Looking into it.");
+    if (issue.ast.type !== 'root') throw new Error('Expected root AST');
     const commentBlock = issue.ast.children.find((n) => n.type === "blockquote");
     expect(commentBlock).toBeDefined();
 
@@ -199,6 +200,7 @@ describe("TERMINAL_SERVICE", () => {
     expect(first.collectible).toBe(false);
     expect(first.meta.motd).toBe("NODE TERMINAL");
     expect(first.meta.connectGate).toBe("g.term-connect");
+    if (first.ast.type !== 'root') throw new Error('Expected root AST');
     expect(first.ast.children[0]).toMatchObject({ type: "code", value: first.body });
   });
 

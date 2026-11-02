@@ -7,6 +7,7 @@ import {
   initialState,
   isWorldComplete,
   replayEvents,
+  settleEvents,
   visibleArtifacts,
 } from "../src/index.js";
 import { TestClock, ACTOR, START, TEAM_ID, applyAt, fixtureBundle, freshState, startLog } from "./helpers.js";
@@ -572,7 +573,7 @@ describe("implicit gates", () => {
       by: ACTOR.userId,
       actorKind: "human",
     };
-    log.push(read);
+    log.push(...settleEvents(fixtureBundle, fold(fixtureBundle, log), [read], ACTOR, clock));
     const folded = fold(fixtureBundle, log);
     expect(folded.readPaths["shell.tut.iz"]?.has("/home/player/flag.txt")).toBe(true);
     expect(folded.solvedGates["g.terminal"]).toEqual({ at: read.at, by: ACTOR.userId });

@@ -19,6 +19,10 @@ import { registerStateRoutes } from "./routes/state.js";
 import { registerActionRoutes } from "./routes/actions.js";
 import { registerViewRoutes } from "./routes/views.js";
 import { registerCaseRoutes } from "./routes/case.js";
+import { registerNoteRoutes } from "./routes/notes.js";
+import { registerAssetRoutes } from './routes/assets.js';
+import staticFiles from '@fastify/static';
+import { existsSync } from 'node:fs';
 
 export interface BuildAppOptions {
   config: ServerConfig;
@@ -109,6 +113,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     registerActionRoutes(api, ctx);
     registerViewRoutes(api, ctx);
     registerCaseRoutes(api, ctx);
+    registerNoteRoutes(api, ctx);
+    registerAssetRoutes(api, ctx);
   });
 
   await registerWebsocket(app, {
@@ -118,6 +124,9 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     getBundle: (worldId) => bundles.get(worldId),
     submit: ctx.submit,
   });
+
+  const webRoot = fileURLToPath(new URL('../../web/dist/', import.meta.url));
+  if (existsSync(webRoot)) await app.register(staticFiles, { root: webRoot, prefix: '/' });
 
   app.addHook("onClose", async () => {
     await pool.end();

@@ -83,7 +83,12 @@ function treeAtCommit(repo: WorldBundle["forge"][number], sha: string): Array<{ 
 
 export function forgeView(bundle: WorldBundle, state: RuntimeState, host: string, rawPath: string, now: string): ForgeView | NotFound {
   const path = rawPath.replace(/^\//, "");
-  const repos = bundle.forge.filter((r) => bundle.artifacts.some((a) => a.kind === "repo" && a.host === host && a.path === `${r.owner}/${r.name}`));
+  const repos = bundle.forge
+    .filter((r) => bundle.artifacts.some((a) => a.kind === 'repo' && a.host === host && a.path === `${r.owner}/${r.name}` && visible(bundle, state, a, now)))
+    .map((repo) => ({ ...repo,
+      commits: repo.commits.filter((c) => bundle.artifacts.some((a) => a.id === `a.${c.sha}` && visible(bundle, state, a, now))),
+      issues: repo.issues.filter((i) => bundle.artifacts.some((a) => a.kind === 'issue' && a.host === host && a.path === `${repo.owner}/${repo.name}/issues/${i.number}` && visible(bundle, state, a, now))),
+    }));
   const segments = path.split("/").filter((s) => s !== "");
 
   // /users/{login}
@@ -180,9 +185,12 @@ export function forgeView(bundle: WorldBundle, state: RuntimeState, host: string
 
   if (third === "tree" && fourth !== undefined) {
     const ref = fourth;
+    const ordered = [...repo.commits].sort((a, b) => a.date.localeCompare(b.date));
+    const resolvedRef = repo.branches.includes(ref) || ref === repo.defaultBranch ? ordered[ordered.length - 1]?.sha : ref;
+    if (resolvedRef === undefined) return notFound(host, rawPath);
     const subPath = rest.length > 0 ? rest.join("/") : "";
-    const files = treeAtCommit(repo, ref);
-    if (files.length === 0 && repo.commits.every((c) => c.sha !== ref)) return notFound(host, rawPath);
+    const files = treeAtCommit({ ...repo, commits: ordered }, resolvedRef);
+    if (files.length === 0 && repo.commits.every((c) => c.sha !== resolvedRef)) return notFound(host, rawPath);
     const dirPrefix = subPath === "" ? "" : `${subPath}/`;
     const entries = new Map<string, "dir" | "file">();
     for (const f of files) {

@@ -15,7 +15,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter @iz/server exec tsx src/index.ts",
+      command: "pnpm exec tsx apps/server/src/index.ts",
       port: 8080,
       reuseExistingServer: true,
       env: {

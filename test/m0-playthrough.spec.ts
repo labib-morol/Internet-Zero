@@ -78,6 +78,9 @@ function playthrough(): { bundle: WorldBundle; log: GameEvent[]; final: RuntimeS
   run({ type: "submitAnswer", gateId: "g.printer", answer: "biscuit2009" }, at(6));
   expect(state.solvedGates["g.printer"]).toBeDefined();
 
+  expect(isWorldComplete(bundle, state)).toBe(false);
+  log.push({ type: 'TerminalRead', host: 'printer.pinecone.pcp', path: '/etc/motd', at: at(7), by: actor.userId, actorKind: actor.kind });
+  state = fold(bundle, log);
   expect(isWorldComplete(bundle, state)).toBe(true);
   expect(state.score).toBe(300); // three gates at 100 points, no hints used
   return { bundle, log, final: state };

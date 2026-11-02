@@ -29,8 +29,14 @@ export function deterministicId(
 }
 
 /** Fallback sequence when the caller does not pass one (see module doc). */
+const eventSequences = new WeakMap<RuntimeState, number>();
+
+export function advanceEventSeq(state: RuntimeState): void {
+  eventSequences.set(state, (eventSequences.get(state) ?? 0) + 1);
+}
+
 export function derivedEventSeq(state: RuntimeState): number {
-  return Object.keys(state.evidence).length + Object.keys(state.claims).length + Object.keys(state.links).length;
+  return eventSequences.get(state) ?? Object.keys(state.evidence).length + Object.keys(state.claims).length + Object.keys(state.links).length;
 }
 
 /**

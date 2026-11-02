@@ -46,6 +46,7 @@ export const TERMINAL_SERVICE: ServiceModule = {
       const artifactMeta: Record<string, string | number> = { host: file.host };
       if (meta.motd !== undefined) artifactMeta.motd = meta.motd;
       if (meta.connectGate !== undefined) artifactMeta.connectGate = meta.connectGate;
+      if (meta.completionFiles?.some((path) => path.replace(/^\/+/, '') === file.path.replace(/^\/+/, ''))) artifactMeta.completion = 'terminalRead';
 
       artifacts.push({
         id: terminalFileId(file.host, file.path),

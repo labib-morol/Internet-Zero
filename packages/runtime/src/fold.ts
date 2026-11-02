@@ -1,9 +1,8 @@
 import type { EvidenceItem, GameEvent, RuntimeState, WorldBundle } from "@iz/schema";
 import { initialState } from "./state.js";
-import { finalizeImplicitGates } from "./implicit-gates.js";
 import { effectUnlocks } from "./world-events.js";
 import { recordAttempt } from "./rate-limit.js";
-import { overlayKey } from "./ids.js";
+import { overlayKey, advanceEventSeq } from "./ids.js";
 
 /**
  * Reconstruct state purely from the event log (§9). The log MUST start with a
@@ -11,12 +10,9 @@ import { overlayKey } from "./ids.js";
  * worldId, bundleHash, startedAt) from it and validates them against the
  * bundle (a log from another world or bundle build is a hard error).
  *
- * fold replays GameEvents — including events the server appended outside of
- * apply, such as TerminalRead / TerminalOverlayWrite produced by
- * packages/terminal's exec() (§19.3) — and then runs the implicit-gate final
- * pass over the final state using the last event's at/by, so gates satisfied
- * by the log's tail are solved in the returned state even without a further
- * apply.
+ * Replay only: no conditions are evaluated and no unrecorded gate solves,
+ * unlocks or points are synthesized. External terminal effects must be passed
+ * through settleEvents() before their complete batch is appended.
  */
 export function fold(bundle: WorldBundle, events: GameEvent[]): RuntimeState {
   const first = events[0];
@@ -28,19 +24,16 @@ export function fold(bundle: WorldBundle, events: GameEvent[]): RuntimeState {
   }
   const state = initialState(bundle, first.teamId, first.startedAt);
   replayEvents(bundle, state, events);
-  const last = events[events.length - 1];
-  if (last !== undefined) finalizeImplicitGates(bundle, state, last.at, last.by);
   return state;
 }
 
 /**
- * Low-level replay: applies events onto an EXISTING state without the
- * implicit-gate final pass. Exported for chunked folding and for tests:
- * fold(all) === finalize(replay(replay(init, prefix), suffix), last.at/by).
- * Mutates and returns `state`.
+ * Low-level recorded-event replay onto an EXISTING state, for chunked replay.
+ * Mutates and returns `state`; never evaluates gate checks.
  */
 export function replayEvents(bundle: WorldBundle, state: RuntimeState, events: readonly GameEvent[]): RuntimeState {
   for (const event of events) {
+    advanceEventSeq(state);
     switch (event.type) {
       case "SessionStarted":
         // Identity was already consumed by fold(); replaying a SessionStarted
@@ -53,6 +46,7 @@ export function replayEvents(bundle: WorldBundle, state: RuntimeState, events: r
         const gate = bundle.gates.find((g) => g.id === event.gateId);
         if (gate !== undefined) {
           for (const id of gate.unlocks) state.unlocked.add(id);
+          if (gate.check.kind === "answer") recordAttempt(state.attempts, gate.id, event.at, event.by);
         }
         state.score += event.score;
         break;
@@ -128,7 +122,8 @@ export function replayEvents(bundle: WorldBundle, state: RuntimeState, events: r
         break;
 
       case "HintRequested":
-        state.hintsUsed[event.gateId] = Math.max(state.hintsUsed[event.gateId] ?? 0, event.tier);
+        if (event.tier <= (state.hintsUsed[event.gateId] ?? 0)) break;
+        state.hintsUsed[event.gateId] = event.tier;
         state.score -= event.cost;
         break;
 
@@ -142,7 +137,10 @@ export function replayEvents(bundle: WorldBundle, state: RuntimeState, events: r
 
       case "ReportGroupAccepted": {
         const groups = state.reportGroupsAccepted[event.reportId] ?? [];
-        if (!groups.includes(event.groupId)) groups.push(event.groupId);
+        if (!groups.includes(event.groupId)) {
+          groups.push(event.groupId);
+          recordAttempt(state.attempts, event.reportId, event.at, event.by);
+        }
         state.reportGroupsAccepted[event.reportId] = groups;
         break;
       }

@@ -79,7 +79,7 @@ function renderNode(node: SafeNode, inspect: boolean, onOpen: SafeAstProps["onOp
       return <blockquote>{node.children.map((child, i) => <Fragment key={i}>{renderNode(child, inspect, onOpen)}</Fragment>)}</blockquote>;
 
     case "table":
-      return <table>{node.children.map((child, i) => <Fragment key={i}>{renderNode(child, inspect, onOpen)}</Fragment>)}</table>;
+      return <table><tbody>{node.children.map((child, i) => <Fragment key={i}>{renderNode(child, inspect, onOpen)}</Fragment>)}</tbody></table>;
 
     case "tableRow":
       return <tr>{node.children.map((child, i) => <Fragment key={i}>{renderNode(child, inspect, onOpen)}</Fragment>)}</tr>;
@@ -110,14 +110,9 @@ function renderNode(node: SafeNode, inspect: boolean, onOpen: SafeAstProps["onOp
     }
 
     case "image":
-      // Asset serving (/api/asset/:id) is not wired yet — placeholder box with
-      // the alt text so nothing is lost and nothing external is fetched.
-      return (
-        <span className="iz-img-placeholder" role="img" aria-label={node.alt ?? "image"}>
-          <ImageGlyph />
-          {node.alt !== undefined && node.alt !== "" ? node.alt : "image unavailable"}
-        </span>
-      );
+      return /^[0-9a-f]{64}$/.test(node.url)
+        ? <img src={`/api/assets/${node.url}`} alt={node.alt ?? ''} title={node.title} loading="lazy" />
+        : <span className="iz-img-placeholder" role="img" aria-label={node.alt ?? "image"}><ImageGlyph />{node.alt ?? 'image unavailable'}</span>;
 
     case "redaction": {
       if (node.removable && inspect) {

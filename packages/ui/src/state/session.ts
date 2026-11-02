@@ -291,7 +291,9 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         (e: GameEvent) => e.type === "GateSolved" || e.type === "WorldEventFired"
       );
       if (unlocksPossible) {
-        void get().refreshState().catch(() => undefined);
+        await get().refreshState();
+        const worlds = await getClient().listWorlds();
+        set({ worlds, world: worlds.find((w) => w.worldId === get().state?.worldId) });
       }
       if (response.rejection !== undefined) {
         announce(`Rejected: ${response.rejection.message}`, true);

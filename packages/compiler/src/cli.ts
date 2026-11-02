@@ -13,6 +13,9 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { compileWorld } from "./pipeline.js";
 import { BuildError } from "./errors.js";
+import { scanAssets } from './assets.js';
+import { emitAssets } from './emit-assets.js';
+import { IssueCollector } from './source.js';
 
 interface Args {
   dir: string;
@@ -61,6 +64,8 @@ async function main(): Promise<void> {
     await mkdir(dirname(reportPath), { recursive: true });
     await writeFile(bundlePath, bundleJson, "utf8");
     await writeFile(reportPath, JSON.stringify(report, null, 2), "utf8");
+    const assets = await scanAssets(resolve(args.dir), new IssueCollector());
+    await emitAssets(resolve(args.dir), `${outDir}/assets`, assets);
 
     console.log(`compiled ${bundle.world.id}@${bundle.world.version}`);
     console.log(`  bundle: ${bundlePath}`);

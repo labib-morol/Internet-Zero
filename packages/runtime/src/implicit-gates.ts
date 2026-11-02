@@ -11,7 +11,7 @@ import { hostReachable, type IsUnlocked } from "./visibility.js";
  * checks compare collected artifact ids and link triples".)
  */
 function endpointRefersTo(linkEndpoint: string, targetId: string, state: RuntimeState): boolean {
-  if (linkEndpoint === targetId) return true;
+  if (linkEndpoint === targetId) return state.evidence[linkEndpoint] !== undefined || state.claims[linkEndpoint] !== undefined;
   return state.evidence[linkEndpoint]?.artifactId === targetId;
 }
 
@@ -40,7 +40,7 @@ export function implicitGateSatisfied(
       if (hostDef === undefined || !hostReachable(bundle, hostDef, state, isUnlocked, now)) return false;
       const read = state.readPaths[check.host];
       if (read === undefined) return false;
-      return check.mustHaveRead.every((p) => read.has(p));
+      return check.mustHaveRead.every((p) => [...read].some((path) => path.replace(/^\/+/, '') === p.replace(/^\/+/, '')));
     }
     case "evidenceSet": {
       const hasEvidenceFrom = (artifactId: string): boolean =>
@@ -57,8 +57,10 @@ export function implicitGateSatisfied(
           )
       );
     }
-    case "report":
-      return (state.reportGroupsAccepted[check.report]?.length ?? 0) >= 1;
+    case "report": {
+      const report = bundle.reports.find((r) => r.id === check.report);
+      return report !== undefined && report.groups.every((g) => (state.reportGroupsAccepted[report.id] ?? []).includes(g.id));
+    }
   }
 }
 

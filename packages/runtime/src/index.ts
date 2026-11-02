@@ -10,5 +10,6 @@ export * from "./rate-limit.js";
 export * from "./apply.js";
 export * from "./fold.js";
 export * from "./complete.js";
+export * from './settle.js';
 
 export const PACKAGE_NAME = "runtime";

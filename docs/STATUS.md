@@ -1,6 +1,16 @@
 # STATUS — INTRANET ZERO
 
-Last updated: 2026-11-02 (M0 planning session — no app code written yet).
+Last updated: 2026-11-02 (progress checkpoint after M1 UI integration).
+
+## Latest verification checkpoint
+
+- `pnpm build` — passed; Vite warns that the frontend bundle exceeds 500 kB.
+- `pnpm lint` — passed.
+- `pnpm test` — 289 tests passed; 25 server tests skipped because Docker/Postgres is unavailable now. A skipped suite is not a passing DB verification.
+- `pnpm run test:integration` — 27 passed, including the headless tutorial, view tests, leak sweep and scorer tests.
+- `pnpm --filter @iz/web test` — 88 passed across 11 files. jsdom reports missing canvas support; the UI kit also reports invalid table nesting. Browser acceptance remains unverified.
+- Local git history contains 23 commits. Nothing was pushed. Both source documents and `.env` remain ignored.
+- Full browser tutorial, mobile/keyboard end-to-end checks and axe acceptance have not run. MCP server/tool execution and oracle/benchmark runs remain unimplemented; scorer code and its tests exist.
 
 ## Environment
 
@@ -122,5 +132,20 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
 | CI green on a PR | partial | identical commands run locally and green: lint, typecheck, build, unit+integration, worlds:build, test:integration | blocked: awaiting push auth (D5) — never pushed per owner directive |
 | packages/terminal interpreter (M1 groundwork) | done | 18 tests: parser, vfs, all §10.5 commands, pipes, redirect caps, events (2026-11-02) | commit 3ee90f5 |
 | M0 gate (§19.1) | done | 1) `iz build worlds/tutorial` zero errors; 2) playthrough test completes tutorial by actions only (3/3); 3) determinism property tests green (fold==apply, chunked replay) — all in the final CI-equivalent local run: lint PASS, typecheck PASS, build PASS, 193 package tests + 7 root integration tests green, `docker compose up` serves /readyz {database:true, bundlesLoaded:1} (2026-11-02, commits up to 93e16d9) | CI-on-PR partial (D5: awaiting push auth); NODE_17-free per owner |
-| M1 (desktop shell, services UI, NODE_17 stages) | not started | M1 plan appended to docs/PLAN.md | NODE_17 blocked on private repo (owner) |
-| M2 (MCP, teams live sync, forum, deploy) | not started | | MCP SDK v2 packages verified (D4) |
+| M1 tutorial UI: desktop, browser, forge/mail/archive, terminal, notebook/board, report/hint panel | partial | code integrated; fresh frontend suite 88/88 passes, build and lint pass | full browser tutorial, mobile, keyboard and axe acceptance not yet run |
+| M1 private notes, snapshots and real asset rendering | not started | | UI has explicit deferred placeholders; not counted as real functionality |
+| M1 acceptance gate | partial | view-layer leak sweep passes; browser Playwright harness exists | tutorial browser completion and accessibility acceptance not yet verified; NODE_17 intentionally excluded |
+| M2 scorer | done | `test/scorer.spec.ts` 2/2 passed in fresh integration run | scorer only; no MCP/oracle benchmark run yet |
+| M2 MCP server, tools and tutorial benchmark runs | not started | packages/mcp remains a scaffold | SDK v2 availability checked; not implementation evidence |
+| Current Docker/Postgres availability | blocked | Docker API pipe `dockerDesktopLinuxEngine` not found; fresh server suite 25 skipped | earlier DB tests passed; current checkpoint does not claim them as passing |
+
+## Continuation checkpoint
+- Docker 29.6.1 restored; existing iz-dev-pg started, no unrelated containers touched.
+- `pnpm build`, `pnpm lint`, `pnpm typecheck`: PASS.
+- `pnpm test`: 363 passed, zero skipped (including 32 real-Postgres tests).
+- `pnpm run test:integration`: 29 passed.
+- `pnpm exec playwright test --workers=1 --reporter=line`: 3 passed: guest startup,
+  full browser tutorial with evidence-derived answer, compact app switcher + persistent
+  private notes. Accessibility scans have no serious/critical findings on those screens.
+- Gate integrity, snapshots, private notes, asset hosting and SPA serving are implemented.
+- M1 broader security signoff/keyboard-only path and M2 MCP benchmark remain in progress.

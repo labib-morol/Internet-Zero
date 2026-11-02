@@ -52,7 +52,7 @@ describe("compileMarkdown — safe-AST allowlist", () => {
 describe("compileMarkdown — link URLs", () => {
   it("accepts links to declared hosts with or without a scheme and normalizes them", () => {
     const ast = compileMarkdown("[repo](https://forge.fix.pcp/acme/notes) and [home](forge.fix.pcp)", { allowedHosts: HOSTS });
-    const paragraph = ast.children[0];
+    const paragraph = ast.children[0]!;
     if (paragraph.type !== "paragraph") throw new Error("expected paragraph");
     const links = paragraph.children.filter((n) => n.type === "link");
     expect(links).toHaveLength(2);
@@ -74,7 +74,7 @@ describe("compileMarkdown — image assets", () => {
   it("rewrites image references to content-addressed ids", () => {
     const ast = compileMarkdown("![sticker](assets/sticker.png)", { resolveAsset: (ref) => (ref === "assets/sticker.png" ? "ca".repeat(32) : null) });
     expect(ast.children[0]).toMatchObject({ type: "paragraph" });
-    const paragraph = ast.children[0];
+    const paragraph = ast.children[0]!;
     if (paragraph.type !== "paragraph") throw new Error("expected paragraph");
     expect(paragraph.children[0]).toMatchObject({ type: "image", url: "ca".repeat(32), alt: "sticker" });
   });
@@ -89,25 +89,25 @@ describe("custom markers", () => {
     const ast = compileMarkdown(
       "Before [[redaction:secret note|removable]] mid [[redaction:other|fixed]] [[signature:K1|AA:BB|valid|id.mara]] [[stamp:INTERNAL]] after",
     );
-    const paragraph = ast.children[0];
+    const paragraph = ast.children[0]!;
     if (paragraph.type !== "paragraph") throw new Error("expected paragraph");
     const types = paragraph.children.map((n) => n.type);
     expect(types).toEqual(["text", "redaction", "text", "redaction", "text", "signature", "text", "stamp", "text"]);
-    const redaction = paragraph.children[1];
+    const redaction = paragraph.children[1]!;
     if (redaction.type !== "redaction") throw new Error("expected redaction");
     expect(redaction).toEqual({ type: "redaction", text: "secret note", removable: true });
-    const signature = paragraph.children[5];
+    const signature = paragraph.children[5]!;
     if (signature.type !== "signature") throw new Error("expected signature");
     expect(signature).toEqual({ type: "signature", keyId: "K1", fingerprint: "AA:BB", valid: true, signer: "id.mara" });
   });
 
   it("leaves markers literal inside code and inlineCode", () => {
     const ast = compileMarkdown("Keep `[[stamp:LITERAL]]` and:\n\n```\n[[redaction:x|fixed]]\n```\n");
-    const paragraph = ast.children[0];
+    const paragraph = ast.children[0]!;
     if (paragraph.type !== "paragraph") throw new Error("expected paragraph");
     expect(paragraph.children[0]).toEqual({ type: "text", value: "Keep " });
     expect(paragraph.children[1]).toEqual({ type: "inlineCode", value: "[[stamp:LITERAL]]" });
-    const code = ast.children[1];
+    const code = ast.children[1]!;
     if (code.type !== "code") throw new Error("expected code");
     expect(code.value).toBe("[[redaction:x|fixed]]");
   });

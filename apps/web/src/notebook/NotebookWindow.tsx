@@ -3,6 +3,7 @@ import type { Claim, EvidenceItem, Fragment } from "@iz/schema";
 import { announce, useSessionStore } from "@iz/ui";
 import { useArtifactTitle } from "./titles.js";
 import "./notebook.css";
+import { PrivateNotes } from './PrivateNotes.js';
 
 /**
  * The notebook (§11.2): the team's evidence and claims in one case log.
@@ -128,6 +129,9 @@ function ClaimNote({ claim }: { claim: Claim }): ReactNode {
 export function NotebookWindow({ onOpenInBrowser }: NotebookWindowProps): ReactNode {
   const evidence = useSessionStore((s) => s.state?.evidence);
   const claims = useSessionStore((s) => s.state?.claims);
+  const dispatch = useSessionStore((s) => s.dispatch);
+  const [newClaim, setNewClaim] = useState('');
+  const [claimFeedback, setClaimFeedback] = useState('');
 
   const [tab, setTab] = useState<Tab>("case");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
@@ -225,6 +229,18 @@ export function NotebookWindow({ onOpenInBrowser }: NotebookWindowProps): ReactN
         </button>
       </div>
 
+      {tab === 'case' && <form style={{ padding: 12 }} onSubmit={(event) => {
+        event.preventDefault();
+        if (!newClaim.trim()) return;
+        void dispatch({ type: 'claim', text: newClaim.trim(), private: false }).then((response) => {
+          if (response.rejection) setClaimFeedback(response.rejection.message);
+          else { setNewClaim(''); setClaimFeedback('Claim added. Link evidence on the board to support it.'); }
+        });
+      }}>
+        <label>New claim<textarea className="iz-input" value={newClaim} maxLength={2000} onChange={(event) => setNewClaim(event.target.value)} /></label>
+        <button className="iz-btn" type="submit">Add claim</button>
+        <p role="status">{claimFeedback}</p>
+      </form>}
       <div className="iz-nb__toolbar">
         <input
           type="search"
@@ -262,12 +278,7 @@ export function NotebookWindow({ onOpenInBrowser }: NotebookWindowProps): ReactN
         </select>
       </div>
 
-      {tab === "private" && (
-        <p className="iz-nb__sync" role="note">
-          Private notes live on the server and do not sync to the notebook yet. Private claims
-          made in this session are shown below.
-        </p>
-      )}
+      {tab === 'private' && <PrivateNotes />}
 
       <ul className="iz-nb__list" aria-label={tab === "case" ? "Case notebook entries" : "Private claims"}>
         {entries.map((entry) => (
@@ -303,7 +314,7 @@ export function NotebookWindow({ onOpenInBrowser }: NotebookWindowProps): ReactN
           {q !== "" ? (
             <p>Nothing matches the current search.</p>
           ) : (
-            <p>Not synced yet — no private claims in this session.</p>
+            <p>No private claims in this session.</p>
           )}
         </div>
       )}

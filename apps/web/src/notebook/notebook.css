@@ -74,8 +74,8 @@
 .iz-nb__segbtn:last-child { border-right: none; }
 .iz-nb__segbtn:hover { color: var(--iz-ink); background: var(--iz-bg3); }
 .iz-nb__segbtn[aria-pressed="true"] {
-  background: var(--iz-accent-dim);
-  color: var(--iz-ink);
+  background: var(--iz-bg4);
+  color: var(--iz-accent-strong);
   font-weight: 600;
 }
 .iz-nb__host { flex: none; max-width: 200px; }

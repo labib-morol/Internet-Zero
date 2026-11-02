@@ -90,6 +90,8 @@ export function minimalBundle(): WorldBundle {
       proofs: [{ fact: "f.rotation", artifacts: ["a.commit-0002"], strength: "direct" }],
     },
     assets: [],
+    forge: [],
+    mailboxes: [],
     bundleSalt: "0123456789abcdef",
     bundleHash: "b".repeat(64),
   };

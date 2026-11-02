@@ -176,6 +176,8 @@ export const TerminalHostMeta = z.strictObject({
   motd: z.string().optional(),
   /** Passphrase gate id bound to `connect` for this host, if any. */
   connectGate: Id.optional(),
+  /** Paths whose reads form this world's authored ending. */
+  completionFiles: z.array(z.string()).optional(),
 });
 export type TerminalHostMeta = z.infer<typeof TerminalHostMeta>;
 export const TerminalFs = z.strictObject({

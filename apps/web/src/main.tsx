@@ -6,6 +6,9 @@ import { useSessionStore } from "@iz/ui";
 import { LandingPage } from "./landing/LandingPage.js";
 import { Shell } from "./shell/Shell.js";
 import "./app.css";
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 5_000 } },

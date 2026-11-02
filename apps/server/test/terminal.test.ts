@@ -37,10 +37,7 @@ describe.skipIf(!pgUp)("tutorial over REST with the terminal as final stage", ()
       // Stage 1: find the rotation commit the way a player would, collect it.
       const openRepo = await act({ type: "open", url: "forge.pinecone.pcp/pinecone/office-scripts" });
       expect(openRepo.rejection).toBeUndefined();
-      const world = await env.app.inject({ method: "GET", url: "/api/worlds", headers: auth });
-      const tutorial = world.json().worlds.find((w: { worldId: string }) => w.worldId === "tutorial")!;
-      const hosts = tutorial.hosts as Array<{ host: string; service: string }>;
-      const mailHost = hosts.find((h) => h.service === "mail")!.host;
+      const mailHost = 'mail.pinecone.pcp';
 
       // Discover the commit artifact id via the repo's commit list view.
       const commits = await env.app.inject({
@@ -48,7 +45,7 @@ describe.skipIf(!pgUp)("tutorial over REST with the terminal as final stage", ()
         url: "/api/view?host=forge.pinecone.pcp&path=/pinecone/office-scripts/commits",
         headers: auth,
       });
-      const commitSummaries = commits.json().view.commits as Array<{ sha: string }>;
+      const commitSummaries = commits.json().view.commits as Array<{ sha: string; message: string }>;
       expect(commitSummaries.length).toBeGreaterThan(0);
       const rotation = commitSummaries.find((c) => c.message.includes("rotate printer admin pass"))!;
       const collected = await act({ type: "collect", artifactId: `a.${rotation.sha}` });

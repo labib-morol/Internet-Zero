@@ -7,6 +7,7 @@ import { artifactVisible, findArtifactAt, hostReachable, type IsUnlocked } from 
 import { effectUnlocks, eventIsDue } from "./world-events.js";
 import { implicitGateSatisfied } from "./implicit-gates.js";
 import { rateLimitFor } from "./rate-limit.js";
+import { settleEvents } from './settle.js';
 
 export interface ApplyResult {
   events: GameEvent[];
@@ -39,6 +40,16 @@ export interface ApplyResult {
  *   3. the action itself runs.
  */
 export function apply(
+  bundle: WorldBundle, state: RuntimeState, action: Action, actor: Actor, clock: Clock, eventSeq?: number,
+): ApplyResult {
+  if (!Number.isFinite(Date.parse(clock.now()))) {
+    return { events: [], rejection: { code: 'invalid_input', message: 'Invalid clock.' } };
+  }
+  const result = applyAction(bundle, state, action, actor, clock, eventSeq);
+  return { ...result, events: settleEvents(bundle, state, result.events, actor, clock) };
+}
+
+function applyAction(
   bundle: WorldBundle,
   state: RuntimeState,
   action: Action,
@@ -94,6 +105,7 @@ export function apply(
   switch (action.type) {
     case "open": {
       const parsed = parseUrl(action.url);
+      if (!safePath(parsed.path)) return { events, rejection: { code: 'invalid_input', message: 'Invalid in-game path.' } };
       const hostDef = bundle.world.hosts.find((h) => h.host === parsed.host);
       // Unknown and unreachable hosts are intentionally indistinguishable (§10.1).
       if (hostDef === undefined || !hostReachable(bundle, hostDef, effState(), isUnlocked, now)) {
@@ -237,7 +249,7 @@ export function apply(
       const normalized = normalizeAnswer(action.answer, gate.check.normalize);
       if (gate.check.answerHashes.includes(hashAnswer(bundle.bundleSalt, gate.id, normalized))) {
         events.push({ type: "GateSolved", gateId: gate.id, score: gate.score, ...nextBase() });
-        return { events, result: { solved: true } };
+        return { events, result: { accepted: true, solved: true } };
       }
       events.push({ type: "AnswerRejected", gateId: gate.id, ...nextBase() });
       return { events, rejection: { code: "invalid_input", message: "Incorrect answer." } };
@@ -247,6 +259,10 @@ export function apply(
       const report = bundle.reports.find((r) => r.id === action.reportId);
       if (report === undefined) {
         return { events, rejection: { code: "not_found", message: "No such report." } };
+      }
+      const reportGate = bundle.gates.find((gate) => gate.check.kind === 'report' && gate.check.report === report.id);
+      if (reportGate === undefined || (reportGate.requires !== undefined && !evaluateCondition(reportGate.requires, effState(), bundle, now))) {
+        return { events, rejection: { code: 'locked', message: 'This report is not available yet.' } };
       }
       const group = report.groups.find((g) => g.id === action.groupId);
       if (group === undefined) {
@@ -321,6 +337,7 @@ export function apply(
       // directly — they are already valid events that fold() replays (read
       // paths, overlay markers). That is why a successful terminal action
       // produces no events here.
+      if (!safePath(action.cwd)) return { events, rejection: { code: 'invalid_input', message: 'Invalid terminal directory.' } };
       const hostDef = bundle.world.hosts.find((h) => h.host === action.host);
       if (hostDef === undefined || hostDef.service !== "terminal" || !hostReachable(bundle, hostDef, effState(), isUnlocked, now)) {
         return { events, rejection: { code: "locked", message: "No terminal is available on this host." } };
@@ -341,6 +358,12 @@ export function apply(
  * (hostnames); the path is compared verbatim against the artifact's path, and
  * an empty path means "/".
  */
+function safePath(path: string): boolean {
+  let decoded: string;
+  try { decoded = decodeURIComponent(path); } catch { return false; }
+  return !decoded.includes('\\') && !decoded.includes('?') && !decoded.includes('#') && !decoded.includes('//') && !decoded.includes('\0') && !decoded.split('/').includes('..');
+}
+
 function parseUrl(url: string): { host: string; path: string } {
   const trimmed = url.trim();
   const slashIndex = trimmed.indexOf("/");

@@ -1,4 +1,5 @@
 import type { GameEvent, WorldBundle } from "@iz/schema";
+import { fold, isWorldComplete } from '@iz/runtime';
 
 /**
  * Scorer (master prompt §14.3): pure metrics over a team's event log.
@@ -26,10 +27,8 @@ export function scoreRun(bundle: WorldBundle, events: GameEvent[], agent: string
   const acceptedGroups = new Set(
     events.filter((e) => e.type === "ReportGroupAccepted").map((e) => `${e.reportId}:${e.groupId}`)
   );
-  const reportSlotsCorrect = bundle.reports
-    .flatMap((report) => report.groups)
-    .filter((g) => acceptedGroups.has(`${reportOf(bundle, g.id)}:${g.id}`))
-    .reduce((sum, g) => sum + g.slots.length, 0);
+  const reportSlotsCorrect = bundle.reports.reduce((sum, report) =>
+    sum + report.groups.filter((g) => acceptedGroups.has(`${report.id}:${g.id}`)).reduce((total, group) => total + group.slots.length, 0), 0);
   const reportSlotsTotal = bundle.reports
     .flatMap((r) => r.groups)
     .reduce((sum, g) => sum + g.slots.length, 0);
@@ -44,10 +43,10 @@ export function scoreRun(bundle: WorldBundle, events: GameEvent[], agent: string
     )
   ).length;
 
-  const claims = new Set(events.filter((e) => e.type === "ClaimCreated").map((e) => e.claimId));
-  const isSupportLink = (e: GameEvent): e is Extract<GameEvent, { type: "LinkCreated" }> =>
-    e.type === "LinkCreated" && e.relation === "supports" && claims.has(e.to);
-  const supported = new Set(events.filter(isSupportLink).map((e) => e.to));
+  const state = fold(bundle, events);
+  const evidenceIds = new Set(Object.keys(state.evidence));
+  const claims = new Set(Object.keys(state.claims));
+  const supported = new Set(Object.values(state.links).filter((link) => link.relation === 'supports' && evidenceIds.has(link.from) && claims.has(link.to)).map((link) => link.to));
   const unsupportedClaims = [...claims].filter((c) => !supported.has(c)).length;
 
   const hintsUsed = events.filter((e) => e.type === "HintRequested").length;
@@ -58,8 +57,7 @@ export function scoreRun(bundle: WorldBundle, events: GameEvent[], agent: string
 
   const gatesSolved = solvedGates.size;
   const gatesTotal = bundle.gates.length;
-  const completed =
-    gatesSolved === gatesTotal && reportSlotsCorrect === reportSlotsTotal && reportSlotsTotal > 0;
+  const completed = isWorldComplete(bundle, state);
 
   return {
     world: `${bundle.world.id}@${bundle.world.version}`,
@@ -77,13 +75,6 @@ export function scoreRun(bundle: WorldBundle, events: GameEvent[], agent: string
     wallSeconds,
     tokens: { input: null, output: null },
   };
-}
-
-function reportOf(bundle: WorldBundle, groupId: string): string {
-  for (const report of bundle.reports) {
-    if (report.groups.some((g) => g.id === groupId)) return report.id;
-  }
-  return "";
 }
 
 function startedAt(event: Extract<GameEvent, { type: "SessionStarted" }>): string {

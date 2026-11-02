@@ -3,6 +3,7 @@ import { forgeView, forgeCollectibles, mailView, mailCollectibles, archiveView, 
 import type { ViewModel } from "@iz/schema";
 import type { AppContext } from "../app-context.js";
 import { loadTeamState } from "../game.js";
+import { hostReachable } from '@iz/runtime';
 
 /**
  * GET /api/view?host=&path= (M1): the visible view model for a host+path in
@@ -35,6 +36,9 @@ export function registerViewRoutes(app: FastifyInstance, ctx: AppContext): void 
     }
     const { state } = await loadTeamState(ctx.db, bundle, auth.team.id);
     const now = new Date().toISOString();
+    if (!hostReachable(bundle, hostDef, state, (id) => state.unlocked.has(id), now)) {
+      return { view: { notFound: true, host, path }, collectibles: [] };
+    }
     let view: ViewModel;
     switch (hostDef.service) {
       case "forge":

@@ -8,14 +8,16 @@ import { privateClaims, type PrivateClaimsRow } from "./schema.js";
  * state. Every function takes userId AND teamId and includes both in WHERE.
  */
 
-export async function upsertNote(db: Db, userId: string, teamId: string, noteId: string, body: string): Promise<void> {
-  await db
+export async function upsertNote(db: Db, userId: string, teamId: string, noteId: string, body: string): Promise<boolean> {
+  const rows = await db
     .insert(privateNotes)
     .values({ id: noteId, userId, teamId, body })
     .onConflictDoUpdate({
       target: privateNotes.id,
       set: { body, updatedAt: new Date() },
-    });
+      setWhere: and(eq(privateNotes.userId, userId), eq(privateNotes.teamId, teamId)),
+    }).returning({ id: privateNotes.id });
+  return rows.length === 1;
 }
 
 export async function listNotes(db: Db, userId: string, teamId: string): Promise<PrivateNotesRow[]> {

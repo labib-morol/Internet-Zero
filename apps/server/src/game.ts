@@ -1,15 +1,16 @@
 import type { Action, Actor, Clock, GameEvent, Rejection, RuntimeState, WorldBundle } from "@iz/schema";
-import { apply, fold, initialState, type ApplyResult } from "@iz/runtime";
+import { apply, fold, initialState, replayEvents, settleEvents, type ApplyResult } from "@iz/runtime";
 import { runTerminalCommand } from "./terminal-run.js";
 import type { Db } from "./db/client.js";
-import { append, readAll } from "./db/events.js";
+import { append, readAfter, nextSeq } from "./db/events.js";
+import { readSnapshot, writeSnapshot } from "./db/snapshots.js";
 import type { EventEnvelope } from "./db/events.js";
 
 /**
  * Team state service (§9, §12): loads state by folding the team's event log,
  * applies actions through the runtime, appends with an optimistic version
  * check and retries ONCE on (team_id, seq) conflict with a fresh fold.
- * Snapshots (§15) are an M1 optimization: this path reads the events table only.
+ * Validated snapshots (§15) cache raw replay prefixes at every 200 events.
  */
 
 export interface SubmitOutcome {
@@ -43,24 +44,35 @@ export class TeamLocks {
   }
 }
 
-/**
- * Loads a team's current state by folding its full event log. The log MUST
- * start with SessionStarted (session creation writes it).
- */
+/** Loads a validated snapshot plus its stream tail. Envelopes contain only replayed events. */
 export async function loadTeamState(
   db: Db,
   bundle: WorldBundle,
   teamId: string
-): Promise<{ state: ReturnType<typeof fold>; envelopes: EventEnvelope[] }> {
-  const envelopes = await readAll(db, teamId);
-  if (envelopes.length === 0) {
-    throw new Error(`Team ${teamId} has no event log (missing SessionStarted)`);
+): Promise<{ state: RuntimeState; envelopes: EventEnvelope[]; lastSeq: number }> {
+  const streamSeq = (await nextSeq(db, teamId)) - 1;
+  const cached = await readSnapshot(db, bundle, teamId, streamSeq);
+  const envelopes = await readAfter(db, teamId, cached?.seq ?? 0);
+  let state: RuntimeState;
+  if (cached !== undefined) {
+    state = cached.state;
+  } else {
+    const first = envelopes[0]?.event;
+    if (first === undefined) throw new Error(`Team ${teamId} has no event log (missing SessionStarted)`);
+    // The runtime validates stream/bundle identity; never rebase an incompatible log.
+    fold(bundle, [first]);
+    if (first.type !== "SessionStarted" || first.teamId !== teamId) throw new Error("Invalid team stream identity");
+    state = initialState(bundle, teamId, first.startedAt);
   }
-  const state = fold(
-    bundle,
-    envelopes.map((envelope) => envelope.event)
-  );
-  return { state, envelopes };
+  // Checkpoint raw replay state: implicit gates must finalize only at the actual tail,
+  // not at an artificial 200-event chunk boundary.
+  for (const envelope of envelopes) {
+    replayEvents(bundle, state, [envelope.event]);
+    if (envelope.seq % 200 === 0) await writeSnapshot(db, teamId, envelope.seq, state);
+  }
+  const last = envelopes[envelopes.length - 1];
+  const lastSeq = last?.seq ?? cached?.seq ?? 0;
+  return { state, envelopes, lastSeq };
 }
 
 export interface SubmitActionOptions {
@@ -84,15 +96,7 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
   const { db, bundle, teamId, action, actor, clock, locks } = opts;
   return locks.run(teamId, async () => {
     const attempt = async (): Promise<{ lastSeq: number; applied: ApplyResult; state: RuntimeState }> => {
-      const envelopes = await readAll(db, teamId);
-      const lastSeq = envelopes.length === 0 ? 0 : envelopes[envelopes.length - 1]!.seq;
-      const state =
-        envelopes.length === 0
-          ? initialState(bundle, teamId, clock.now())
-          : fold(
-              bundle,
-              envelopes.map((envelope) => envelope.event)
-            );
+      const { state, lastSeq } = await loadTeamState(db, bundle, teamId);
       // eventSeq = events already in the log; seeds deterministic ids (§9).
       const applied = apply(bundle, state, action, actor, clock, lastSeq);
       return { lastSeq, applied, state };
@@ -110,8 +114,9 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
         return { rejection: { code: terminalResult.code, message: terminalResult.message }, events: [] };
       }
     }
-    const gameEvents: GameEvent[] =
-      terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events;
+    let gameEvents: GameEvent[] = settleEvents(bundle, state,
+      terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events,
+      actor, clock);
     if (gameEvents.length > 0) {
       let outcome = await append(db, teamId, lastSeq + 1, gameEvents);
       if (!outcome.ok) {
@@ -126,9 +131,10 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
             return { rejection: { code: terminalResult.code, message: terminalResult.message }, events: [] };
           }
         }
-        const retriedEvents: GameEvent[] =
-          terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events;
-        outcome = await append(db, teamId, lastSeq + 1, retriedEvents);
+        gameEvents = settleEvents(bundle, state,
+          terminalResult !== undefined && terminalResult.ok ? [...applied.events, ...terminalResult.events] : applied.events,
+          actor, clock);
+        outcome = await append(db, teamId, lastSeq + 1, gameEvents);
         if (!outcome.ok) {
           return {
             rejection: {
@@ -138,6 +144,9 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
             events: [],
           };
         }
+      }
+      if (Math.floor(lastSeq / 200) < Math.floor((lastSeq + gameEvents.length) / 200)) {
+        await loadTeamState(db, bundle, teamId);
       }
     }
 

@@ -841,6 +841,141 @@
       "contentType": "image/png"
     }
   ],
+  "forge": [
+    {
+      "id": "a.notes",
+      "owner": "acme",
+      "name": "notes",
+      "description": "Office scripts and notes for Acme Office Co.",
+      "defaultBranch": "main",
+      "readme": "# acme/notes\n\nInternal notes for Acme Office Co.\n\nThe floor 2 printer admin password was rotated on 2026-10-28 after a support\nticket. See the maintenance log in the archive.\n\n[[redaction:rotated by the vendor technician|fixed]]\n\nApproved by [[signature:K1|9A:2C:44:1F|valid|id.mara-git]].\n\n[[stamp:ACME INTERNAL]]\n",
+      "branches": [
+        "main"
+      ],
+      "users": [
+        {
+          "login": "jamiefox",
+          "name": "Jamie Fox",
+          "identity": "id.jamie-git",
+          "deleted": false
+        },
+        {
+          "login": "mara.voss",
+          "name": "Mara Voss",
+          "identity": "id.mara-git",
+          "deleted": false
+        }
+      ],
+      "commits": [
+        {
+          "sha": "5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+          "parents": [],
+          "author": {
+            "name": "Mara Voss",
+            "email": "mara.voss@acme.pcp",
+            "identity": "id.mara-git"
+          },
+          "committer": {
+            "name": "Acme CI",
+            "email": "ci@acme.pcp",
+            "host": "forge.fix.pcp"
+          },
+          "date": "2026-10-28T14:12:00Z",
+          "message": "Rotate floor-2 printer admin password (approved by Mara Voss)",
+          "signature": {
+            "keyId": "K1",
+            "fingerprint": "9A:2C:44:1F",
+            "valid": true,
+            "signer": "id.mara-git"
+          },
+          "changes": [
+            {
+              "kind": "modify",
+              "path": "printer.conf",
+              "before": "admin_password=hunter2",
+              "after": "admin_password=papercut-7331"
+            }
+          ]
+        }
+      ],
+      "issues": [
+        {
+          "number": 1,
+          "title": "Printer rejects new password",
+          "body": "The floor 2 printer rejects the new password. [[stamp:TICKET-114]]",
+          "author": "id.jamie-git",
+          "date": "2026-10-29T09:30:00Z",
+          "state": "open",
+          "comments": [
+            {
+              "author": "id.mara-git",
+              "date": "2026-10-29T10:00:00Z",
+              "body": "Reset completed on 2026-10-28 by the office manager."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "mailboxes": [
+    {
+      "id": "a.mbox-jamie",
+      "owner": "p.jamie",
+      "messages": [
+        {
+          "id": "a.m-lie",
+          "mailbox": "a.mbox-jamie",
+          "folder": "inbox",
+          "from": "id.mara-mail",
+          "to": [
+            "id.jamie-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-29T08:05:00Z",
+          "subject": "printer incident",
+          "body": "I saw **jamiefox** mess with the printer that morning.\n\n[[redaction:HR case number|removable]]\n",
+          "attachments": [
+            {
+              "asset": "assets/sticker.png",
+              "filename": "printer-sticker.png",
+              "redactions": []
+            }
+          ],
+          "headers": {
+            "X-Mailer": "DEADLETTER 1.0"
+          }
+        },
+        {
+          "id": "a.m-truth",
+          "mailbox": "a.mbox-jamie",
+          "folder": "sent",
+          "from": "id.jamie-mail",
+          "to": [
+            "id.mara-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-28T15:00:00Z",
+          "subject": "printer reset on 2026-10-28",
+          "body": "Confirmed: the floor 2 printer admin password was reset on 2026-10-28.",
+          "attachments": []
+        },
+        {
+          "id": "a.m-003",
+          "mailbox": "a.mbox-jamie",
+          "folder": "inbox",
+          "from": "id.it-mail",
+          "to": [
+            "id.jamie-mail"
+          ],
+          "cc": [],
+          "date": "2026-10-30T09:00:00Z",
+          "subject": "ticket closed",
+          "body": "Your ticket was closed after the password rotation.",
+          "attachments": []
+        }
+      ]
+    }
+  ],
   "bundleSalt": "0123456789abcdef0123456789abcdef",
-  "bundleHash": "15b0a16739ff71a47399fe05c64d40f694b48ee0d10a79330118ff3cb62ad568"
+  "bundleHash": "88de3244048708eb853573338f4bc70c5e3f956d4170951ea937fbad1a697c41"
 }

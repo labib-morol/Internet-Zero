@@ -21,7 +21,7 @@
   --iz-line2: #36414a; /* emphasised borders */
   --iz-ink: #e7ebee; /* off-white text */
   --iz-dim: #a2aeb6; /* secondary text */
-  --iz-faint: #6f7d86; /* tertiary text, disabled */
+  --iz-faint: #95a2ab; /* tertiary text, AA contrast on dark surfaces */
   --iz-shadow: rgba(2, 5, 8, 0.55);
 
   /* The single accent: brass. Used for primary actions, focus, selection. */
@@ -41,8 +41,8 @@
   --iz-svc-edge: var(--iz-line);
 
   /* Type (token layer — swap for self-hosted fonts without touching rules) */
-  --iz-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --iz-font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --iz-font-sans: 'Inter', system-ui, sans-serif;
+  --iz-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Motion: everything settles in under 200 ms (§11.4) */
   --iz-fast: 120ms ease-out;

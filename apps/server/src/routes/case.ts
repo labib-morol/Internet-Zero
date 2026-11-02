@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { CaseFileResponse } from "@iz/schema";
 import type { AppContext } from "../app-context.js";
 import { loadTeamState } from "../game.js";
+import { hostReachable } from '@iz/runtime';
 
 /**
  * GET /api/case (M1): the desktop shell's case file side panel data — gates
@@ -24,7 +25,8 @@ export function registerCaseRoutes(app: FastifyInstance, ctx: AppContext): void 
       .filter(
         (gate) =>
           state.solvedGates[gate.id] === undefined &&
-          (gate.requires === undefined || evaluateCondition(gate.requires, state, bundle, now))
+          (gate.requires === undefined || evaluateCondition(gate.requires, state, bundle, now)) &&
+          (gate.check.kind !== 'terminal' || bundle.world.hosts.some((h) => h.host === ('host' in gate.check ? gate.check.host : undefined) && hostReachable(bundle, h, state, (id) => state.unlocked.has(id), now)))
       )
       .map((gate) => ({ gateId: gate.id, title: gate.title }));
     const openGateIds = new Set(openGates.map((g) => g.gateId));
@@ -52,7 +54,6 @@ export function registerCaseRoutes(app: FastifyInstance, ctx: AppContext): void 
             label: slot.label,
             type: slot.type,
             ...(slot.options !== undefined ? { options: slot.options } : {}),
-            fact: slot.fact,
           })),
         })),
       })),

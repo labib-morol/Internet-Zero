@@ -139,3 +139,23 @@ requestHint's result now includes the hint `text` (revealed only to the requesti
 team via their own action result). The case-file panel needs report slot definitions
 (labels, types, options — never answers), served by GET /api/case for gates visible to
 the team. Both are additive contract changes recorded per §19.3.
+
+### D24 — Continuation integrity repairs
+`fold` now replays only recorded events. `apply` settles implicit gates after effects;
+`settleEvents` makes interpreter batches record their gate completions before append.
+Server retries broadcast exactly the retried persisted batch. Ending reads are declared
+by terminal `completionFiles` metadata; the tutorial requires reading `/etc/motd`.
+Public report forms no longer contain canonical `fact` identifiers. World host lists
+are filtered to the requesting team's reachable hosts.
+
+### D25 — Browser acceptance and local assets
+In-app browser guest could not attach (`browser guest not attached (webview not ready)`).
+Project Playwright uses the installed Edge channel instead, with reproducible UI-only tests.
+MPL-2.0 @axe-core/playwright 4.14.0 performs accessibility checks. Fonts are self-hosted
+OFL-1.1 Inter and IBM Plex Mono 5.3.0. Content-hash assets are emitted to WORLDS_DIR/assets
+and served only for visible references. Private notes use their isolated database table.
+
+### D26 — MCP v2 dependency verification correction
+Official client 2.4.0 and node transport 2.1.2 are available (Apache-2.0). Prior claim
+that the official client package did not exist was incorrect. Installed SDK README and
+Fastify adapter README were read before implementation; v1 SDK remains prohibited.

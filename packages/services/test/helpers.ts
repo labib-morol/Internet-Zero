@@ -25,9 +25,9 @@ export function makeWorldSource(overrides: Partial<WorldSource> = {}): WorldSour
     people: [],
     orgs: [],
     identities: [
-      { id: "id.jamie-git", service: "forge", login: "jamiefox", displayName: "Jamie Fox" },
-      { id: "id.mara-mail", service: "mail", login: "mara.voss@acme.pcp", displayName: "Mara Voss" },
-      { id: "id.jamie-mail", service: "mail", login: "jamie.fox@acme.pcp", displayName: "Jamie Fox" },
+      { id: "id.jamie-git", service: "forge", login: "jamiefox", displayName: "Jamie Fox", deleted: false },
+      { id: "id.mara-mail", service: "mail", login: "mara.voss@acme.pcp", displayName: "Mara Voss", deleted: false },
+      { id: "id.jamie-mail", service: "mail", login: "jamie.fox@acme.pcp", displayName: "Jamie Fox", deleted: false },
     ],
     facts: [],
     beliefs: [],

@@ -321,8 +321,8 @@ describe("notebook", () => {
 
     // Nothing private yet: say so instead of pretending.
     fireEvent.click(screen.getByRole("tab", { name: "Private notes" }));
-    expect(screen.getByText(/Not synced yet/)).toBeInTheDocument();
-    expect(screen.getByRole("note")).toHaveTextContent(/do not sync to the notebook yet/);
+    expect(screen.getByText(/No private claims/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save private note' })).toBeInTheDocument();
 
     // A private claim arriving (e.g. a teammate's action merged into the wire
     // state) shows up live under the private tab only.

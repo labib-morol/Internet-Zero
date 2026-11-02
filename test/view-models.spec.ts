@@ -65,6 +65,18 @@ const mailbox = bundle.mailboxes[0]!;
 const firstMessage = mailbox.messages[0]!;
 
 describe("forge views", () => {
+  it('resolves the default branch file tree from authored commit chronology', () => {
+    const v = forgeView(bundle, state(), forgeHost, `/${repo.owner}/${repo.name}/tree/${repo.defaultBranch}`, NOW);
+    expect(v).toMatchObject({ view: 'file-browser' });
+    if ('view' in v && v.view === 'file-browser') expect(v.entries.length).toBeGreaterThan(0);
+  });
+  it('does not expose gated commit titles in repository aggregate views', () => {
+    const hidden = structuredClone(bundle);
+    const a = hidden.artifacts.find((item) => item.id === `a.${firstCommit.sha}`)!;
+    a.visibility = { teamSizeAtLeast: 2 };
+    const v = forgeView(hidden, state(), forgeHost, `/${repo.owner}/${repo.name}/commits`, NOW);
+    expect(JSON.stringify(v)).not.toContain(firstCommit.message);
+  });
   it("renders the repo home from structured source data", () => {
     const v = forgeView(bundle, state(), forgeHost, `/${repo.owner}/${repo.name}`, NOW);
     expect(v).toMatchObject({ view: "repo-home", owner: repo.owner, name: repo.name });

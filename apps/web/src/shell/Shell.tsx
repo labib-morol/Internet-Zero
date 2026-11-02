@@ -48,9 +48,12 @@ function WindowSurface({ win }: { win: ManagedWindow }): ReactNode {
     case "terminal":
       return <TerminalWindow />;
     case "notebook":
-      return <NotebookWindow />;
+      return <NotebookWindow onOpenInBrowser={({ host, path }) => {
+        useWindowsStore.getState().activate('browser');
+        void useBrowserStore.getState().navigate(host, path.startsWith('/') ? path : `/${path}`);
+      }} />;
     case "board":
-      return <BoardWindow />;
+      return <BoardWindow onOpenItem={() => useWindowsStore.getState().activate('notebook')} />;
     default:
       return <p>Unknown app.</p>;
   }
@@ -187,15 +190,15 @@ export function Shell(): ReactNode {
 
       {compact ? (
         <nav className="iz-switcher" aria-label="Open windows">
-          {windows.map((win) => (
+          {DOCK_ORDER.map((app) => (
             <button
-              key={win.id}
+              key={app.id}
               type="button"
               className="iz-switcher__btn"
-              aria-pressed={win.id === focusId && !win.minimized}
-              onClick={() => focus(win.id)}
+              aria-pressed={windows.some((win) => win.appId === app.id && win.id === focusId && !win.minimized)}
+              onClick={() => activate(app.id as AppId)}
             >
-              {win.title}
+              {app.label}
             </button>
           ))}
           {windows.length === 0 && (

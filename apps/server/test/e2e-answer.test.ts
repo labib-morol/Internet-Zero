@@ -57,7 +57,7 @@ describe.skipIf(!pgUp)("end-to-end: answer gate", () => {
       expect(right.statusCode).toBe(200);
       const rightBody = right.json();
       expect(rightBody.rejection).toBeUndefined();
-      expect(rightBody.result).toEqual({ solved: true });
+      expect(rightBody.result).toEqual({ accepted: true, solved: true });
       const gateSolved = rightBody.events.find((e: { type: string }) => e.type === "GateSolved");
       expect(gateSolved).toBeDefined();
       expect(gateSolved.gateId).toBe("g.first-commit");
