@@ -20,6 +20,7 @@ import { registerActionRoutes } from "./routes/actions.js";
 import { registerViewRoutes } from "./routes/views.js";
 import { registerCaseRoutes } from "./routes/case.js";
 import { registerNoteRoutes } from "./routes/notes.js";
+import { registerTeamRoutes } from "./routes/teams.js";
 import { registerAssetRoutes } from './routes/assets.js';
 import { registerAgentTokenRoutes } from './routes/agent-tokens.js';
 import { registerMcpRoutes } from './routes/mcp.js';
@@ -120,6 +121,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     registerAssetRoutes(api, ctx);
     registerAgentTokenRoutes(api, ctx);
     registerBenchmarkRoutes(api, ctx);
+    registerTeamRoutes(api, ctx);
   });
 
   await registerMcpRoutes(app, ctx);

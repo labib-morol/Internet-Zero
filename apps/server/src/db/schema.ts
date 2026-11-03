@@ -178,10 +178,15 @@ export const sessionsWeb = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
+    /** The team this session plays on (set at creation or via invite join, §12). */
+    teamId: uuid("team_id").references(() => teams.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
-  (t) => [unique("sessions_web_token_hash_uq").on(t.tokenHash), index("sessions_web_user_idx").on(t.userId)]
+  (t) => [
+    unique("sessions_web_token_hash_uq").on(t.tokenHash),
+    index("sessions_web_user_idx").on(t.userId),
+  ]
 );
 
 export const usersRelations = relations(users, ({ many }) => ({

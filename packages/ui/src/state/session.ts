@@ -60,6 +60,7 @@ interface SessionStore {
   /** 401 anywhere: drop the session and return to the landing page. */
   invalidate(reason: string): void;
   refreshState(): Promise<void>;
+  switchTeam(teamId: string): Promise<void>;
   dispatch(
     action: Action,
     context?: MergeContext
@@ -274,6 +275,24 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   async refreshState() {
     const state = await getClient().getState();
     set({ state });
+  },
+
+  /** Rebind the local session to the joined team and resync stream + world. */
+  async switchTeam(teamId: string) {
+    const session = get().session;
+    if (session === undefined) return;
+    teamSocket.restart(session.token);
+    const [state, worlds] = await Promise.all([getClient().getState(), getClient().listWorlds()]);
+    const world = worlds.find((w) => w.worldId === state.worldId);
+    set({
+      session: { ...session, teamId },
+      state,
+      worlds,
+      world,
+      seenEvents: [],
+      pendingRecoveryCode: undefined,
+    });
+    announce("Joined the team. You share their case now.");
   },
 
   async dispatch(action, context) {

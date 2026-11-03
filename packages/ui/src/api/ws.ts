@@ -73,6 +73,12 @@ export class TeamSocket {
     this.#open();
   }
 
+  /** Reconnect with a fresh team binding (invite join, §12). */
+  restart(token: string): void {
+    this.stop();
+    this.start(token);
+  }
+
   stop(): void {
     this.#stopped = true;
     if (this.#retryTimer !== undefined) {

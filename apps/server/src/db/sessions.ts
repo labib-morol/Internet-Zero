@@ -8,15 +8,25 @@ export async function createSession(
   db: Db,
   userId: string,
   tokenHash: string,
-  ttlMs: number = SESSION_TTL_MS
+  options: { ttlMs?: number; teamId?: string } = {}
 ): Promise<SessionWebRow> {
   const rows = await db
     .insert(sessionsWeb)
-    .values({ userId, tokenHash, expiresAt: new Date(Date.now() + ttlMs) })
+    .values({
+      userId,
+      tokenHash,
+      ...(options.teamId !== undefined ? { teamId: options.teamId } : {}),
+      expiresAt: new Date(Date.now() + (options.ttlMs ?? SESSION_TTL_MS)),
+    })
     .returning();
   const session = rows[0];
   if (session === undefined) throw new Error("createSession: insert returned no row");
   return session;
+}
+
+/** Binds an existing session to a team (invite join, §12). */
+export async function bindSessionTeam(db: Db, sessionId: string, teamId: string): Promise<void> {
+  await db.update(sessionsWeb).set({ teamId }).where(eq(sessionsWeb.id, sessionId));
 }
 
 export interface SessionWithUser {

@@ -1,6 +1,6 @@
 import { and, asc, eq } from "drizzle-orm";
 import type { Db } from "./client.js";
-import { teamMembers, teams, type TeamRow } from "./schema.js";
+import { teamMembers, teams, users, type TeamRow } from "./schema.js";
 
 export interface CreateTeamInput {
   worldId: string;
@@ -66,4 +66,34 @@ export async function membershipRole(db: Db, teamId: string, userId: string): Pr
     .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)))
     .limit(1);
   return rows[0]?.role;
+}
+
+export async function findTeamByInviteHash(db: Db, inviteHash: string): Promise<TeamRow | undefined> {
+  const rows = await db.select().from(teams).where(eq(teams.inviteCodeHash, inviteHash)).limit(1);
+  return rows[0];
+}
+
+export async function setInviteCodeHash(db: Db, teamId: string, inviteHash: string): Promise<void> {
+  await db.update(teams).set({ inviteCodeHash: inviteHash }).where(eq(teams.id, teamId));
+}
+
+export async function countMembers(db: Db, teamId: string): Promise<number> {
+  const rows = await db.select({ userId: teamMembers.userId }).from(teamMembers).where(eq(teamMembers.teamId, teamId));
+  return rows.length;
+}
+
+export interface TeamMemberInfo {
+  userId: string;
+  displayName: string;
+  role: string;
+  joinedAt: Date;
+}
+
+export async function listMembers(db: Db, teamId: string): Promise<TeamMemberInfo[]> {
+  const rows = await db
+    .select({ userId: teamMembers.userId, role: teamMembers.role, joinedAt: teamMembers.joinedAt, displayName: users.displayName })
+    .from(teamMembers)
+    .innerJoin(users, eq(teamMembers.userId, users.id))
+    .where(eq(teamMembers.teamId, teamId));
+  return rows.map((row) => ({ userId: row.userId, role: row.role, joinedAt: row.joinedAt, displayName: row.displayName }));
 }

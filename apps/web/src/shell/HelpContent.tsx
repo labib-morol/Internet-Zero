@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AgentConnection } from './AgentConnection.js';
+import { TeamsPanel } from './TeamsPanel.js';
 
 /**
  * Help window content: the in-fiction field manual. Real content, no mocks.
@@ -33,6 +34,7 @@ export function HelpContent(): ReactNode {
         <li>Focus a window's title bar: <span className="iz-kbd">←→↑↓</span> move it, hold <span className="iz-kbd">Shift</span> to resize</li>
         <li>Under 900 px wide the desktop switches to one full-screen window with a switcher bar</li>
       </ul>
+      <TeamsPanel />
       <AgentConnection />
       <h2>Recovery</h2>
       <p>

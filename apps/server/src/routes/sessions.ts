@@ -58,7 +58,7 @@ export function registerSessionRoutes(app: FastifyInstance, ctx: AppContext): vo
     await addTeamMember(ctx.db, team.id, user.id, "owner");
 
     const sessionToken = generateToken();
-    await createSession(ctx.db, user.id, hashToken(sessionToken));
+    await createSession(ctx.db, user.id, hashToken(sessionToken), { teamId: team.id });
 
     // The team stream always begins with SessionStarted (seq 1, §9/§12).
     const startEvent = sessionStartEvent(bundle, team.id, startedAt, {
@@ -95,7 +95,7 @@ export function registerSessionRoutes(app: FastifyInstance, ctx: AppContext): vo
       return reply.code(401).send({ error: "invalid recovery code" });
     }
     const sessionToken = generateToken();
-    await createSession(ctx.db, user.id, hashToken(sessionToken));
+    await createSession(ctx.db, user.id, hashToken(sessionToken), { teamId: team.id });
 
     setSessionCookie(app, ctx, reply, sessionToken);
     return reply.code(201).send(

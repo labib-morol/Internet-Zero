@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { Db } from "./db/client.js";
 import { findLiveSession } from "./db/sessions.js";
-import { firstTeamForUser } from "./db/teams.js";
+import { firstTeamForUser, getTeam } from "./db/teams.js";
 import type { TeamRow, UserRow } from "./db/schema.js";
 import { SESSION_COOKIE } from "./config.js";
 
@@ -26,6 +26,8 @@ export function generateToken(bytes = 32): string {
 export interface AuthContext {
   user: UserRow;
   team: TeamRow;
+  /** The session row id (used to rebind the team on invite join, §12). */
+  sessionId: string;
 }
 
 /**
@@ -50,9 +52,14 @@ export async function authenticate(db: Db, request: FastifyRequest): Promise<Aut
 
   const session = await findLiveSession(db, hashToken(token));
   if (session === undefined) return undefined;
-  const team = await firstTeamForUser(db, session.user.id);
+  // §12: every session belongs to a team. Sessions created before invite-join
+  // have no binding and fall back to the user's first membership.
+  const team =
+    session.session.teamId !== null
+      ? ((await getTeam(db, session.session.teamId)) ?? (await firstTeamForUser(db, session.user.id)))
+      : await firstTeamForUser(db, session.user.id);
   if (team === undefined) return undefined;
-  return { user: session.user, team };
+  return { user: session.user, team, sessionId: session.session.id };
 }
 
 export async function authGuard(

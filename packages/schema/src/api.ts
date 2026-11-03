@@ -70,6 +70,29 @@ export const ReadyResponse = z.strictObject({
 });
 export type ReadyResponse = z.infer<typeof ReadyResponse>;
 
+/** Teams via invite link (§2.1.10, §12). Invite codes are stored hashed. */
+export const TeamInviteResponse = z.strictObject({ code: z.string().min(8) });
+export type TeamInviteResponse = z.infer<typeof TeamInviteResponse>;
+
+export const TeamJoinResponse = z.strictObject({
+  teamId: z.string(),
+  teamName: z.string(),
+  alreadyMember: z.boolean().default(false),
+});
+export type TeamJoinResponse = z.infer<typeof TeamJoinResponse>;
+
+export const TeamMembersResponse = z.strictObject({
+  members: z.array(
+    z.strictObject({
+      userId: z.string(),
+      displayName: z.string(),
+      role: z.enum(["owner", "member"]),
+      joinedAt: z.string(),
+    })
+  ),
+});
+export type TeamMembersResponse = z.infer<typeof TeamMembersResponse>;
+
 /** GET /api/case (M1): visible case-file data for the desktop shell's side panel. */
 export const CaseFileResponse = z.strictObject({
   openGates: z.array(z.strictObject({ gateId: z.string(), title: z.string() })),
