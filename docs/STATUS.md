@@ -169,3 +169,28 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
   `docs/security/threat-model.md`; all reviewer blockers/majors fixed.
 - Owner actions needed: investigate Docker Desktop startup; push auth (D5) to turn
   "CI green on a PR" partial into verified; review MORNING_REPORT.md.
+
+## Completion checkpoint (2026-11-04)
+
+M2 features completed this session, all locally committed:
+- **Teams** (§2.1.10, §12): invite links (hashed), join with 6-member cap,
+  session-to-team binding (migration 0001), members list, TeamsPanel UI,
+  live rebind via TeamSocket restart. Tests: teams-m2 (1/1).
+- **GHOSTBOARD** (§10.7, M2): ForumBoard/Thread/Post schemas, WorldBundle.forum,
+  FORUM_SERVICE loader (tombstones, edit-history artifacts, author validation),
+  forumView projections, /api/view + MCP routing, ForumPage UI; tutorial gains
+  ghostboard.pinecone.pcp with a flavor thread (no puzzle change).
+- **GitHub sign-in** (§2.1.10, M2): env-gated OAuth (start/callback with signed
+  state cookie, token exchange injectable for tests), GitHub users get their own
+  team + start event; 503 when unconfigured. Test: github-m2 (1/1).
+- **Reference agent** (§14.3): OpenAI-compatible chat loop over the official MCP
+  client; model-driven tutorial completion verified end-to-end (reference-m2).
+- **Render deploy** (§17.3): infra/render.yaml (paid tiers, pre-deploy migrations
+  via migrate-cli, /readyz health check) + docs/deploy/render.md.
+
+Final battery (2026-11-04): build PASS, lint PASS, typecheck PASS, `pnpm test`
+22 files / 43 server tests / all packages green, integration 29 PASS,
+browser 4 PASS (incl. keyboard-only). Docker/Postgres available this run.
+
+Remaining (owner-dependent): push/CI-on-PR (D5), NODE_17 (needs private repo),
+Render account, GitHub OAuth app credentials for real sign-in.

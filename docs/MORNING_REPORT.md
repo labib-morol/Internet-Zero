@@ -105,4 +105,19 @@ git log --oneline | head -30            # 24+ local commits
 | Oracle agent + scorer + benchmark | done | `docs/mcp/tutorial-benchmark.json` |
 | CI green on a PR | partial | awaiting push auth (D5) |
 | NODE_17 / private content | not started | needs owner-provided private repo |
-| Docker daemon tonight | blocked | "Docker Desktop is unable to start" |
+| Teams invite links + live sync | done | teams-m2 1/1 + session binding migration 0001 |
+| GHOSTBOARD forum (§10.7) | done | loader/views/UI + tutorial board; compiler+server green |
+| GitHub sign-in (env-gated OAuth) | done | github-m2 1/1 (503 unconfigured; full flow with stub API) |
+| Reference LLM agent (§14.3) | done | reference-m2: model-driven tutorial completion, scorer parity |
+| Render deploy blueprint + docs | done | infra/render.yaml + docs/deploy/render.md |
+| Docker daemon (2026-11-03) | was blocked, restarted | daemon + iz-dev-pg restored 2026-11-04 |
+
+
+## Completion follow-up (2026-11-04)
+
+"Finish the remaining stuffs" executed: teams, forum, GitHub sign-in, reference
+agent, Render blueprint + deploy docs. Final battery 2026-11-04: build/lint/
+typecheck PASS; workspace suite all green (22 server files / 43 tests with
+Postgres live); integration 29 PASS; browser 4 PASS. Commits 3e5d00f (teams),
+a937b62 (forum) and the final closeout commit. Still owner-dependent:
+push/CI (D5), NODE_17 private repo, Render account + GitHub OAuth app.

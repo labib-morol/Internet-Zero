@@ -1,0 +1,41 @@
+# Render blueprint (master prompt §17.3). Keys verified against Render's
+# blueprint spec (services.type/plan/healthCheckPath/preDeployCommand,
+# top-level databases with plan) on 2026-11-03.
+#
+# Paid instances only: free web services spin down after 15 idle minutes and
+# free Postgres expires after 30 days. Migrations run as the pre-deploy task
+# AND at boot (the app re-checks and reports /readyz.migrationsCurrent).
+#
+# Deploy: push this repo to GitHub, then "New Blueprint" in Render and point
+# it at this file. SESSION_SECRET must be set in the dashboard (sync: false).
+
+services:
+  - type: web
+    name: intranet-zero
+    runtime: docker
+    plan: 0.5c-512mb
+    healthCheckPath: /readyz
+    preDeployCommand: node apps/server/dist/migrate-cli.js
+    autoDeployTrigger: commits
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: intranet-zero-db
+          property: connectionString
+      - key: SESSION_SECRET
+        sync: false
+      - key: PUBLIC_ORIGIN
+        value: https://intranet-zero.onrender.com
+      - key: WORLDS_DIR
+        value: /app/dist/worlds
+      - key: ASSET_STORE
+        value: local
+      - key: LOG_LEVEL
+        value: info
+
+databases:
+  - name: intranet-zero-db
+    databaseName: intranet_zero
+    user: intranet
+    plan: 0.1c-256mb
+    postgresMajorVersion: 18

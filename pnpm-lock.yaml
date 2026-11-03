@@ -238,6 +238,9 @@ importers:
       '@iz/terminal':
         specifier: workspace:*
         version: link:../../packages/terminal
+      '@modelcontextprotocol/client':
+        specifier: 2.4.0
+        version: 2.4.0
       '@modelcontextprotocol/fastify':
         specifier: 2.0.1
         version: 2.0.1(@modelcontextprotocol/server@2.4.0)(fastify@5.12.7)

@@ -21,6 +21,7 @@ import { registerViewRoutes } from "./routes/views.js";
 import { registerCaseRoutes } from "./routes/case.js";
 import { registerNoteRoutes } from "./routes/notes.js";
 import { registerTeamRoutes } from "./routes/teams.js";
+import { registerGithubRoutes } from "./routes/github.js";
 import { registerAssetRoutes } from './routes/assets.js';
 import { registerAgentTokenRoutes } from './routes/agent-tokens.js';
 import { registerMcpRoutes } from './routes/mcp.js';
@@ -122,6 +123,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     registerAgentTokenRoutes(api, ctx);
     registerBenchmarkRoutes(api, ctx);
     registerTeamRoutes(api, ctx);
+    registerGithubRoutes(app, ctx);
   });
 
   await registerMcpRoutes(app, ctx);

@@ -20,6 +20,7 @@
     "@iz/schema": "workspace:*",
     "@iz/services": "workspace:*",
     "@iz/terminal": "workspace:*",
+    "@modelcontextprotocol/client": "2.4.0",
     "@modelcontextprotocol/fastify": "2.0.1",
     "@modelcontextprotocol/node": "2.1.2",
     "drizzle-orm": "0.45.4",
