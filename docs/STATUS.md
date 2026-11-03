@@ -167,8 +167,8 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
   4/4 required facts, completed:true) — `docs/mcp/tutorial-benchmark.json`.
 - Security: audit record `docs/security/audit-2026-11-03.md`; threat model
   `docs/security/threat-model.md`; all reviewer blockers/majors fixed.
-- Owner actions needed: investigate Docker Desktop startup; push auth (D5) to turn
-  "CI green on a PR" partial into verified; review MORNING_REPORT.md.
+- Owner actions needed: review MORNING_REPORT.md. (Docker and push both working
+  as of 2026-11-04 — see below.)
 
 ## Completion checkpoint (2026-11-04)
 
@@ -192,5 +192,17 @@ Final battery (2026-11-04): build PASS, lint PASS, typecheck PASS, `pnpm test`
 22 files / 43 server tests / all packages green, integration 29 PASS,
 browser 4 PASS (incl. keyboard-only). Docker/Postgres available this run.
 
-Remaining (owner-dependent): push/CI-on-PR (D5), NODE_17 (needs private repo),
-Render account, GitHub OAuth app credentials for real sign-in.
+Remaining (owner-dependent): NODE_17 (needs private repo), Render account,
+GitHub OAuth app credentials for real sign-in.
+
+## CI on GitHub (2026-11-04)
+
+- First push of main triggered the `ci` workflow; the first run failed on two
+  steps: `pnpm lint` (unused variable in github-m2 test — fixed) and gitleaks
+  (fixed SESSION_SECRET literal in playwright.config.ts — now generated
+  ephemeral per run; historical commit allowlisted by fingerprint in
+  `.gitleaks.toml`, verified clean via gitleaks docker run).
+- World-format docs (§19.6) added: docs/world-format/ with generated JSON
+  Schema from the Zod source of truth + write-your-first-world walkthrough.
+- Push verified safe: private docs and .env confirmed absent from GitHub via
+  the contents API before and after the push.

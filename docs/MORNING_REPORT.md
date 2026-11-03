@@ -103,7 +103,7 @@ git log --oneline | head -30            # 24+ local commits
 | Keyboard-only + mobile + axe acceptance | done | `test/e2e/tutorial.spec.ts` |
 | MCP server, tokens, tools, permissions | done | `apps/server/test/mcp-*.test.ts` |
 | Oracle agent + scorer + benchmark | done | `docs/mcp/tutorial-benchmark.json` |
-| CI green on a PR | partial | awaiting push auth (D5) |
+| CI on GitHub | run triggered 2026-11-04 by pushing main (credentials were stored in Git Credential Manager) | first run failed: lint unused var + gitleaks history finding; both fixed (ephemeral e2e secret, fingerprint allowlist) |
 | NODE_17 / private content | not started | needs owner-provided private repo |
 | Teams invite links + live sync | done | teams-m2 1/1 + session binding migration 0001 |
 | GHOSTBOARD forum (§10.7) | done | loader/views/UI + tutorial board; compiler+server green |

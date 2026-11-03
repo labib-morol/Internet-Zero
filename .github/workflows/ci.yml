@@ -36,8 +36,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
-      - run: pnpm typecheck
+      # typecheck resolves workspace packages through their dist exports,
+      # so the build must run first on a fresh checkout.
       - run: pnpm build
+      - run: pnpm typecheck
       - name: Compile the public tutorial world
         run: pnpm run worlds:build
       - run: pnpm test
@@ -62,6 +64,12 @@ jobs:
               exit 1
             fi
           done
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
