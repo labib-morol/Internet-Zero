@@ -1,5 +1,5 @@
 import type { Artifact, Cond } from "@iz/schema";
-import { ARCHIVE_SERVICE, FORGE_SERVICE, MAIL_SERVICE, TERMINAL_SERVICE } from "@iz/services";
+import { ARCHIVE_SERVICE, FORGE_SERVICE, FORUM_SERVICE, MAIL_SERVICE, TERMINAL_SERVICE } from "@iz/services";
 import type { LoadContext } from "@iz/services";
 import type { AssetIndex } from "./assets.js";
 import { BuildError, issueFromError } from "./errors.js";
@@ -62,6 +62,9 @@ export function artifactize(source: WorldSourceFiles, assets: AssetIndex): Artif
   for (const { file, meta, body } of source.archive) {
     artifacts.push(...loadArtifacts(ARCHIVE_SERVICE, { docs: [{ meta, body }] }, ctx, file));
   }
+  for (const { file, boards } of source.forum) {
+    artifacts.push(...loadArtifacts(FORUM_SERVICE, { boards }, ctx, file));
+  }
 
   if (source.terminalFiles.length > 0 || source.terminalFs.hosts.length > 0) {
     artifacts.push(...loadArtifacts(TERMINAL_SERVICE, { fs: source.terminalFs, files: source.terminalFiles }, ctx, "services/terminal/fs.yaml"));
@@ -108,6 +111,7 @@ export function artifactize(source: WorldSourceFiles, assets: AssetIndex): Artif
   if (source.forge.length > 0) servicesWithContent.add("forge");
   if (source.mail.length > 0) servicesWithContent.add("mail");
   if (source.archive.length > 0) servicesWithContent.add("archive");
+  if (source.forum.length > 0) servicesWithContent.add("forum");
   for (const service of servicesWithContent) {
     const count = source.world.hosts.filter((h) => h.service === service).length;
     if (count === 0) {

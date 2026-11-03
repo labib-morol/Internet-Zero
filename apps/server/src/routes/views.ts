@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { forgeView, forgeCollectibles, mailView, mailCollectibles, archiveView, archiveCollectibles, terminalView, terminalCollectibles } from "@iz/services";
+import { forgeView, forgeCollectibles, mailView, mailCollectibles, archiveView, archiveCollectibles, terminalView, terminalCollectibles, forumView, forumCollectibles } from "@iz/services";
 import type { ViewModel } from "@iz/schema";
 import type { AppContext } from "../app-context.js";
 import { loadTeamState } from "../game.js";
@@ -17,6 +17,7 @@ const COLLECTIBLE_LABELS: Record<string, (v: ViewModel) => ReturnType<typeof for
   mail: mailCollectibles,
   archive: archiveCollectibles,
   terminal: terminalCollectibles,
+  forum: forumCollectibles,
 };
 
 export function registerViewRoutes(app: FastifyInstance, ctx: AppContext): void {
@@ -52,6 +53,9 @@ export function registerViewRoutes(app: FastifyInstance, ctx: AppContext): void 
         break;
       case "terminal":
         view = terminalView(bundle, state, host, path, now);
+        break;
+      case "forum":
+        view = forumView(bundle, state, host, path, now);
         break;
       default:
         view = { notFound: true, host, path };

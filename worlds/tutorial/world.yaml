@@ -14,5 +14,6 @@ hosts:
   - { host: forge.pinecone.pcp, service: forge, title: "GIT//FORGE" }
   - { host: mail.pinecone.pcp, service: mail, title: "DEADLETTER", requires: { gateSolved: g.first-commit } }
   - { host: printer.pinecone.pcp, service: terminal, title: "NODE TERMINAL", requires: { gateSolved: g.mailbox } }
+  - { host: ghostboard.pinecone.pcp, service: forum, title: "GHOSTBOARD" }
 entry: "forge.pinecone.pcp/pinecone/office-scripts"
 reports: [r.who-holds]

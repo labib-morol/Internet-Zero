@@ -28,4 +28,6 @@ export { FORGE_SERVICE } from "./forge.js";
 export { MAIL_SERVICE } from "./mail.js";
 export { ARCHIVE_SERVICE } from "./archive.js";
 export { TERMINAL_SERVICE } from "./terminal.js";
+export * from "./forum.js";
+export * from "./forum-views.js";
 export * from "./views.js";

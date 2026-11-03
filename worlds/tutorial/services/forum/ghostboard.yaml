@@ -1,0 +1,24 @@
+# GHOSTBOARD — the Pinecone community board (§10.7, M2). Flavor content: the
+# shop's public thread documents the printer trouble from a resident's view.
+boards:
+  - id: b.front-desk
+    name: front desk
+    threads:
+      - id: th.printer-woes
+        title: "The office printer is haunted (again)"
+        pinned: true
+        posts:
+          - id: a.gb-1
+            author: id.odile-mail
+            at: "2026-10-31T18:12:00Z"
+            body: |
+              Heads up, neighbors — the office printer started refusing jobs again.
+              IT volunteer is on it. **Do not** try the admin panel yourself; it
+              locks out after three attempts and then *I* have to drive downtown.
+          - id: a.gb-2
+            author: id.odile-mail
+            at: "2026-11-01T09:40:00Z"
+            body: |
+              Update: new passphrase is set. It's two things everyone in this
+              thread already knows, squished together. If you were here in 2009,
+              you can guess it. — *O.*

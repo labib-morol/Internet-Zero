@@ -92,6 +92,7 @@ export function minimalBundle(): WorldBundle {
     assets: [],
     forge: [],
     mailboxes: [],
+    forum: [],
     bundleSalt: "0123456789abcdef",
     bundleHash: "b".repeat(64),
   };

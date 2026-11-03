@@ -4,6 +4,7 @@ import { Person, Org, Identity, Asset, EventDef, ForgeRepo, Mailbox } from "./en
 import { Fact, Belief, Statement, Proof } from "./primitives.js";
 import { Artifact } from "./artifacts.js";
 import { BundleGate, BundleReport, Hint } from "./gates.js";
+import { ForumBoard } from "./forum.js";
 
 /** Server-only section of a bundle: canonical truth (§6.4). Never sent to clients. */
 export const Canon = z.strictObject({
@@ -29,6 +30,8 @@ export const WorldBundle = z.strictObject({
   forge: z.array(ForgeRepo).default([]),
   /** Structured mail sources for view building (server-side; never sent raw). */
   mailboxes: z.array(Mailbox).default([]),
+  /** Structured GHOSTBOARD sources for view building (server-side; never sent raw). */
+  forum: z.array(ForumBoard).default([]),
   /** Salt for answer hashes: sha256(bundleSalt + ":" + gateOrSlotId + ":" + normalized). */
   bundleSalt: z.string().min(16),
   /** sha256 of the canonical JSON of the bundle without this field. */

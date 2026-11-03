@@ -16,6 +16,7 @@ import type {
 } from "@iz/schema";
 import { artifactVisible } from "@iz/runtime";
 
+
 /**
  * View-model builders (§10). The server calls these AFTER checking host
  * reachability for the page's artifact; thread/tree aggregations filter their

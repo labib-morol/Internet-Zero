@@ -274,11 +274,77 @@ export type TerminalView = z.infer<typeof TerminalView>;
 // Aggregate
 // ---------------------------------------------------------------------------
 
+
+// ---------------------------------------------------------------------------
+// GHOSTBOARD (§10.7, M2)
+// ---------------------------------------------------------------------------
+
+export const ForumBoardSummary = z.strictObject({
+  boardId: z.string(),
+  name: z.string(),
+  threads: z.number().int(),
+  posts: z.number().int(),
+});
+export type ForumBoardSummary = z.infer<typeof ForumBoardSummary>;
+
+export const ForumThreadSummary = z.strictObject({
+  threadId: z.string(),
+  title: z.string(),
+  pinned: z.boolean(),
+  posts: z.number().int(),
+  lastAt: z.string(),
+  lastAuthor: z.string(),
+});
+export type ForumThreadSummary = z.infer<typeof ForumThreadSummary>;
+
+export const ForumBoardListView = z.strictObject({
+  view: z.literal("forum-board-list"),
+  host: z.string(),
+  boards: z.array(ForumBoardSummary),
+});
+export type ForumBoardListView = z.infer<typeof ForumBoardListView>;
+
+export const ForumBoardView = z.strictObject({
+  view: z.literal("forum-board"),
+  host: z.string(),
+  artifactId: z.string().nullable(),
+  boardId: z.string(),
+  boardName: z.string(),
+  threads: z.array(ForumThreadSummary),
+});
+export type ForumBoardView = z.infer<typeof ForumBoardView>;
+
+export const ForumPostView = z.strictObject({
+  artifactId: z.string(),
+  author: IdentityRef,
+  at: IsoTime,
+  ast: SafeNodeSchema,
+  deleted: z.boolean(),
+  edits: z.number().int(),
+});
+export type ForumPostView = z.infer<typeof ForumPostView>;
+
+export const ForumThreadView = z.strictObject({
+  view: z.literal("forum-thread"),
+  host: z.string(),
+  artifactId: z.string(),
+  boardId: z.string(),
+  threadId: z.string(),
+  title: z.string(),
+  pinned: z.boolean(),
+  posts: z.array(ForumPostView),
+});
+export type ForumThreadView = z.infer<typeof ForumThreadView>;
+
+export const ForumView = z.discriminatedUnion("view", [ForumBoardListView, ForumBoardView, ForumThreadView]);
+export type ForumView = z.infer<typeof ForumView>;
+
 export const ViewModel = z.union([
   ForgeView,
   MailView,
   ArchiveView,
   TerminalView,
+  ForumView,
   NotFound,
 ]);
-export type ViewModel = ForgeView | MailView | ArchiveView | TerminalView | NotFound;
+export type ViewModel = ForgeView | MailView | ArchiveView | TerminalView | ForumView | NotFound;

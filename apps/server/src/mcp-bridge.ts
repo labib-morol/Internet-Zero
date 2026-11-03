@@ -1,6 +1,6 @@
 import type { Action, RuntimeState, SafeNode, ViewModel, WorldBundle } from '@iz/schema';
 import { evaluateCondition, hostReachable, isWorldComplete, visibleArtifacts } from '@iz/runtime';
-import { forgeView, mailView, archiveView, terminalView, forgeCollectibles, mailCollectibles, archiveCollectibles } from '@iz/services';
+import { forgeView, mailView, archiveView, terminalView, forumView, forgeCollectibles, mailCollectibles, archiveCollectibles } from '@iz/services';
 import type { AppContext } from './app-context.js';
 import { loadTeamState } from './game.js';
 
@@ -11,6 +11,7 @@ export function viewFor(bundle: WorldBundle, state: RuntimeState, host: string, 
     case 'forge': return forgeView(bundle, state, host, path, now);
     case 'mail': return mailView(bundle, state, host, path, now);
     case 'archive': return archiveView(bundle, state, host, path, now);
+    case 'forum': return forumView(bundle, state, host, path, now);
     case 'terminal': return terminalView(bundle, state, host, path, now);
     default: return { notFound: true, host, path };
   }

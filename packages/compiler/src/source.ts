@@ -18,6 +18,8 @@ import {
   Statement,
   TerminalFs,
   WorldYaml,
+  ForumSource,
+  type ForumBoard,
 } from "@iz/schema";
 import type {
   ArchiveDocMeta as ArchiveDocMetaT,
@@ -47,6 +49,7 @@ export type StringRef = { file: string; path: string; value: string };
 
 export type ForgeFile = { file: string; repo: ForgeRepo };
 export type MailFile = { file: string; mailbox: Mailbox };
+export type ForumFile = { file: string; boards: ForumBoard[] };
 export type ArchiveFile = { file: string; meta: ArchiveDocMetaT; body: string; markdown: string };
 export type TerminalFile = { host: string; path: string; text: string };
 
@@ -69,6 +72,7 @@ export type WorldSourceFiles = {
   forge: ForgeFile[];
   mail: MailFile[];
   archive: ArchiveFile[];
+  forum: ForumFile[];
   terminalFs: TerminalFsT;
   terminalFiles: TerminalFile[];
 };
@@ -333,6 +337,23 @@ export async function loadWorldSource(dir: string): Promise<WorldSourceFiles> {
     archive.push({ file, meta: checked.data, body: split.body, markdown });
   }
 
+  // services/forum/*.yaml — GHOSTBOARD boards (§10.7).
+  const forum: ForumFile[] = [];
+  for (const name of await listFiles(join(dir, "services", "forum"), [".yaml", ".yml"])) {
+    const file = `services/forum/${name}`;
+    const loaded = await loadYaml(collector, dir, `services/forum/${name}`);
+    if (loaded === null) continue;
+    const checked = ForumSource.safeParse(loaded.data);
+    if (!checked.success) {
+      collector.schema(file, checked.error, "forum source");
+      continue;
+    }
+    for (const board of checked.data.boards) {
+      collectStrings({ threads: board.threads }, file, "forum", strings);
+    }
+    forum.push({ file, boards: checked.data.boards });
+  }
+
   // services/terminal/fs.yaml + the services/terminal/fs/<host>/** tree.
   let terminalFs: TerminalFsT = { hosts: [] };
   const fsYaml = await loadYaml(collector, dir, "services/terminal/fs.yaml");
@@ -374,6 +395,7 @@ export async function loadWorldSource(dir: string): Promise<WorldSourceFiles> {
     forge,
     mail,
     archive,
+    forum,
     terminalFs,
     terminalFiles,
   };

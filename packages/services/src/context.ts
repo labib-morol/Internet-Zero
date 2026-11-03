@@ -59,7 +59,7 @@ export function parseSource<T>(schema: z.ZodType<T>, source: unknown, service: s
  * host assignment which the frozen source schemas cannot express, so more than
  * one host for forge/mail/archive is a build error.
  */
-export function resolveHost(ctx: LoadContext, service: Exclude<ServiceId, "terminal" | "forum">): string {
+export function resolveHost(ctx: LoadContext, service: Exclude<ServiceId, "terminal">): string {
   const hosts = ctx.world.world.hosts.filter((h) => h.service === service).map((h) => h.host);
   if (hosts.length === 0) {
     throw new ServiceError(`world has content for the ${service} service but declares no ${service} host in world.yaml`);

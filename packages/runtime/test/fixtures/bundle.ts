@@ -197,6 +197,7 @@ export const fixtureBundle: WorldBundle = {
   assets: [],
   forge: [],
   mailboxes: [],
+  forum: [],
   bundleSalt: FIXTURE_SALT,
   bundleHash: "b7e23ec29af22b0b4e41da31e868d57226121c84a1b46e3a0c8a2d3f4e5f6071",
 };

@@ -6,6 +6,7 @@ export * from "./normalize.js";
 export * from "./gates.js";
 export * from "./entities.js";
 export * from "./world.js";
+export * from "./forum.js";
 export * from "./artifacts.js";
 export * from "./bundle.js";
 export * from "./state.js";

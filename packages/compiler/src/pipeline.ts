@@ -180,6 +180,7 @@ function assembleBundle(source: WorldSourceFiles, artifacts: ReturnType<typeof a
     assets: assetRecords,
     forge: source.forge.map((f) => f.repo),
     mailboxes: source.mail.map((m) => m.mailbox),
+    forum: source.forum.flatMap((f) => f.boards),
     bundleSalt: salt,
     bundleHash: "",
   };

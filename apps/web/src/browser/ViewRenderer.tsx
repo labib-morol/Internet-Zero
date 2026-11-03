@@ -4,6 +4,7 @@ import type { Collectible } from "./store.js";
 import { ForgePage } from "../services/forge/ForgeViews.js";
 import { MailPage } from "../services/mail/MailViews.js";
 import { ArchivePage } from "../services/archive/ArchiveViews.js";
+import { ForumPage } from "../services/forum/ForumViews.js";
 import { TerminalSessionPage } from "../services/terminal/TerminalWindow.js";
 import "../services/services.css";
 
@@ -76,6 +77,10 @@ function ViewBody({ view, host, collectibles, onCollect }: {
       return <ArchivePage view={view} host={host} />;
     case "terminal":
       return <TerminalSessionPage view={view} />;
+    case "forum-board-list":
+    case "forum-board":
+    case "forum-thread":
+      return <ForumPage view={view} host={host} collectibles={collectibles} onCollect={onCollect} />;
     default:
       return <NoRendererYet />;
   }
