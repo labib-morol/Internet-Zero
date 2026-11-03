@@ -45,3 +45,14 @@ Gate events now persist, not synthetic in fold. 363 workspace tests +29 root tes
 browser tests pass. Notes/snapshots/assets/SPA implemented. Exact next: M2 tool factory,
 Fastify /mcp bearer agent-token auth, oracle runner + benchmark integration; then full
 security/review gate and MORNING_REPORT. Never push. `.env` and master prompt ignored.
+
+## Continuation handoff (2026-11-03 morning)
+
+Everything is committed locally through the M1/M2 engine checkpoint. Main owns all
+paths; the two GLM-5.3 verification/docs subagents failed with provider
+"Model request failed", so docs and audit were written inline (files listed in
+MORNING_REPORT.md). Exact next steps: (1) fix Docker Desktop startup, run
+`pnpm --filter @iz/server test` to re-verify the 32 DB tests; (2) set up push auth
+and turn CI-on-PR from partial to verified; (3) read MORNING_REPORT.md. Never push
+without the owner. `.env` and the master prompt remain git-ignored (verify with
+`git check-ignore` before any commit).

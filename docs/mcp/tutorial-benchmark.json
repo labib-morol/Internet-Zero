@@ -1,0 +1,19 @@
+{
+  "world": "tutorial@1.0.0",
+  "agent": "tutorial-oracle",
+  "completed": true,
+  "gatesSolved": 3,
+  "gatesTotal": 3,
+  "reportSlotsCorrect": 2,
+  "reportSlotsTotal": 2,
+  "requiredFactsEvidenced": 4,
+  "requiredFactsTotal": 4,
+  "unsupportedClaims": 0,
+  "toolCalls": 17,
+  "hintsUsed": 0,
+  "wallSeconds": 1,
+  "tokens": {
+    "input": null,
+    "output": null
+  }
+}

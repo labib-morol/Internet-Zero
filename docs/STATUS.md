@@ -149,3 +149,23 @@ D3 (TypeScript line). Nothing blocks writing the M0 plan.
   private notes. Accessibility scans have no serious/critical findings on those screens.
 - Gate integrity, snapshots, private notes, asset hosting and SPA serving are implemented.
 - M1 broader security signoff/keyboard-only path and M2 MCP benchmark remain in progress.
+
+## Final checkpoint (2026-11-03, morning)
+
+- `pnpm build`, `pnpm lint`, `pnpm typecheck` — PASS.
+- `pnpm test` — compiler timeout fixed via package vitest config (60 s test timeout;
+  full-world compilations are CPU-heavy under parallel package runs). Last full
+  workspace run: 367 passed / 0 failed. Final re-run: all packages green EXCEPT the
+  server DB suite, which was **skipped** because Docker Desktop can no longer start
+  ("Docker Desktop is unable to start" at daemon level) — its last green run earlier
+  this night was 32/32 with real Postgres, including the full tutorial-over-REST.
+- `pnpm run test:integration` — 29 passed.
+- `pnpm exec playwright test` — 4 passed (guest startup + full browser tutorial +
+  keyboard-only completion + compact/mobile; axe zero serious/critical). One flaky
+  step observed once under load, retry-masked (retries=1, json reporter captures).
+- MCP: official-client tutorial oracle completed (17 real tool calls, 3/3 gates,
+  4/4 required facts, completed:true) — `docs/mcp/tutorial-benchmark.json`.
+- Security: audit record `docs/security/audit-2026-11-03.md`; threat model
+  `docs/security/threat-model.md`; all reviewer blockers/majors fixed.
+- Owner actions needed: investigate Docker Desktop startup; push auth (D5) to turn
+  "CI green on a PR" partial into verified; review MORNING_REPORT.md.
