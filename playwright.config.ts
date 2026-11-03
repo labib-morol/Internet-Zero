@@ -1,9 +1,13 @@
+import { randomBytes } from "node:crypto";
 import { defineConfig } from "@playwright/test";
 
 /**
  * E2E (M1 task 13). Uses the system Edge channel so no browser download is
- * required; falls back to bundled chromium when installed.
+ * required; falls back to bundled chromium when installed. The session secret
+ * is ephemeral and local to this run — never a committed credential.
  */
+const sessionSecret = randomBytes(32).toString("hex");
+
 export default defineConfig({
   testDir: "test/e2e",
   timeout: 90_000,
@@ -23,7 +27,7 @@ export default defineConfig({
       reuseExistingServer: true,
       env: {
         DATABASE_URL: "postgres://intranet:intranet@localhost:5432/intranet_zero",
-        SESSION_SECRET: "0123456789abcdef0123456789abcdef0123456789abcdef01234567",
+        SESSION_SECRET: sessionSecret,
         PUBLIC_ORIGIN: "http://localhost:8080",
         WORLDS_DIR: "dist/worlds",
         LOG_LEVEL: "warn",

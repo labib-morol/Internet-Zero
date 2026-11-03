@@ -1,0 +1,14 @@
+# Gitleaks configuration for INTRANET ZERO.
+#
+# 9b5a68c: playwright.config.ts once contained a fixed SESSION_SECRET used by
+# local e2e runs only. It is an ephemeral, machine-local test credential that
+# was never a real secret; the code now generates one at runtime (see
+# playwright.config.ts). The commit stays in history (history rewrites are
+# forbidden by the project's safety rules), so it is allowlisted by fingerprint.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "ephemeral local-only e2e session secret"
+commits = ["9b5a68cbdb127277fe8d6b63dce87af6daa95ef5"]

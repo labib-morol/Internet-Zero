@@ -25,12 +25,11 @@ describe.skipIf(!pgUp)("github sign-in (§2.1.10, M2)", () => {
           const start = await configuredEnv.app.inject({ method: "GET", url: "/api/auth/github/start" });
           expect(start.statusCode).toBe(302);
           const setCookie = [].concat(start.headers["set-cookie"] as never) as string[];
-          const stateCookie = setCookie[0].split(";")[0].split("=").slice(1).join("=");
           // The signed cookie value comes back signed; extract the raw state via the callback mismatch check.
           const bad = await configuredEnv.app.inject({ method: "GET", url: "/api/auth/github/callback?code=abc&state=wrong" });
           expect(bad.statusCode, JSON.stringify(bad.body) + String(bad.statusCode)).toBe(400);
 
-          // Recover the signed state from the Set-Cookie header (iz_github_state=<sig>.<value>? fastify signs as value.signature)
+          // Recover the signed state from the Set-Cookie header (fastify signs as value.signature)
           const rawPair = setCookie.find((c) => c.startsWith("iz_github_state="));
           const signedValue = rawPair!.split(";")[0].split("=").slice(1).join("=");
           const unsigned = signedValue.split(".")[0];
