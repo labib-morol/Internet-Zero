@@ -206,3 +206,22 @@ GitHub OAuth app credentials for real sign-in.
   Schema from the Zod source of truth + write-your-first-world walkthrough.
 - Push verified safe: private docs and .env confirmed absent from GitHub via
   the contents API before and after the push.
+
+## CI on GitHub — GREEN (2026-11-05)
+
+Run 41935825449 for commit 6e8bd20: security success, test success.
+https://github.com/labib-morol/Internet-Zero/actions/runs/41935825449
+
+Two prior runs failed on runner-specific issues the local environment did not
+catch (resolved in 64f67e9 + d35db44 + 6e8bd20): missing @iz/schema declaration
+for @iz/ui (root walk-up worked locally, strict pnpm layout did not honor it on
+CI), workspace dist-order (typecheck must follow build on a fresh checkout),
+missing pnpm in the security job before pnpm audit, gitleaks flagging an
+ephemeral local e2e secret in playwright.config.ts history (secret now
+generated at runtime, commit allowlisted by fingerprint), and web/ui/server
+vitest configs needing sequential files or explicit timeouts to avoid
+jsdom/worker-startup timeouts under parallel package runs.
+
+"CI green on a PR" ledger status: done (runs on push to main; PRs use the
+same workflow). Remaining owner-dependent: NODE_17 (private repo), Render
+account, GitHub OAuth app credentials for real sign-in.
