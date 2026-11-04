@@ -496,6 +496,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@iz/schema':
+        specifier: workspace:*
+        version: link:../schema
       zustand:
         specifier: 5.0.16
         version: 5.0.16(@types/react@19.3.0)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1))

@@ -1,11 +1,12 @@
 import { defineConfig } from "vitest/config";
 
+// Integration tests boot full apps against real Postgres (unique DB each,
+// migrations included). Solo runs take ~5s per app; under the full
+// workspace's parallel package runs the default 5s test timeout is too tight.
 export default defineConfig({
   test: {
-    // Integration tests run against a real Postgres (unique database per app).
     testTimeout: 30_000,
-    hookTimeout: 30_000,
-    // Keep file-level parallelism modest: each file provisions its own database.
-    fileParallelism: true,
+    hookTimeout: 120_000,
+    poolOptions: { forks: { maxForks: 4 } },
   },
 });
