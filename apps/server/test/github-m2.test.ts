@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { createTestApp, postgresUp } from "./helpers.js";
 import { setGithubFetchForTests } from "../src/routes/github.js";
 
+/** Fastify's set-cookie header is `string | string[] | undefined`. */
+function firstCookieHeader(value: unknown): string {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return typeof value === "string" ? value : "";
+}
+
 const pgUp = await postgresUp();
 describe.skipIf(!pgUp)("github sign-in (§2.1.10, M2)", () => {
   it("returns 503 when unconfigured and completes the flow when configured", async () => {
@@ -24,14 +30,13 @@ describe.skipIf(!pgUp)("github sign-in (§2.1.10, M2)", () => {
         try {
           const start = await configuredEnv.app.inject({ method: "GET", url: "/api/auth/github/start" });
           expect(start.statusCode).toBe(302);
-          const setCookie = [].concat(start.headers["set-cookie"] as never) as string[];
           // The signed cookie value comes back signed; extract the raw state via the callback mismatch check.
           const bad = await configuredEnv.app.inject({ method: "GET", url: "/api/auth/github/callback?code=abc&state=wrong" });
           expect(bad.statusCode, JSON.stringify(bad.body) + String(bad.statusCode)).toBe(400);
 
           // Recover the signed state from the Set-Cookie header (fastify signs as value.signature)
-          const rawPair = setCookie.find((c) => c.startsWith("iz_github_state="));
-          const signedValue = rawPair!.split(";")[0].split("=").slice(1).join("=");
+          const statePair = firstCookieHeader(start.headers["set-cookie"]).split(";")[0]!;
+          const signedValue = statePair.split("=").slice(1).join("=");
           const unsigned = signedValue.split(".")[0];
           const callback = await configuredEnv.app.inject({
             method: "GET",
@@ -42,13 +47,15 @@ describe.skipIf(!pgUp)("github sign-in (§2.1.10, M2)", () => {
           expect(callback.headers.location).toBe("/");
 
           // The GitHub user has a team, a SessionStarted event and a session.
-          const callbackCookie = [].concat(callback.headers["set-cookie"] as never).find((c) => c.startsWith("iz_session="))!;
-          const sessionToken = decodeURIComponent(callbackCookie.split(";")[0].split("=").slice(1).join("=")).split(".")[0];
+          const allCookies = callback.headers["set-cookie"];
+          const cookieList = Array.isArray(allCookies) ? allCookies : [allCookies ?? ""];
+          const sessionPair = cookieList.find((c) => c.startsWith("iz_session=")) ?? "";
+          const sessionToken = sessionPair.split(";")[0]!.split("=").slice(1).join("=").split(".")[0];
           const state = await configuredEnv.app.inject({ method: "GET", url: "/api/state", headers: { authorization: `Bearer ${sessionToken}` } });
-          expect(state.statusCode).toBe(200);
+          expect(state.statusCode, `token=${sessionToken}`).toBe(200);
           expect(state.json().state.startedAt).toBeTypeOf("string");
           const members = await configuredEnv.app.inject({ method: "GET", url: "/api/teams/members", headers: { authorization: `Bearer ${sessionToken}` } });
-          expect(members.json().members[0].displayName).toBe("octo-investigator");
+          expect(members.json().members[0]?.displayName ?? "missing").toBe("octo-investigator");
         } finally {
           delete process.env.GITHUB_OAUTH_ID;
           delete process.env.GITHUB_OAUTH_SECRET;
