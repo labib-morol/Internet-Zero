@@ -1,5 +1,5 @@
-import { and, eq, gt } from "drizzle-orm";
-import type { Db } from "./client.js";
+import { and, desc, eq, gt, isNotNull } from "drizzle-orm";
+import type { Db, Tx } from "./client.js";
 import { sessionsWeb, users, type SessionWebRow, type UserRow } from "./schema.js";
 
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -25,8 +25,34 @@ export async function createSession(
 }
 
 /** Binds an existing session to a team (invite join, §12). */
-export async function bindSessionTeam(db: Db, sessionId: string, teamId: string): Promise<void> {
+export async function bindSessionTeam(db: Db | Tx, sessionId: string, teamId: string): Promise<void> {
   await db.update(sessionsWeb).set({ teamId }).where(eq(sessionsWeb.id, sessionId));
+}
+
+/** Revokes a session immediately (logout): the row is deleted, not expired. */
+export async function revokeSession(db: Db, sessionId: string): Promise<void> {
+  await db.delete(sessionsWeb).where(eq(sessionsWeb.id, sessionId));
+}
+
+/**
+ * The team of the user's most recent live BOUND session. Recovery continuity:
+ * a player who joined a team must land back in that team after recovering
+ * their session, not in their first (original solo) membership.
+ */
+export async function latestLiveSessionTeamId(db: Db, userId: string): Promise<string | undefined> {
+  const rows = await db
+    .select({ teamId: sessionsWeb.teamId })
+    .from(sessionsWeb)
+    .where(
+      and(
+        eq(sessionsWeb.userId, userId),
+        gt(sessionsWeb.expiresAt, new Date()),
+        isNotNull(sessionsWeb.teamId)
+      )
+    )
+    .orderBy(desc(sessionsWeb.createdAt))
+    .limit(1);
+  return rows[0]?.teamId ?? undefined;
 }
 
 export interface SessionWithUser {

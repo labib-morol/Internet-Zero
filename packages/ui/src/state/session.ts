@@ -42,6 +42,8 @@ interface SessionStore {
   world: WorldSummary | undefined;
   worlds: WorldSummary[];
   state: WireRuntimeState | undefined;
+  /** Hint tiers this team already paid for (DECISIONS D28). */
+  purchasedHints: Record<string, Array<{ tier: number; text: string; cost: number }>> | undefined;
   connection: "online" | "connecting" | "offline";
   /**
    * Recovery code from a fresh guest start, held ONLY until the one-time
@@ -139,6 +141,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   world: undefined,
   worlds: [],
   state: undefined,
+  purchasedHints: undefined,
   connection: "offline",
   pendingRecoveryCode: undefined,
   seenEvents: [],
@@ -146,18 +149,47 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   async bootstrap() {
     const token = readStoredToken();
     if (token === undefined) {
-      set({ screen: "landing", status: "idle" });
+      // Cookie-authenticated bootstrap (OAuth callback or a cookie left by a
+      // previous navigation): REST accepts the signed HttpOnly cookie, so try
+      // it before falling back to the landing page. The session token stays
+      // out of page JS — an empty token makes the WebSocket authenticate via
+      // its upgrade cookie.
+      set({ status: "starting" });
+      try {
+        const [response, worlds] = await Promise.all([getClient().getState(), getClient().listWorlds()]);
+        const state = response.state;
+        const world = worlds.find((w) => w.worldId === state.worldId);
+        set({
+          session: { teamId: state.teamId, userId: "", token: "" },
+          world,
+          worlds,
+          state,
+          purchasedHints: response.purchasedHints,
+          screen: "shell",
+          status: "ready",
+          error: undefined,
+        });
+        teamSocket.start("");
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          // Dead cookie: clear it so every page load stops with a doomed call.
+          void getClient().logout().catch(() => {});
+        }
+        set({ screen: "landing", status: "idle" });
+      }
       return;
     }
     set({ status: "starting" });
     try {
-      const [state, worlds] = await Promise.all([getClient().getState(), getClient().listWorlds()]);
+      const [response, worlds] = await Promise.all([getClient().getState(), getClient().listWorlds()]);
+      const state = response.state;
       const world = worlds.find((w) => w.worldId === state.worldId);
       set({
         session: { teamId: state.teamId, userId: "", token },
         world,
         worlds,
         state,
+        purchasedHints: response.purchasedHints,
         screen: "shell",
         status: "ready",
         error: undefined,
@@ -166,6 +198,9 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
         storeToken(undefined);
+        // Clear the dead HttpOnly cookie too, so a cookie-only visitor does
+        // not loop on it. Best effort: the server may be unreachable.
+        void getClient().logout().catch(() => {});
         set({ screen: "landing", status: "idle", session: undefined, state: undefined });
       } else {
         set({ status: "error", error: describeError(error) });
@@ -181,10 +216,20 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   async startGuest(worldId) {
     set({ status: "starting", error: undefined });
+    let created: Awaited<ReturnType<IzClient["createSession"]>>;
     try {
-      const created = await getClient().createSession(worldId);
-      storeToken(created.sessionToken);
-      const state = await getClient().getState();
+      created = await getClient().createSession(worldId);
+    } catch (error) {
+      set({ status: "error", error: describeError(error) });
+      return;
+    }
+    // The one-time recovery handoff lands FIRST: a failure in the follow-up
+    // state/world fetches must never cost the player their only copy of it.
+    storeToken(created.sessionToken);
+    set({ status: "starting", pendingRecoveryCode: created.recoveryCode });
+    try {
+      const response = await getClient().getState();
+      const state = response.state;
       const worlds = get().worlds.length > 0 ? get().worlds : await getClient().listWorlds();
       const world = worlds.find((w) => w.worldId === state.worldId);
       set({
@@ -197,6 +242,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         world,
         worlds,
         state,
+        purchasedHints: response.purchasedHints,
         screen: "shell",
         status: "ready",
         connection: "connecting",
@@ -205,7 +251,10 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       teamSocket.start(created.sessionToken);
       announce(`Session started. Welcome, ${created.displayName}.`);
     } catch (error) {
-      set({ status: "error", error: describeError(error) });
+      // Token is stored and the recovery code is held in state: the retry
+      // path (bootstrap) reuses the existing session instead of creating
+      // another guest.
+      set({ status: "error", error: describeError(error), pendingRecoveryCode: created.recoveryCode });
     }
   },
 
@@ -214,7 +263,8 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     try {
       const resumed = await getClient().resumeSession(recoveryCode.trim());
       storeToken(resumed.sessionToken);
-      const state = await getClient().getState();
+      const response = await getClient().getState();
+      const state = response.state;
       const worlds = get().worlds.length > 0 ? get().worlds : await getClient().listWorlds();
       const world = worlds.find((w) => w.worldId === state.worldId);
       set({
@@ -222,6 +272,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         world,
         worlds,
         state,
+        purchasedHints: response.purchasedHints,
         screen: "shell",
         status: "ready",
         connection: "connecting",
@@ -242,6 +293,10 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   },
 
   signOut() {
+    // Revoke the session server-side and clear the HttpOnly cookie (cookie
+    // and Bearer auth die together). Best effort: network errors must not
+    // block the local sign-out.
+    void getClient().logout().catch(() => {});
     storeToken(undefined);
     teamSocket.stop();
     set({
@@ -250,6 +305,8 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       session: undefined,
       world: undefined,
       state: undefined,
+      purchasedHints: undefined,
+      seenEvents: [],
       connection: "offline",
       error: undefined,
       pendingRecoveryCode: undefined,
@@ -265,6 +322,8 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       session: undefined,
       world: undefined,
       state: undefined,
+      purchasedHints: undefined,
+      seenEvents: [],
       connection: "offline",
       error: reason,
       pendingRecoveryCode: undefined,
@@ -273,16 +332,21 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   },
 
   async refreshState() {
-    const state = await getClient().getState();
-    set({ state });
+    const response = await getClient().getState();
+    set({ state: response.state, purchasedHints: response.purchasedHints });
   },
 
   /** Rebind the local session to the joined team and resync stream + world. */
   async switchTeam(teamId: string) {
     const session = get().session;
     if (session === undefined) return;
-    teamSocket.restart(session.token);
-    const [state, worlds] = await Promise.all([getClient().getState(), getClient().listWorlds()]);
+    // Server truth first (REST already resolves the joined team), then a
+    // CURSOR-RESET socket restart: the replay cursor is per team, so keeping
+    // the old team's lastSeq would make the server skip the new team's
+    // earlier events. The full replay re-merges idempotently (keep-first
+    // guards in the event reducer).
+    const [response, worlds] = await Promise.all([getClient().getState(), getClient().listWorlds()]);
+    const state = response.state;
     const world = worlds.find((w) => w.worldId === state.worldId);
     set({
       session: { ...session, teamId },
@@ -291,7 +355,10 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       world,
       seenEvents: [],
       pendingRecoveryCode: undefined,
+      purchasedHints: response.purchasedHints, // the joined team's own paid hints
     });
+    teamSocket.resetStream();
+    teamSocket.restart(session.token);
     announce("Joined the team. You share their case now.");
   },
 

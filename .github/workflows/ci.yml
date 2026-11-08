@@ -26,7 +26,11 @@ jobs:
           --health-timeout 5s
           --health-retries 12
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      # Required-Postgres mode: the server suite must run its DB-backed tests
+      # against this isolated instance. A green run with skipped DB tests is
+      # NOT database verification, so skips fail the job (see the grep below).
+      TEST_DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5432/postgres
+      REQUIRE_POSTGRES: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -42,9 +46,60 @@ jobs:
       - run: pnpm typecheck
       - name: Compile the public tutorial world
         run: pnpm run worlds:build
-      - run: pnpm test
+      - name: Unit + integration tests (DB required, zero silent skips)
+        run: |
+          set -o pipefail
+          pnpm test 2>&1 | tee /tmp/pnpm-test.log
+          if grep -Eqi '[0-9]+ (skipped|todo)' /tmp/pnpm-test.log; then
+            echo "::error::Tests were skipped while REQUIRE_POSTGRES=1 — DB acceptance did not execute"
+            grep -Ei '[0-9]+ (skipped|todo)' /tmp/pnpm-test.log || true
+            exit 1
+          fi
       - name: Headless tutorial playthrough + determinism (M0 gate)
         run: pnpm run test:integration
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      E2E_DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm run worlds:build
+      - name: Install bundled Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Browser acceptance (tutorial, accessibility, compact)
+        run: pnpm exec playwright test --workers=1
+      - name: Upload Playwright reports (no traces/screenshots on public CI)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-reports
+          path: |
+            test-results/e2e-report.json
+            test-results/html
+          retention-days: 14
+          if-no-files-found: warn
 
   security:
     runs-on: ubuntu-latest

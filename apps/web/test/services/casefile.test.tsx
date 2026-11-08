@@ -63,7 +63,7 @@ function install(submit: SubmitSpy): ReturnType<typeof vi.fn> {
     resumeSession: async () => {
       throw new Error("unused");
     },
-    getState: async () => wireState(),
+    getState: async () => ({ state: wireState() }),
     submit: spy as unknown as IzClient["submit"],
     getView: async () => {
       throw new Error("unused");
@@ -209,5 +209,17 @@ describe("CaseFilePanel: open reports", () => {
     expect(screen.getByText("Accepted: A")).toBeInTheDocument();
     expect(screen.getByText("Every group is accepted.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Submit group A" })).not.toBeInTheDocument();
+  });
+
+  it("restores purchased hint text from the server projection without another charge (D28)", async () => {
+    install(async () => ({ events: [] }));
+    useSessionStore.setState({
+      state: { ...wireState(), hintsUsed: { "g.printer": 1 } },
+      // The server projection slice (DECISIONS D28), not the wire state.
+      purchasedHints: { "g.printer": [{ tier: 1, text: "The passphrase is on the printer log.", cost: 10 }] },
+    });
+    render(<CaseFilePanel onClose={() => undefined} />);
+    // The paid-for text is back after a panel reopen — no hint request fired.
+    expect(await screen.findByText("The passphrase is on the printer log.")).toBeInTheDocument();
   });
 });

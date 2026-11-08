@@ -2,7 +2,8 @@ import { createHash, randomBytes } from "node:crypto";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { Db } from "./db/client.js";
 import { findLiveSession } from "./db/sessions.js";
-import { firstTeamForUser, getTeam } from "./db/teams.js";
+import { firstTeamForUser, getTeam, membershipRole } from "./db/teams.js";
+import type { SessionWithUser } from "./db/sessions.js";
 import type { TeamRow, UserRow } from "./db/schema.js";
 import { SESSION_COOKIE } from "./config.js";
 
@@ -28,6 +29,25 @@ export interface AuthContext {
   team: TeamRow;
   /** The session row id (used to rebind the team on invite join, §12). */
   sessionId: string;
+  /** sha256 of the session token (live-socket revocation registry key). */
+  sessionTokenHash: string;
+}
+
+/**
+ * The one authoritative team resolution for a session, shared by REST and the
+ * WebSocket transport (§12): the session's BOUND team when valid membership
+ * exists, otherwise the user's first membership. Both transports MUST use
+ * this — diverging (REST bound vs WS first membership) put a joined player's
+ * REST writes and live stream on different teams.
+ */
+export async function resolveSessionTeam(db: Db, session: SessionWithUser): Promise<TeamRow | undefined> {
+  if (session.session.teamId !== null) {
+    const bound = await getTeam(db, session.session.teamId);
+    if (bound !== undefined && (await membershipRole(db, bound.id, session.user.id)) !== undefined) {
+      return bound;
+    }
+  }
+  return firstTeamForUser(db, session.user.id);
 }
 
 /**
@@ -38,8 +58,10 @@ export async function authenticate(db: Db, request: FastifyRequest): Promise<Aut
   let token: string | undefined;
   const header = request.headers.authorization;
   if (typeof header === "string" && header.startsWith("Bearer ")) {
-    token = header.slice("Bearer ".length).trim();
-  } else {
+    const bearerToken = header.slice("Bearer ".length).trim();
+    if (bearerToken.length > 0) token = bearerToken;
+  }
+  if (token === undefined) {
     const rawCookie = request.cookies[COOKIE_NAME];
     if (rawCookie !== undefined) {
       const unsigned = request.unsignCookie(rawCookie);
@@ -52,14 +74,14 @@ export async function authenticate(db: Db, request: FastifyRequest): Promise<Aut
 
   const session = await findLiveSession(db, hashToken(token));
   if (session === undefined) return undefined;
-  // §12: every session belongs to a team. Sessions created before invite-join
-  // have no binding and fall back to the user's first membership.
-  const team =
-    session.session.teamId !== null
-      ? ((await getTeam(db, session.session.teamId)) ?? (await firstTeamForUser(db, session.user.id)))
-      : await firstTeamForUser(db, session.user.id);
+  const team = await resolveSessionTeam(db, session);
   if (team === undefined) return undefined;
-  return { user: session.user, team, sessionId: session.session.id };
+  return {
+    user: session.user,
+    team,
+    sessionId: session.session.id,
+    sessionTokenHash: session.session.tokenHash,
+  };
 }
 
 export async function authGuard(

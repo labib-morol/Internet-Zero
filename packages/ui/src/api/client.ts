@@ -33,11 +33,19 @@ export interface ViewResponse {
   collectibles: Array<{ artifactId: string; label: string }>;
 }
 
+export interface StateResponse {
+  state: WireRuntimeState;
+  /** Hints this team already paid for (DECISIONS D28); absent when none. */
+  purchasedHints?: Record<string, Array<{ tier: number; text: string; cost: number }>>;
+}
+
 export interface IzClient {
   listWorlds(): Promise<WorldSummary[]>;
   createSession(worldId: string): Promise<CreateSessionResponse>;
   resumeSession(recoveryCode: string): Promise<ResumeSessionResponse>;
-  getState(): Promise<WireRuntimeState>;
+  /** Revoke the current session server-side and clear its cookie (204/401). */
+  logout(): Promise<void>;
+  getState(): Promise<StateResponse>;
   submit(action: Action): Promise<SubmitActionResponse>;
   getView(host: string, path: string): Promise<ViewResponse>;
 }
@@ -96,9 +104,11 @@ export function createIzClient(options: IzClientOptions = {}): IzClient {
         body: JSON.stringify({ recoveryCode }),
       });
     },
+    async logout() {
+      await request<void>("/api/sessions/logout", { method: "POST" });
+    },
     async getState() {
-      const body = await request<{ state: WireRuntimeState }>("/api/state");
-      return body.state;
+      return request<StateResponse>("/api/state");
     },
     async submit(action) {
       return request<SubmitActionResponse>("/api/actions", {

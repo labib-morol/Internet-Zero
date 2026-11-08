@@ -9,8 +9,8 @@ import { createDb } from "./db/client.js";
 import { declaredMigrationCount, runMigrations } from "./db/migrate.js";
 import { submitAction, TeamLocks } from "./game.js";
 import { authGuard } from "./auth.js";
-import { registerRateLimit, registerSecurityHeaders } from "./security.js";
-import { broadcastToTeam, createRooms, registerWebsocket } from "./ws.js";
+import { registerMutationOriginGuard, registerRateLimit, registerSecurityHeaders } from "./security.js";
+import { broadcastToTeam, createRooms, createSessionSockets, registerWebsocket } from "./ws.js";
 import type { AppContext } from "./app-context.js";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerSessionRoutes } from "./routes/sessions.js";
@@ -40,6 +40,8 @@ export interface BuildAppOptions {
   runMigrations?: boolean;
   /** Override the in-memory rate limit for tests. Default 120/min (§16). */
   requestsPerMinute?: number;
+  /** Test seam: WebSocket hello deadline in ms. */
+  wsHelloTimeoutMs?: number;
 }
 
 export const DEFAULT_REQUESTS_PER_MINUTE = 120;
@@ -76,6 +78,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   const locks = new TeamLocks();
   const clock = { now: () => new Date().toISOString() };
   const rooms = createRooms();
+  const sessionSockets = createSessionSockets();
   const ctx: AppContext = {
     config,
     db,
@@ -83,6 +86,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     locks,
     clock,
     rooms,
+    sessionSockets,
     submit: (input: { teamId: string; bundle: WorldBundle; action: Action; actor: Actor }) =>
       submitAction({
         db,
@@ -101,7 +105,11 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(cookie, { secret: config.sessionSecret });
 
   registerSecurityHeaders(app, { publicOrigin: config.publicOrigin });
-  registerRateLimit(app, { requestsPerMinute: opts.requestsPerMinute ?? DEFAULT_REQUESTS_PER_MINUTE });
+  registerRateLimit(app, {
+    requestsPerMinute: opts.requestsPerMinute ?? DEFAULT_REQUESTS_PER_MINUTE,
+    trustProxy: config.trustProxy,
+  });
+  registerMutationOriginGuard(app, { publicOrigin: config.publicOrigin });
 
   registerHealthRoutes(app, ctx, expectedMigrations);
   registerSessionRoutes(app, ctx);
@@ -130,9 +138,12 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await registerWebsocket(app, {
     db,
     locks,
+    config,
     rooms,
+    sessionSockets,
     getBundle: (worldId) => bundles.get(worldId),
     submit: ctx.submit,
+    ...(opts.wsHelloTimeoutMs === undefined ? {} : { helloTimeoutMs: opts.wsHelloTimeoutMs }),
   });
 
   const webRoot = fileURLToPath(new URL('../../web/dist/', import.meta.url));

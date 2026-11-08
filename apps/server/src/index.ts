@@ -33,7 +33,18 @@ async function boot(): Promise<void> {
 
   const shutdown = (signal: string): void => {
     app.log.info({ signal }, "shutting down");
-    void app.close().finally(() => process.exit(0));
+    // Drain deadline: a hung close (open sockets, stalled pool) must not keep
+    // the process alive past the orchestrator's kill grace period anyway.
+    const forceTimer = setTimeout(() => process.exit(1), 10_000);
+    void app.close()
+      .then(() => {
+        clearTimeout(forceTimer);
+        process.exit(0);
+      })
+      .catch((error) => {
+        app.log.error(`close failed: ${error instanceof Error ? error.message : String(error)}`);
+        process.exit(1);
+      });
   };
   process.on("SIGINT", () => shutdown("SIGINT"));
   process.on("SIGTERM", () => shutdown("SIGTERM"));

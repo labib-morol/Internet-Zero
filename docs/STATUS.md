@@ -225,3 +225,74 @@ jsdom/worker-startup timeouts under parallel package runs.
 "CI green on a PR" ledger status: done (runs on push to main; PRs use the
 same workflow). Remaining owner-dependent: NODE_17 (private repo), Render
 account, GitHub OAuth app credentials for real sign-in.
+
+## Production-readiness planning checkpoint (2026-11-09)
+
+- Planning only: no product implementation, commit, push, deployment or model
+  switch in this session. Added the tutorial-first beta spec, GLM execution plan
+  and owner checklist:
+  - `docs/release/BETA_SPEC.md`
+  - `docs/superpowers/plans/2026-11-09-production-readiness.md`
+  - `docs/release/MANUAL_LAUNCH.md` (includes copy-paste executor prompt)
+- Fresh environment: Node 24.15.0, pnpm 12.16.1; `docker info` fails because
+  `dockerDesktopLinuxEngine` is unavailable. Restore Docker or supply isolated
+  test Postgres before DB acceptance. D1 records the approved Node 24 deviation;
+  AGENTS.md still says Node 22, so that instruction discrepancy is disclosed,
+  not silently rewritten.
+- Fresh baseline `pnpm build && pnpm test`: exit 0; build passed, package tests
+  **314 passed / 42 skipped**. All 42 skips are DB-backed server tests. This is
+  **not passing database verification**. Frontend JS remains 879.06 kB minified /
+  251.44 kB gzip, with the >500 kB bundle warning.
+- Read-only code inspection identified release blockers needing regression
+  tests and fixes: hardcoded DB test credentials can skip CI DB coverage; REST
+  and WS disagree on a joined session's team; session presentation caches survive
+  logout; cookie-only OAuth cannot fully bootstrap the browser; readiness failures
+  retain HTTP 200; Render's nested Dockerfile selection needs explicit configuration.
+  Proxy/Origin/session lifecycle hardening and notes/hints/terminal/focus/navigation
+  repairs are specified in the plan. These findings are not reported as fixed.
+- No fresh browser, real OAuth, external reference-model, staging, backup/restore
+  or public-production acceptance was performed. Prior CI green is historical
+  evidence, not a substitute for the new required checks. Recommended release
+  scope: tutorial-only public beta, private NODE_17 and competitive benchmark
+  claims deferred. Current launch verdict: **NOT READY pending execution and
+  acceptance**.
+
+## Execution checkpoint (2026-11-09, release/tutorial-beta — GLM-5.3 Flash)
+
+All six tasks of the production-readiness plan executed; ledger
+`docs/release/EXECUTION_LEDGER.md`; report `docs/release/RELEASE_REPORT.md`.
+Verdict: **LOCAL CANDIDATE** (staging/production acceptance owner-gated).
+
+- Fresh battery: `pnpm build && pnpm test && pnpm lint && pnpm typecheck` exit 0 —
+  **395 passed / 0 skipped** (baseline at planning: 314 passed / 42 DB-skipped).
+  `pnpm run test:integration` 29 passed. Browser e2e (bundled chromium, fresh DB,
+  workers=1, retries=0): 4/4 including full tutorial, keyboard-only, compact, axe
+  zero serious/critical. `pnpm audit --prod --audit-level high` clean after
+  updating @fastify/static; gitleaks (history + tree) clean.
+- Verification trust: server DB tests now env-driven (`TEST_DATABASE_ADMIN_URL`),
+  `REQUIRE_POSTGRES=1` fails instead of skipping (CI + skip-grep), CI gained a
+  chromium e2e job with sanitized report uploads. Remote admin hosts refused for
+  destructive test setup without opt-in.
+- Session/team correctness: shared REST/WS team resolution; recovery returns the
+  last team; transactional join with cap race closed; logout endpoint revokes
+  Bearer/cookie/new+open sockets and clears the cookie; sign-out wipes case
+  presentation state; guest recovery code survives bootstrap failures; cookie-only
+  bootstrap (OAuth can complete; WS cookie hello — schema D27).
+- Production safety: /readyz 503, proxy-aware rate limiting (rightmost XFF,
+  TRUST_PROXY), cookie-mutation Origin gate, no-store on /api, https-only
+  production origin, WS hello deadline, pool error handler, drain deadline,
+  Render blueprint dockerfilePath/TRUST_PROXY/NODE_ENV, audit
+  docs/security/audit-2026-11-09.md (blockers F1–F5 fixed, threat model updated).
+- Player journey: terminal Clear/rollover fix (identity-based sync), navigation
+  request identity, purchased-hints projection (schema D28; unpurchased text never
+  leaves the server), notes team-refetch + draft survival, honest landing links.
+- Performance: initial JS 879→354 kB (251→106 kB gzip, −58%) via lazy board/terminal
+  chunks with chunk error boundaries.
+- Independent whole-branch review: no blockers; 1 major (chunk error boundary) and
+  effect-worthy minors fixed with regression tests; security invariants explicitly
+  confirmed. Deferred (disclosed): modal focus traps, completion/replay UI, WS
+  cookie-hello integration test, Lighthouse field runs, real-model reference agent.
+- **Nothing is committed** — the entire change set is the uncommitted working tree
+  of `release/tutorial-beta`. Owner: review the release report, then authorize
+  commit + PR. Staging/OAuth/backup acceptance remains owner-gated per
+  docs/release/MANUAL_LAUNCH.md.

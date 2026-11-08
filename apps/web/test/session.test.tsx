@@ -193,7 +193,7 @@ describe("guest session flow (§11.3, §15)", () => {
         if (code !== "aaaaaaaaaaaaaaaa") throw new ApiError(401, "invalid recovery code");
         return { teamId: "team-1", userId: "user-9", sessionToken: "tok-9" };
       }),
-      getState: vi.fn(async () => wireState()),
+      getState: vi.fn(async () => ({ state: wireState() })),
       listWorlds: vi.fn(async () => [WORLD]),
     } as unknown as IzClient & { resumeSession: ReturnType<typeof vi.fn> };
     setIzClientForTests(client);
@@ -222,6 +222,7 @@ describe("guest session flow (§11.3, §15)", () => {
         throw new ApiError(401, "unauthorized");
       }),
       listWorlds: vi.fn(async () => [WORLD]),
+      logout: vi.fn(async () => undefined),
     } as unknown as IzClient;
     setIzClientForTests(client);
     sessionStorage.setItem("iz.session.token", "stale-token");
@@ -231,6 +232,8 @@ describe("guest session flow (§11.3, §15)", () => {
     expect(state.screen).toBe("landing");
     expect(state.session).toBeUndefined();
     expect(sessionStorage.getItem("iz.session.token")).toBeNull();
+    // The dead HttpOnly cookie is cleared server-side on the way out.
+    expect(client.logout).toHaveBeenCalledTimes(1);
     setIzClientForTests(undefined);
   });
 });

@@ -18,7 +18,8 @@ and `infra/compose.prebuilt.yml` runs compose against the prebuilt image.
 ## Render (master prompt §17.3)
 
 `infra/render.yaml` is a Blueprint: one Docker web service (plan `0.5c-512mb`,
-health check `/readyz`, migrations as `preDeployCommand`) plus a Postgres 18
+health check `/readyz`, migrations as `preDeployCommand`, Dockerfile explicitly
+`./infra/Dockerfile` because it is not at the repo root) plus a Postgres 18
 database (plan `0.1c-256mb`). Free tiers are intentionally not used: free web
 services spin down after 15 idle minutes and free Postgres expires after 30 days.
 
@@ -27,6 +28,20 @@ services spin down after 15 idle minutes and free Postgres expires after 30 days
    secret (32+ random bytes), apply.
 3. Put Cloudflare in front for TLS/caching if desired; point PUBLIC_ORIGIN at
    the public URL.
+
+Deployment shape and safety notes (2026-11-09):
+
+- **One process/replica only.** WS team rooms, team locks, rate-limit buckets
+  and MCP counters are process-local. Scaling beyond one instance (or a rolling
+  deploy overlapping two live instances) splits the live event fan-out and is
+  NOT supported until those are shared across processes.
+- `TRUST_PROXY=1` is set in the blueprint: requests arrive through Render's
+  proxy, so rate limiting keys on the proxy-added (rightmost) X-Forwarded-For
+  entry. Do not enable it for directly exposed servers, and revisit the policy
+  if you add a second proxy hop.
+- `NODE_ENV=production` is set: the server refuses to boot unless PUBLIC_ORIGIN
+  is https://, and `/readyz` reports 503 until the database, migrations and
+  bundles are actually ready.
 
 Troubleshooting: deploy failures usually mean `SESSION_SECRET` was not set
 (sync: false) or the world bundle was not baked (`pnpm run worlds:build` runs

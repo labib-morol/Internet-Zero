@@ -20,7 +20,15 @@ export type TerminalLineKind = "out" | "err" | "cmd" | "sys";
 export interface TerminalBufferLine {
   kind: TerminalLineKind;
   text: string;
+  /**
+   * Monotonic id, unique across the whole store lifetime. Renderers track what
+   * they wrote by id, NOT by array index: Clear shrinks the buffer and the
+   * 500-line cap rolls old lines off — index arithmetic goes blind in both.
+   */
+  n: number;
 }
+
+let lineCounter = 0;
 
 export interface TerminalConnectInfo {
   target: string;
@@ -56,12 +64,16 @@ interface TerminalState {
   reset(): void;
 }
 
-function pushLines(lines: TerminalBufferLine[], additions: TerminalBufferLine[]): TerminalBufferLine[] {
-  const next = [...lines, ...additions];
+export function pushLines(
+  lines: TerminalBufferLine[],
+  additions: Array<Omit<TerminalBufferLine, "n">>
+): TerminalBufferLine[] {
+  const withIds = additions.map((line) => ({ ...line, n: ++lineCounter }));
+  const next = [...lines, ...withIds];
   return next.length > TERMINAL_BUFFER_CAP ? next.slice(next.length - TERMINAL_BUFFER_CAP) : next;
 }
 
-function outputLines(output: string, kind: TerminalLineKind = "out"): TerminalBufferLine[] {
+function outputLines(output: string, kind: TerminalLineKind = "out"): Array<Omit<TerminalBufferLine, "n">> {
   const split = output.split("\n");
   // A trailing newline is layout, not an empty output line.
   if (split.length > 1 && split[split.length - 1] === "") split.pop();
@@ -78,7 +90,7 @@ function viewFetch(): ReturnType<typeof createIzClient>["getView"] {
 
 export const useTerminalStore = create<TerminalState>((set, get) => {
   /** Shared tail of every action: run a terminal dispatch and fold the result in. */
-  const runTerminalLine = async (line: string, echo: TerminalBufferLine | undefined): Promise<void> => {
+  const runTerminalLine = async (line: string, echo: Omit<TerminalBufferLine, "n"> | undefined): Promise<void> => {
     const { host, cwd, busy } = get();
     if (host === undefined || busy) return;
     set({ busy: true, lastError: undefined });
@@ -204,7 +216,7 @@ function applyRejection(set: StoreSet, get: StoreGet, rejection: Rejection): voi
 
 function applyResult(set: StoreSet, get: StoreGet, result: TerminalResultShape): void {
   const state = get();
-  const additions: TerminalBufferLine[] = [];
+  const additions: Array<Omit<TerminalBufferLine, "n">> = [];
   let host = state.host;
   let cwd = result.cwd;
   let pendingGateId = state.pendingGateId;

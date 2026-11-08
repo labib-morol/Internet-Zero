@@ -19,14 +19,19 @@ async function probeDatabase(ctx: AppContext, expectedMigrations: number): Promi
 export function registerHealthRoutes(app: FastifyInstance, ctx: AppContext, expectedMigrations: number): void {
   app.get("/healthz", async () => HealthResponse.parse({ ok: true }));
 
-  app.get("/readyz", async () => {
+  app.get("/readyz", async (_request, reply) => {
     const { database, migrations } = await probeDatabase(ctx, expectedMigrations);
     const bundlesLoaded = ctx.bundles.size;
-    return ReadyResponse.parse({
-      ready: database && migrations && bundlesLoaded >= 1,
+    const ready = database && migrations && bundlesLoaded >= 1;
+    const body = ReadyResponse.parse({
+      ready,
       database,
       migrationsCurrent: migrations,
       bundlesLoaded,
     });
+    // Orchestrators (Render health checks, compose) act on the STATUS CODE:
+    // an unready instance must be 503, never a 200 with ready:false.
+    if (!ready) return reply.code(503).send(body);
+    return body;
   });
 }

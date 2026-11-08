@@ -23,6 +23,20 @@ export function registerStateRoutes(app: FastifyInstance, ctx: AppContext): void
     validated.state.claims = Object.fromEntries(Object.entries(validated.state.claims).filter(([, claim]) => !claim.private || claim.createdBy === auth.user.id));
     validated.state.links = Object.fromEntries(Object.entries(validated.state.links).filter(([, link]) =>
       (validated.state.evidence[link.from] || validated.state.claims[link.from]) && (validated.state.evidence[link.to] || validated.state.claims[link.to])));
-    return { state: stateToWire(validated.state) };
+    // Hints this team has ALREADY paid for (DECISIONS D28): the panel-local
+    // hint list dies with the window, and re-requesting a purchased tier is
+    // rejected — so purchased text rides with the authoritative state.
+    // Unpurchased tiers are never included.
+    const purchasedHints: Record<string, Array<{ tier: 1 | 2 | 3; text: string; cost: number }>> = {};
+    for (const [gateId, usedTier] of Object.entries(validated.state.hintsUsed)) {
+      const tiers = bundle.hints
+        .filter((hint) => hint.gate === gateId && hint.tier <= usedTier)
+        .map((hint) => ({ tier: hint.tier, text: hint.text, cost: hint.cost }));
+      if (tiers.length > 0) purchasedHints[gateId] = tiers;
+    }
+    return {
+      state: stateToWire(validated.state),
+      ...(Object.keys(purchasedHints).length > 0 ? { purchasedHints } : {}),
+    };
   });
 }

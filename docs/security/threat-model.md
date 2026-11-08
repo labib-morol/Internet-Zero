@@ -40,8 +40,19 @@ reference tests that exist in the repo at commit `1067d03` or later — verify w
 
 ## Known gaps (honest)
 
-- Render deployment, team invite links, GitHub sign-in and the forum are not built.
+Updated 2026-11-09 (production-readiness audit, docs/security/audit-2026-11-09.md):
+
+- Teams, GitHub sign-in, the forum and the Render blueprint now EXIST; the 2026-11-03
+  note above is historical. Remaining deployment acceptance (real HTTPS host, OAuth
+  credentials, staging persistence, backup/restore) is owner-gated and pending.
+- Deployment is SINGLE-REPLICA by design: WS rooms, team locks, rate-limit buckets and
+  MCP counters are process-local. Horizontal scaling or rolling overlap is not supported
+  until events fan-out and admission control are shared across processes.
 - The CSP allows `style-src 'unsafe-inline'` (needed for window geometry); no inline
   scripts are permitted.
-- `pnpm audit --prod` reports 2 moderate advisories in dev-transitive `minimatch`/
-  `glob` (no fix adopted yet; not in the production runtime path).
+- Cookie-authenticated mutations require a matching Origin (browsers always send one on
+  cross-site POSTs); non-browser clients authenticate with explicit Bearer tokens.
+- `pnpm audit --prod --audit-level high` is clean (the two moderate transitive
+  advisories were resolved by updating @fastify/static).
+- Backup/restore drills and outage exercises have not been run against staging
+  infrastructure; the local battery proves code behavior only.

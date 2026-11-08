@@ -7,11 +7,11 @@ import {
 } from "@iz/schema";
 import { sessionStartEvent } from "@iz/runtime";
 import type { AppContext } from "../app-context.js";
-import { generateToken, hashToken, COOKIE_NAME } from "../auth.js";
+import { authenticate, generateToken, hashToken, COOKIE_NAME } from "../auth.js";
 import { append } from "../db/events.js";
-import { createSession } from "../db/sessions.js";
+import { createSession, latestLiveSessionTeamId, revokeSession } from "../db/sessions.js";
 import { createGuestUser, findUserByRecoveryCodeHash } from "../db/users.js";
-import { addTeamMember, createTeam, firstTeamForUser } from "../db/teams.js";
+import { addTeamMember, createTeam, firstTeamForUser, getTeam } from "../db/teams.js";
 
 const RECOVERY_CODE_BYTES = 8; // -> 16 hex chars
 
@@ -26,6 +26,15 @@ function setSessionCookie(
     httpOnly: true,
     sameSite: "lax",
     path: "/",
+    secure: ctx.config.publicOrigin.startsWith("https://"),
+  });
+}
+
+function clearSessionCookie(reply: FastifyReply, ctx: AppContext): void {
+  reply.clearCookie(COOKIE_NAME, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
     secure: ctx.config.publicOrigin.startsWith("https://"),
   });
 }
@@ -90,7 +99,11 @@ export function registerSessionRoutes(app: FastifyInstance, ctx: AppContext): vo
     if (user === undefined) {
       return reply.code(401).send({ error: "invalid recovery code" });
     }
-    const team = await firstTeamForUser(ctx.db, user.id);
+    // Recovery continuity: the player's most recent live bound team first
+    // (a joined team), falling back to their first membership.
+    const latestTeamId = await latestLiveSessionTeamId(ctx.db, user.id);
+    const latestTeam = latestTeamId !== undefined ? await getTeam(ctx.db, latestTeamId) : undefined;
+    const team = latestTeam ?? (await firstTeamForUser(ctx.db, user.id));
     if (team === undefined) {
       return reply.code(401).send({ error: "invalid recovery code" });
     }
@@ -105,5 +118,19 @@ export function registerSessionRoutes(app: FastifyInstance, ctx: AppContext): vo
         sessionToken,
       })
     );
+  });
+
+  // POST /api/sessions/logout — revoke the current session everywhere: the
+  // row is deleted (Bearer and cookie both die), open sockets for the token
+  // hash are closed, and the cookie is cleared. Idempotent: an absent or dead
+  // session still clears the cookie.
+  app.post("/api/sessions/logout", async (request, reply) => {
+    const auth = await authenticate(ctx.db, request);
+    if (auth !== undefined) {
+      await revokeSession(ctx.db, auth.sessionId);
+      ctx.sessionSockets.closeAll(auth.sessionTokenHash);
+    }
+    clearSessionCookie(reply, ctx);
+    return reply.code(204).send();
   });
 }

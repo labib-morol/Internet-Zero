@@ -1,5 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
-import type { Db } from "./client.js";
+import type { Db, Tx } from "./client.js";
 import { teamMembers, teams, users, type TeamRow } from "./schema.js";
 
 export interface CreateTeamInput {
@@ -36,7 +36,7 @@ export async function getTeam(db: Db, teamId: string): Promise<TeamRow | undefin
 }
 
 export async function addTeamMember(
-  db: Db,
+  db: Db | Tx,
   teamId: string,
   userId: string,
   role: "owner" | "member"

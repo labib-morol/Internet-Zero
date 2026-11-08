@@ -83,6 +83,33 @@ export function TerminalSessionArea(): ReactNode {
 
 /* ------------------------------ Graphical mode ---------------------------- */
 
+export interface TerminalSyncPlan {
+  /** Wipe the engine before writing (buffer was cleared/shrunk). */
+  clear: boolean;
+  /** Lines the engine has not written yet, oldest first. */
+  write: TerminalBufferLine[];
+  /** The id the engine is caught up to after applying this plan. */
+  lastN: number;
+}
+
+/**
+ * Decides what the graphical engine must write given the highest line id it
+ * already rendered. Identity-based: index arithmetic goes blind when Clear
+ * shrinks the buffer or the 500-line cap rolls old lines off, which used to
+ * make all new output invisible until the window was reopened.
+ */
+export function planTerminalSync(lastN: number, lines: readonly TerminalBufferLine[]): TerminalSyncPlan {
+  if (lines.length === 0) {
+    return lastN > 0 ? { clear: true, write: [], lastN: 0 } : { clear: false, write: [], lastN: 0 };
+  }
+  const newest = lines[lines.length - 1]!;
+  if (newest.n < lastN) {
+    // Engine is ahead of the buffer (shrunk without emptying): rebuild.
+    return { clear: true, write: [...lines], lastN: newest.n };
+  }
+  return { clear: false, write: lines.filter((line) => line.n > lastN), lastN: newest.n };
+}
+
 function TerminalConsole({ lines }: { lines: TerminalBufferLine[] }): ReactNode {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<TerminalEngine | null>(null);
@@ -105,11 +132,13 @@ function TerminalConsole({ lines }: { lines: TerminalBufferLine[] }): ReactNode 
     const engine = createTerminalEngine(container);
     engineRef.current = engine;
     // Replay the buffer built before this mount (e.g. session started in the
-    // browser page, window opened afterwards).
-    for (const line of useTerminalStore.getState().lines) {
+    // browser page, window opened afterwards). The buffer is append-ordered,
+    // so the last line carries the highest id.
+    const existing = useTerminalStore.getState().lines;
+    for (const line of existing) {
       engine.write(`${ansiFor(line)}${lineText(line)}${ANSI.reset}\n`);
     }
-    writtenRef.current = useTerminalStore.getState().lines.length;
+    writtenRef.current = existing.length > 0 ? existing[existing.length - 1]!.n : 0;
 
     // Whole-line dispatch on Enter; printable keys echo locally, never executed.
     const handleData = (data: string): void => {
@@ -147,16 +176,27 @@ function TerminalConsole({ lines }: { lines: TerminalBufferLine[] }): ReactNode 
     };
   }, []);
 
-  // New scrollback lines → xterm.
+  // New scrollback lines → xterm, tracked by line id (never by index).
   useEffect(() => {
     const engine = engineRef.current;
     if (engine === null) return;
-    while (writtenRef.current < lines.length) {
-      const line = lines[writtenRef.current]!;
+    const plan = planTerminalSync(writtenRef.current, lines);
+    if (plan.clear) engine.clear();
+    for (const line of plan.write) {
       engine.write(`${ansiFor(line)}${lineText(line)}${ANSI.reset}\n`);
-      writtenRef.current += 1;
     }
+    writtenRef.current = plan.lastN;
   }, [lines]);
+
+  // The terminal fits its container, which resizes with the desktop window
+  // (drag/resize/minimize) — not just with the browser viewport.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container === null || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => engineRef.current?.fit());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   // Prompt: written whenever the awaiting-input state changes. The key flips
   // to "busy" while a dispatch is in flight, so a failed passphrase attempt

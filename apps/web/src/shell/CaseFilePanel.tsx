@@ -43,6 +43,28 @@ export function CaseFilePanel({ onClose }: { onClose: () => void }): ReactNode {
   const [reportSlots, setReportSlots] = useState<Record<string, string>>({});
   const [reportFeedback, setReportFeedback] = useState<Record<string, Feedback>>({});
 
+  // Purchased hints are SERVER state (DECISIONS D28): the authoritative state
+  // projection carries the text of every tier this team paid for, so a
+  // reopened panel (or a reload) restores them instead of silently losing
+  // paid-for content. Never overwrite fresher local entries.
+  const purchasedHints = useSessionStore((s) => s.purchasedHints);
+  useEffect(() => {
+    if (purchasedHints === undefined) return;
+    setHints((current) => {
+      let changed = false;
+      const next = { ...current };
+      for (const [gateId, tiers] of Object.entries(purchasedHints)) {
+        const existing = next[gateId] ?? [];
+        const missing = tiers.filter((tier) => !existing.some((x) => x.tier === tier.tier));
+        if (missing.length > 0) {
+          next[gateId] = [...existing, ...missing.map((m) => ({ tier: m.tier as 1 | 2 | 3, text: m.text, cost: m.cost }))].sort((a, b) => a.tier - b.tier);
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [purchasedHints]);
+
   const solvedCount = Object.keys(state?.solvedGates ?? {}).length;
   const score = state?.score;
 

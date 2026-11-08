@@ -2,31 +2,58 @@ import { randomBytes } from "node:crypto";
 import { defineConfig } from "@playwright/test";
 
 /**
- * E2E (M1 task 13). Uses the system Edge channel so no browser download is
- * required; falls back to bundled chromium when installed. The session secret
- * is ephemeral and local to this run — never a committed credential.
+ * E2E (M1 task 13).
+ * Browser: bundled chromium in CI; locally the system Edge channel by default
+ * (no download). Override with E2E_BROWSER_CHANNEL anywhere (empty string =
+ * bundled chromium locally).
+ * Database: derived from E2E_DATABASE_ADMIN_URL (default: the local dev
+ * instance); the server webServer's bootstrap command creates a uniquely
+ * named database per run (`iz_e2e_*`; clean up stale ones locally with
+ * `docker exec iz-dev-pg psql -U intranet -d postgres -c
+ * "drop database \"iz_e2e_<name>\" with (force)"`). Migrations run at server
+ * boot. The session secret is ephemeral per run — never a committed credential.
  */
 const sessionSecret = randomBytes(32).toString("hex");
+const isCi = Boolean(process.env.CI);
+
+const adminUrl =
+  process.env.E2E_DATABASE_ADMIN_URL ?? "postgres://intranet:intranet@localhost:5432/postgres";
+const dbName = process.env.E2E_DB_NAME ?? `iz_e2e_${randomBytes(4).toString("hex")}`;
+const databaseUrl = new URL(adminUrl);
+databaseUrl.pathname = `/${dbName}`;
+
+const channel =
+  process.env.E2E_BROWSER_CHANNEL === undefined && !isCi
+    ? "msedge"
+    : process.env.E2E_BROWSER_CHANNEL || undefined;
 
 export default defineConfig({
   testDir: "test/e2e",
   timeout: 90_000,
-  // One retry: the tutorial flow is long; under heavy local load a single
-  // 5s expect can race a re-render. A retry is reported as such, never hidden.
-  retries: 1,
-  reporters: [["line"], ["json", { outputFile: "test-results/e2e-report.json" }]],
+  // Explicit retry policy: one CI retry, reported as flaky in the JSON
+  // report — never hidden; none locally so flakes surface during development.
+  retries: isCi ? 1 : 0,
+  reporters: [
+    ["line"],
+    ["json", { outputFile: "test-results/e2e-report.json" }],
+    ["html", { open: "never", outputFolder: "test-results/html" }],
+  ],
   use: {
-    channel: "msedge",
+    ...(channel === undefined ? {} : { channel }),
     baseURL: "http://localhost:5173",
-    trace: "retain-on-failure",
+    // CI uploads only reports, never traces/screenshots: public-CI artifacts
+    // must not carry page content. Local runs keep failure traces locally.
+    trace: isCi ? "off" : "retain-on-failure",
   },
   webServer: [
     {
-      command: "pnpm exec tsx apps/server/src/index.ts",
+      command:
+        "pnpm --filter @iz/server exec tsx scripts/e2e-ensure-db.ts && pnpm exec tsx apps/server/src/index.ts",
       port: 8080,
-      reuseExistingServer: true,
+      // CI must test a fresh server, never a stale local process.
+      reuseExistingServer: !isCi,
       env: {
-        DATABASE_URL: "postgres://intranet:intranet@localhost:5432/intranet_zero",
+        DATABASE_URL: databaseUrl.toString(),
         SESSION_SECRET: sessionSecret,
         PUBLIC_ORIGIN: "http://localhost:8080",
         WORLDS_DIR: "dist/worlds",
@@ -36,7 +63,7 @@ export default defineConfig({
     {
       command: "pnpm --filter @iz/web exec vite --port 5173 --strictPort",
       port: 5173,
-      reuseExistingServer: true,
+      reuseExistingServer: !isCi,
     },
   ],
 });

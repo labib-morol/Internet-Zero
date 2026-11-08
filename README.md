@@ -10,11 +10,16 @@ Prerequisites: Node 24 (engines `>=22`), pnpm 12, Docker (for Postgres).
 
 ```bash
 pnpm install
-docker compose -f infra/docker-compose.yml up -d          # Postgres 18
-cp .env.example .env                                       # then set SESSION_SECRET
+cp .env.example .env                                       # FIRST: set SESSION_SECRET (compose refuses to start without it)
+docker compose -f infra/docker-compose.yml up -d          # Postgres 18 + app on :8080
 pnpm run worlds:build                                      # compile the tutorial
-pnpm run dev                                               # API :8080 + web :5173
+pnpm run dev                                               # API :8080 + web :5173 (host dev needs a reachable Postgres)
 ```
+
+Host-based `pnpm run dev` needs Postgres on localhost:5432 — publish the port or run a
+throwaway instance: `docker run -d --name iz-dev-pg -e POSTGRES_USER=intranet -e
+POSTGRES_PASSWORD=intranet -p 5432:5432 postgres:18-alpine`. The compose stack above is
+the self-contained alternative (no published DB port; the app container talks to `db`).
 
 Open http://localhost:5173 and press **Open the case** — a guest session starts the
 public tutorial "Lost and Found" (CC BY 4.0), playable in the browser, keyboard-only
@@ -40,9 +45,12 @@ run the scripted tutorial oracle with `pnpm exec tsx tools/benchmark.ts`
 
 ## Status
 
-M0 and M1 are complete for the public tutorial; M2 engine parts (MCP server, agent
-tokens, oracle, scorer, benchmark runs) are implemented. Not built yet: team invite
-links, GitHub sign-in, forum, Render deploy. Details and evidence:
-`docs/STATUS.md` (ledger), `docs/PLAN.md`, `docs/security/audit-2026-11-03.md`.
+M0 and M1 are complete for the public tutorial. M2 (teams with invite links, forum,
+GitHub sign-in backend, MCP server, agent tokens, oracle, scorer, benchmark runs) is
+implemented; production-readiness hardening (required-DB CI, logout/revocation,
+team-binding fixes, readiness 503, origin/CSRF gate, proxy-aware rate limiting) landed
+2026-11-09 — see `docs/security/audit-2026-11-09.md`. Tutorial-first public beta is the
+release target. Details and evidence: `docs/STATUS.md` (ledger), `docs/PLAN.md`,
+`docs/release/RELEASE_REPORT.md`.
 
 Engine Apache-2.0 · sample worlds CC BY 4.0

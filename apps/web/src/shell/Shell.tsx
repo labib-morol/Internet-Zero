@@ -1,16 +1,21 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, useRef, useState, type ReactNode } from "react";
 import { LiveRegion, MenuBar, Window, announce, teamSocket, useSessionStore } from "@iz/ui";
 import { BrowserWindow } from "../browser/BrowserWindow.js";
 import { parseAddress, useBrowserStore } from "../browser/store.js";
-import { TerminalWindow } from "../services/index.js";
 import { NotebookWindow } from "../notebook/index.js";
-import { BoardWindow } from "../board/index.js";
 import { NetworkDirectory } from "../network/NetworkDirectory.js";
 import { CaseFilePanel } from "./CaseFilePanel.js";
 import { HelpContent } from "./HelpContent.js";
 import { DOCK_ORDER, activateByHotkey, useWindowsStore, type AppId, type ManagedWindow } from "./windows.js";
 import { Dock } from "@iz/ui";
 import { RecoveryModal } from "../shared/RecoveryModal.js";
+import { ChunkErrorBoundary } from "../shared/ChunkErrorBoundary.js";
+
+// The evidence board (graph canvas) and the graphical terminal (xterm) are
+// only loaded when their windows open: they are the two heaviest surfaces in
+// the bundle and rarely the first thing a new player touches.
+const BoardWindow = lazy(() => import("../board/index.js").then((m) => ({ default: m.BoardWindow })));
+const TerminalWindow = lazy(() => import("../services/index.js").then((m) => ({ default: m.TerminalWindow })));
 
 /**
  * Desktop shell (§11.1): menu bar, dock, window manager, case file panel.
@@ -46,14 +51,26 @@ function WindowSurface({ win }: { win: ManagedWindow }): ReactNode {
         </div>
       );
     case "terminal":
-      return <TerminalWindow />;
+      return (
+        <ChunkErrorBoundary label="terminal">
+          <Suspense fallback={<p style={{ color: "var(--iz-faint)", padding: 12 }}>Connecting to the node…</p>}>
+            <TerminalWindow />
+          </Suspense>
+        </ChunkErrorBoundary>
+      );
     case "notebook":
       return <NotebookWindow onOpenInBrowser={({ host, path }) => {
         useWindowsStore.getState().activate('browser');
         void useBrowserStore.getState().navigate(host, path.startsWith('/') ? path : `/${path}`);
       }} />;
     case "board":
-      return <BoardWindow onOpenItem={() => useWindowsStore.getState().activate('notebook')} />;
+      return (
+        <ChunkErrorBoundary label="evidence board">
+          <Suspense fallback={<p style={{ color: "var(--iz-faint)", padding: 12 }}>Loading evidence board…</p>}>
+            <BoardWindow onOpenItem={() => useWindowsStore.getState().activate('notebook')} />
+          </Suspense>
+        </ChunkErrorBoundary>
+      );
     default:
       return <p>Unknown app.</p>;
   }

@@ -46,7 +46,23 @@ export type WorldSummary = z.infer<typeof WorldSummary>;
 export const ListWorldsResponse = z.strictObject({ worlds: z.array(WorldSummary) });
 export type ListWorldsResponse = z.infer<typeof ListWorldsResponse>;
 
-export const GetStateResponse = z.strictObject({ state: RuntimeState });
+/** A hint tier the team has already PAID for (state projection, DECISIONS D28). */
+export const PurchasedHint = z.strictObject({
+  tier: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  text: z.string(),
+  cost: z.number().int().min(0),
+});
+export type PurchasedHint = z.infer<typeof PurchasedHint>;
+
+export const GetStateResponse = z.strictObject({
+  state: RuntimeState,
+  /**
+   * Texts of hint tiers this team has purchased, keyed by gate. Unpurchased
+   * tiers are never included — the client cannot buy, and hint text must not
+   * leave the server before it is paid for (DECISIONS D28).
+   */
+  purchasedHints: z.record(z.string(), z.array(PurchasedHint)).optional(),
+});
 export type GetStateResponse = z.infer<typeof GetStateResponse>;
 
 export const SubmitActionRequest = z.strictObject({ action: Action });

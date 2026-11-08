@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { Button, useSessionStore } from "@iz/ui";
+import { Button, readStoredToken, useSessionStore } from "@iz/ui";
 
 /**
  * Landing page (§11.3): one sentence, one primary button, guest start with no
@@ -47,10 +47,13 @@ export function LandingPage(): ReactNode {
         <span style={{ color: "var(--iz-faint)", fontSize: 12.5 }}>the internet is your crime scene</span>
         <span className="iz-menubar__spacer" />
         <nav aria-label="Site links" style={{ display: "flex", gap: 14 }}>
-          <a href="#" style={{ color: "var(--iz-dim)", fontSize: 13 }}>
+          <a href="https://github.com/labib-morol/Internet-Zero" style={{ color: "var(--iz-dim)", fontSize: 13 }}>
             GitHub
           </a>
-          <a href="#" style={{ color: "var(--iz-dim)", fontSize: 13 }}>
+          <a
+            href="https://github.com/labib-morol/Internet-Zero/blob/main/docs/mcp/connect.md"
+            style={{ color: "var(--iz-dim)", fontSize: 13 }}
+          >
             MCP docs
           </a>
         </nav>
@@ -84,6 +87,19 @@ export function LandingPage(): ReactNode {
             {error !== undefined && (
               <p role="alert" style={{ color: "var(--iz-bad)", fontSize: 13, marginBottom: 0 }}>
                 {error}
+                {/* A stored token means a session EXISTS: retrying re-enters it
+                    instead of creating a second guest (recovery-code safety). */}
+                {readStoredToken() !== undefined && status === "error" && (
+                  <>
+                    {" "}
+                    <Button
+                      variant="quiet"
+                      onClick={() => void useSessionStore.getState().bootstrap()}
+                    >
+                      Try again
+                    </Button>
+                  </>
+                )}
               </p>
             )}
           </div>
@@ -112,8 +128,8 @@ export function LandingPage(): ReactNode {
           <section className="iz-landing__section">
             <h2>Play with friends</h2>
             <p>
-              Investigations are shared per team — up to six players on one case stream. Team invite
-              links arrive with the next milestone.
+              Investigations are shared per team — up to six players on one case stream. Open the
+              teams panel on your desktop to mint an invite code.
             </p>
           </section>
           <section className="iz-landing__section">
@@ -121,7 +137,7 @@ export function LandingPage(): ReactNode {
             <p>
               The engine and world format are open source. Fork the repo, build a world from YAML, and
               your intranet comes alive.{" "}
-              <a href="#" aria-label="INTRANET ZERO on GitHub (placeholder link)">
+              <a href="https://github.com/labib-morol/Internet-Zero" aria-label="INTRANET ZERO on GitHub">
                 GitHub →
               </a>
             </p>
@@ -131,7 +147,10 @@ export function LandingPage(): ReactNode {
             <p>
               The same worlds are playable over MCP with exactly a player's permissions — a benchmark
               you can score.{" "}
-              <a href="#" aria-label="MCP documentation (placeholder link)">
+              <a
+                href="https://github.com/labib-morol/Internet-Zero/blob/main/docs/mcp/connect.md"
+                aria-label="MCP documentation"
+              >
                 MCP docs →
               </a>
             </p>
@@ -141,8 +160,8 @@ export function LandingPage(): ReactNode {
 
       <footer className="iz-landing__foot">
         <span>Engine Apache-2.0 · sample worlds CC BY 4.0</span>
-        <a href="#">Source</a>
-        <a href="#">Documentation</a>
+        <a href="https://github.com/labib-morol/Internet-Zero">Source</a>
+        <a href="https://github.com/labib-morol/Internet-Zero/tree/main/docs">Documentation</a>
         <span>
           {world === undefined
             ? "Runs entirely on a private server. Nothing leaves it."

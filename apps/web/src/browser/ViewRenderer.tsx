@@ -1,11 +1,16 @@
-import type { ReactNode } from "react";
+import { Suspense, lazy, type ReactNode } from "react";
 import type { NotFound, ViewModel } from "@iz/schema";
 import type { Collectible } from "./store.js";
 import { ForgePage } from "../services/forge/ForgeViews.js";
 import { MailPage } from "../services/mail/MailViews.js";
 import { ArchivePage } from "../services/archive/ArchiveViews.js";
 import { ForumPage } from "../services/forum/ForumViews.js";
-import { TerminalSessionPage } from "../services/terminal/TerminalWindow.js";
+import { ChunkErrorBoundary } from "../shared/ChunkErrorBoundary.js";
+// xterm (the graphical terminal) is the heaviest single surface: it loads on
+// first terminal page/window render instead of at boot.
+const TerminalSessionPage = lazy(() =>
+  import("../services/terminal/TerminalWindow.js").then((m) => ({ default: m.TerminalSessionPage }))
+);
 import "../services/services.css";
 
 /**
@@ -76,7 +81,13 @@ function ViewBody({ view, host, collectibles, onCollect }: {
     case "archive-document":
       return <ArchivePage view={view} host={host} />;
     case "terminal":
-      return <TerminalSessionPage view={view} />;
+      return (
+        <ChunkErrorBoundary label="terminal page">
+          <Suspense fallback={<p style={{ color: "var(--iz-faint)", padding: 12 }}>Loading terminal…</p>}>
+            <TerminalSessionPage view={view} />
+          </Suspense>
+        </ChunkErrorBoundary>
+      );
     case "forum-board-list":
     case "forum-board":
     case "forum-thread":

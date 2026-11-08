@@ -41,7 +41,16 @@ export function registerGithubRoutes(app: FastifyInstance, ctx: AppContext): voi
   app.get("/api/auth/github/start", async (request, reply) => {
     if (!configured()) return unauthorized(reply);
     const state = randomBytes(16).toString("hex");
-    reply.setCookie(STATE_COOKIE, state, { signed: true, httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
+    reply.setCookie(STATE_COOKIE, state, {
+      signed: true,
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 600,
+      // The state cookie protects a redirect dance that ends in a session —
+      // it must never travel over plain HTTP.
+      secure: ctx.config.publicOrigin.startsWith("https://"),
+    });
     const params = new URLSearchParams({
       client_id: String(process.env.GITHUB_OAUTH_ID),
       redirect_uri: `${ctx.config.publicOrigin}/api/auth/github/callback`,
@@ -71,6 +80,8 @@ export function registerGithubRoutes(app: FastifyInstance, ctx: AppContext): voi
         code: query.code,
         redirect_uri: `${ctx.config.publicOrigin}/api/auth/github/callback`,
       }),
+      // Never hang a browser redirect on a stalled upstream.
+      signal: AbortSignal.timeout(10_000),
     });
     if (!tokenResponse.ok) return reply.code(502).send({ error: "github token exchange failed" });
     const tokenBody = (await tokenResponse.json()) as { access_token?: string };
@@ -78,6 +89,7 @@ export function registerGithubRoutes(app: FastifyInstance, ctx: AppContext): voi
 
     const userResponse = await githubFetchImpl("https://api.github.com/user", {
       headers: { authorization: `Bearer ${tokenBody.access_token}`, accept: "application/vnd.github+json", "user-agent": "intranet-zero" },
+      signal: AbortSignal.timeout(10_000),
     });
     if (!userResponse.ok) return reply.code(502).send({ error: "github user fetch failed" });
     const profile = (await userResponse.json()) as { id?: number; login?: string };

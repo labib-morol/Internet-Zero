@@ -42,6 +42,13 @@ interface BrowserState {
   collect(artifactId: string, label?: string): Promise<boolean>;
   /** Collect the selected range of the current view (select-then-press-C). */
   collectSelection(fragment: { kind: "range"; start: number; end: number }): Promise<boolean>;
+  /**
+   * Session teardown: wipe everything that belongs to the CASE being viewed —
+   * history, cached view, bookmarks, visited hosts. Presentation preferences
+   * that outlive a session are not kept here today; if any are added, keep
+   * them OUT of this reset.
+   */
+  resetSessionContent(): void;
 }
 
 export function parseAddress(input: string): NavEntry | undefined {
@@ -103,6 +110,7 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
     const samePage = current !== undefined && current.host === normalized.host && current.path === normalized.path;
     const nextEntries = samePage ? entries : [...entries.slice(0, index + 1), normalized];
     const nextIndex = samePage ? index : nextEntries.length - 1;
+    const requestId = nextNavigationId();
     set({
       entries: nextEntries,
       index: nextIndex,
@@ -117,17 +125,20 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
     void session.dispatch({ type: "open", url: `${normalized.host}${normalized.path}` });
     try {
       const response = await createViewFetch()(normalized.host, normalized.path);
-      // Ignore stale responses (address bar moved on meanwhile).
-      if (get().index !== nextIndex || get().entries[nextIndex] !== nextEntries[nextIndex]) return;
+      if (navigationId !== requestId) return; // superseded by a newer navigation
       set({ load: "ready", view: response.view, collectibles: response.collectibles });
     } catch (error) {
+      if (navigationId !== requestId) return; // a newer navigation owns the view now
       set({ load: "error", error: error instanceof Error ? error.message : "The page could not be loaded." });
     }
   },
 
   async goToAddress(address) {
     const parsed = parseAddress(address);
-    if (parsed === undefined) return false;
+    if (parsed === undefined) {
+      set({ load: "error", error: "That address doesn't look right. Try a host like forge.pinecone.pcp/." });
+      return false;
+    }
     await get().navigate(parsed.host, parsed.path);
     return true;
   },
@@ -135,21 +146,21 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
   async back() {
     const { index } = get();
     if (index <= 0) return;
-    set({ index: index - 1 });
+    const requestId = nextNavigationId();
+    set({ index: index - 1, load: "loading", error: undefined });
     const entry = get().entries[get().index];
     if (entry === undefined) return;
-    set({ load: "loading" });
-    await loadCurrent(set, get, entry);
+    await loadCurrent(set, get, entry, requestId);
   },
 
   async forward() {
     const { index, entries } = get();
     if (index >= entries.length - 1) return;
-    set({ index: index + 1 });
+    const requestId = nextNavigationId();
+    set({ index: index + 1, load: "loading", error: undefined });
     const entry = get().entries[get().index];
     if (entry === undefined) return;
-    set({ load: "loading" });
-    await loadCurrent(set, get, entry);
+    await loadCurrent(set, get, entry, requestId);
   },
 
   toggleBookmark() {
@@ -197,17 +208,44 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
     if (artifactId === undefined || artifactId === null) return false;
     return get().collect(artifactId, `selection (${fragment.end - fragment.start} chars)`);
   },
+
+  resetSessionContent() {
+    set({
+      entries: [],
+      index: -1,
+      bookmarks: [],
+      load: "idle",
+      view: undefined,
+      collectibles: [],
+      error: undefined,
+      visitedHosts: [],
+    });
+  },
 }));
+
+/**
+ * Monotonic navigation id: every navigation/back/forward takes one, and a
+ * response may only touch the view while its id is the CURRENT one. Late
+ * successes and late failures alike must never clobber a newer page.
+ */
+let navigationId = 0;
+function nextNavigationId(): number {
+  navigationId += 1;
+  return navigationId;
+}
 
 async function loadCurrent(
   set: (partial: Partial<BrowserState>) => void,
   get: () => BrowserState,
-  entry: NavEntry
+  entry: NavEntry,
+  requestId: number
 ): Promise<void> {
   try {
     const response = await createViewFetch()(entry.host, entry.path);
+    if (navigationId !== requestId) return; // superseded
     set({ load: "ready", view: response.view, collectibles: response.collectibles, error: undefined });
   } catch (error) {
+    if (navigationId !== requestId) return; // superseded
     set({ load: "error", error: error instanceof Error ? error.message : "The page could not be loaded." });
   }
 }

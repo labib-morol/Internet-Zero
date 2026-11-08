@@ -79,6 +79,16 @@ export class TeamSocket {
     this.start(token);
   }
 
+  /**
+   * Drop the replay cursor: the next hello replays the team stream from the
+   * beginning. The cursor is PER TEAM — switching teams without resetting it
+   * makes the server skip every new-team event below the old team's lastSeq.
+   */
+  resetStream(): void {
+    this.#lastSeq = 0;
+    this.#attempt = 0;
+  }
+
   stop(): void {
     this.#stopped = true;
     if (this.#retryTimer !== undefined) {

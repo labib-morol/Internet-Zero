@@ -14,6 +14,13 @@ export interface ServerConfig {
   logLevel: string;
   port: number;
   host: string;
+  /**
+   * Behind a trusted reverse proxy (Render), client IPs arrive in
+   * X-Forwarded-For. Only the rightmost (proxy-added) entry is used, so a
+   * client-supplied chain cannot forge its bucket. Never enable for directly
+   * exposed servers.
+   */
+  trustProxy: boolean;
 }
 
 /**
@@ -66,8 +73,13 @@ export function resolveConfig(env: NodeJS.ProcessEnv = process.env): ServerConfi
     throw new Error("SESSION_SECRET must be at least 32 bytes");
   }
   const publicOrigin = env.PUBLIC_ORIGIN ?? requireEnv("PUBLIC_ORIGIN");
-  if (!/^https?:\/\//.test(publicOrigin)) {
-    throw new Error("PUBLIC_ORIGIN must start with http:// or https://");
+  if (!/^https?:\/\//.test(publicOrigin) || (() => { try { new URL(publicOrigin); return false; } catch { return true; } })()) {
+    throw new Error("PUBLIC_ORIGIN must be a parseable http:// or https:// URL");
+  }
+  // Production serves cookies and OAuth redirects: a canonical HTTPS origin
+  // is required there, not merely recommended.
+  if (env.NODE_ENV === "production" && !publicOrigin.startsWith("https://")) {
+    throw new Error("PUBLIC_ORIGIN must be https:// in production (cookies/HSTS depend on it)");
   }
   const worldsDir = env.WORLDS_DIR ?? requireEnv("WORLDS_DIR");
   const logLevel = env.LOG_LEVEL ?? "info";
@@ -76,5 +88,6 @@ export function resolveConfig(env: NodeJS.ProcessEnv = process.env): ServerConfi
     throw new Error("PORT must be an integer between 1 and 65535");
   }
   const host = env.HOST ?? "0.0.0.0";
-  return { databaseUrl, sessionSecret, publicOrigin, worldsDir, logLevel, port, host };
+  const trustProxy = env.TRUST_PROXY === "1";
+  return { databaseUrl, sessionSecret, publicOrigin, worldsDir, logLevel, port, host, trustProxy };
 }

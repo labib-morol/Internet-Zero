@@ -90,7 +90,7 @@ function installSession(submit: SubmitSpy): Mock {
     resumeSession: async () => {
       throw new Error("unused");
     },
-    getState: async () => wireState(),
+    getState: async () => ({ state: wireState() }),
     submit: spy as unknown as IzClient["submit"],
     getView: async () => {
       throw new Error("unused");
@@ -189,7 +189,7 @@ describe("terminal store: passphrase state machine", () => {
     expect(useTerminalStore.getState().cwd).toBe("/etc");
 
     // Stuff the buffer past the cap, then run one more command.
-    const stuffed = Array.from({ length: 505 }, (_, i) => ({ kind: "out" as const, text: `old ${i}` }));
+    const stuffed = Array.from({ length: 505 }, (_, i) => ({ kind: "out" as const, text: `old ${i}`, n: i + 1 }));
     useTerminalStore.setState({ lines: stuffed });
     await useTerminalStore.getState().submitLine("pwd");
     const s = useTerminalStore.getState();
@@ -250,7 +250,7 @@ describe("terminal screen-reader mode (§11.5)", () => {
     useTerminalStore.setState({
       host: "printer.pinecone.pcp",
       cwd: "/",
-      lines: [{ kind: "out", text: "file.txt" }],
+      lines: [{ kind: "out", text: "file.txt", n: 1 }],
       busy: false,
       announcement: "file.txt",
     });
@@ -291,7 +291,7 @@ describe("terminal graphical console (xterm seam)", () => {
     useTerminalStore.setState({
       host: "printer.pinecone.pcp",
       cwd: "/",
-      lines: [{ kind: "out", text: "welcome banner" }],
+      lines: [{ kind: "out", text: "welcome banner", n: 1 }],
       busy: false,
     });
     render(<TerminalSessionArea />);

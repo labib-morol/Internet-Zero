@@ -3,7 +3,7 @@ import type { Db } from "./db/client.js";
 import type { BundleRegistry } from "./bundles.js";
 import type { TeamLocks, SubmitOutcome } from "./game.js";
 import type { ServerConfig } from "./config.js";
-import type { TeamRooms } from "./ws.js";
+import type { SessionSockets, TeamRooms } from "./ws.js";
 import type { Action } from "@iz/schema";
 
 /**
@@ -17,6 +17,8 @@ export interface AppContext {
   locks: TeamLocks;
   clock: { now(): string };
   rooms: TeamRooms;
+  /** Live sockets per session hash: logout closes them (revocation). */
+  sessionSockets: SessionSockets;
   submit(input: { teamId: string; bundle: WorldBundle; action: Action; actor: Actor }): Promise<SubmitOutcome>;
 }
 

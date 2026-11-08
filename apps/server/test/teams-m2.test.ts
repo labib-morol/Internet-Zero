@@ -23,8 +23,7 @@ describe.skipIf(!pgUp)("teams via invite link (§2.1.10, §12)", () => {
       expect(joined.json()).toMatchObject({ alreadyMember: false });
       const joinerState = await env.app.inject({ method: "GET", url: "/api/state", headers: bearer(joiner.sessionToken) });
       expect(joinerState.json().state.teamId).toBe(owner.teamId);
-      // The joiner sees the owner's SessionStarted event: one shared case.
-      expect(joinerState.json().state.teamId).toBe(joinerState.json().state.teamId);
+      expect(joinerState.statusCode).toBe(200);
       const members = await env.app.inject({ method: "GET", url: "/api/teams/members", headers: bearer(joiner.sessionToken) });
       const roles = members.json().members.map((m: { role: string }) => m.role);
       expect(roles.filter((r: string) => r === "owner")).toHaveLength(1);

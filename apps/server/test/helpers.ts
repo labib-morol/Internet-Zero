@@ -9,12 +9,39 @@ import type { AppContext } from "../src/app-context.js";
 import type { ServerConfig } from "../src/config.js";
 
 /**
- * Test infrastructure: a UNIQUE-NAME database per app on the iz-dev-pg
+ * Test infrastructure: a UNIQUE-NAME database per app on a real Postgres
  * instance, real migrations, the compiled fixture world — no mocks. Tests skip
- * cleanly only when Postgres is unreachable.
+ * cleanly only when Postgres is unreachable (set REQUIRE_POSTGRES=1, as CI
+ * does, to fail instead of skip).
  */
 
-export const ADMIN_URL = "postgres://intranet:intranet@localhost:5432/postgres";
+const DEFAULT_ADMIN_URL = "postgres://intranet:intranet@localhost:5432/postgres";
+
+/** Admin connection for destructive test setup (CREATE/DROP DATABASE). */
+export const ADMIN_URL = process.env.TEST_DATABASE_ADMIN_URL ?? DEFAULT_ADMIN_URL;
+
+const LOCAL_ADMIN_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
+
+/**
+ * Builds the per-test database URL from the admin URL, swapping only the
+ * database name. Refuses remote admin hosts unless TEST_ALLOW_REMOTE_ADMIN=1:
+ * CREATE/DROP DATABASE is destructive, so pointing the harness at a
+ * production instance must be an explicit, opt-in decision.
+ */
+export function deriveTestDatabaseUrl(dbName: string): string {
+  const url = new URL(ADMIN_URL);
+  // WHATWG URLs keep brackets on IPv6 hostnames ("[::1]"); strip for the check.
+  const hostname = url.hostname.replace(/^\[|\]$/g, "");
+  if (!LOCAL_ADMIN_HOSTS.has(hostname) && process.env.TEST_ALLOW_REMOTE_ADMIN !== "1") {
+    throw new Error(
+      `TEST_DATABASE_ADMIN_URL host "${hostname}" is not local — refusing destructive test setup. ` +
+        "Point it at an isolated local/disposable Postgres, or set TEST_ALLOW_REMOTE_ADMIN=1 to opt in."
+    );
+  }
+  url.pathname = `/${dbName}`;
+  return url.toString();
+}
+
 export const FIXTURE_WORLDS_DIR = fileURLToPath(new URL("./fixtures/worlds", import.meta.url));
 export const FIXTURE_WORLD_ID = "fixture";
 export const FIXTURE_SOURCE_DIR = fileURLToPath(
@@ -48,6 +75,7 @@ export function testConfig(databaseUrl: string, overrides: Partial<ServerConfig>
     logLevel: "silent",
     port: 0,
     host: "127.0.0.1",
+    trustProxy: false,
     ...overrides,
   };
 }
@@ -64,21 +92,31 @@ export interface TestEnv {
  * Builds an app against a freshly created, uniquely named database; close()
  * drops the database again. Migrations run inside buildApp (as at boot).
  */
-export async function createTestApp(opts: { publicOrigin?: string; requestsPerMinute?: number; worldsDir?: string } = {}): Promise<TestEnv> {
+export async function createTestApp(
+  opts: {
+    publicOrigin?: string;
+    requestsPerMinute?: number;
+    worldsDir?: string;
+    trustProxy?: boolean;
+    wsHelloTimeoutMs?: number;
+  } = {}
+): Promise<TestEnv> {
   const dbName = `iz_test_${randomBytes(6).toString("hex")}`;
   const admin = new Client({ connectionString: ADMIN_URL });
   await admin.connect();
   await admin.query(`CREATE DATABASE "${dbName}"`);
   await admin.end();
 
-  const databaseUrl = `postgres://intranet:intranet@localhost:5432/${dbName}`;
+  const databaseUrl = deriveTestDatabaseUrl(dbName);
   const config = testConfig(databaseUrl, {
     ...(opts.publicOrigin === undefined ? {} : { publicOrigin: opts.publicOrigin }),
     ...(opts.worldsDir === undefined ? {} : { worldsDir: opts.worldsDir }),
+    ...(opts.trustProxy === undefined ? {} : { trustProxy: opts.trustProxy }),
   });
   const app = await buildApp({
     config,
     ...(opts.requestsPerMinute === undefined ? {} : { requestsPerMinute: opts.requestsPerMinute }),
+    ...(opts.wsHelloTimeoutMs === undefined ? {} : { wsHelloTimeoutMs: opts.wsHelloTimeoutMs }),
   });
 
   return {

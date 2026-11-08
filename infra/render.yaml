@@ -13,10 +13,16 @@ services:
   - type: web
     name: intranet-zero
     runtime: docker
+    # The Dockerfile lives in infra/, not the repo root — Render needs the
+    # explicit path or the blueprint build fails.
+    dockerfilePath: ./infra/Dockerfile
     plan: 0.5c-512mb
     healthCheckPath: /readyz
     preDeployCommand: node apps/server/dist/migrate-cli.js
     autoDeployTrigger: commits
+    # One process/replica for this release: WS rooms, locks and rate-limit
+    # buckets are process-local. Do NOT scale beyond one instance without the
+    # cross-replica work in docs/deploy/render.md.
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -32,6 +38,12 @@ services:
         value: local
       - key: LOG_LEVEL
         value: info
+      # Requests arrive through Render's proxy: rate limiting keys on the
+      # proxy-added (rightmost) X-Forwarded-For entry.
+      - key: TRUST_PROXY
+        value: "1"
+      - key: NODE_ENV
+        value: production
 
 databases:
   - name: intranet-zero-db

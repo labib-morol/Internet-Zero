@@ -7,7 +7,9 @@ import { EventEnvelope } from "./game-events.js";
  * events after lastSeq are replayed on reconnect.
  */
 export const ClientMsg = z.discriminatedUnion("t", [
-  z.strictObject({ t: z.literal("hello"), sessionToken: z.string().min(1), lastSeq: z.number().int().min(0) }),
+  // sessionToken "" means browser cookie auth: the signed session cookie rode
+  // in on the upgrade request and is validated server-side (DECISIONS D10).
+  z.strictObject({ t: z.literal("hello"), sessionToken: z.string().min(0), lastSeq: z.number().int().min(0) }),
   z.strictObject({ t: z.literal("action"), clientId: z.string().min(1), action: Action }),
   z.strictObject({ t: z.literal("ping") }),
 ]);

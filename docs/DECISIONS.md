@@ -159,3 +159,19 @@ and served only for visible references. Private notes use their isolated databas
 Official client 2.4.0 and node transport 2.1.2 are available (Apache-2.0). Prior claim
 that the official client package did not exist was incorrect. Installed SDK README and
 Fastify adapter README were read before implementation; v1 SDK remains prohibited.
+
+### D27 — WS hello accepts an empty sessionToken for browser cookie auth (2026-11-09)
+Contract change to `ClientMsg` hello (packages/schema/src/ws.ts): `sessionToken.min(1)` →
+`min(0)`. An empty token means the signed session cookie on the upgrade request is the
+credential, validated server-side; the token is never exposed to page JS. Motivated by
+OAuth sign-in (cookie-only callback) and logout revocation. Non-browser clients keep
+explicit Bearer tokens. Recorded per the §19.3 contract-change rule.
+
+### D28 — Purchased hint text rides with GET /api/state (2026-11-09)
+Contract change to `GetStateResponse` (packages/schema/src/api.ts): optional
+`purchasedHints: Record<gateId, Array<{tier, text, cost}>>`. The server derives it
+from the team's own `hintsUsed` + the bundle — unpurchased tiers are never included.
+Motivation: the case-file panel kept purchased hint text in component state, which
+died when the panel closed while `hintsUsed` (and its cost) persisted; re-requesting
+a purchased tier is rejected by the runtime, so players lost paid-for content.
+Non-browser/MCP clients are unaffected (response stays additive).

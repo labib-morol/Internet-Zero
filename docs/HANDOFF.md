@@ -4,32 +4,29 @@ Owner directive (2026-11-02, overnight autonomous run): M0 tasks in order, then 
 M2 engine parts. No pushes, no PRs. Commit locally after every green task. Decisions are
 owner-final (docs/DECISIONS.md). No NODE_17 content ever.
 
-## Current state
+## Current state (updated 2026-11-09)
 
-- M0 gate passed earlier (recorded in STATUS, commit dd76258).
-- M1 UI code is integrated (commit cf52d80): desktop shell, browser, forge/mail/archive UIs, terminal, report/hint panel, notebook and evidence board. Browser acceptance has NOT been verified.
-- Fresh checkpoint: build and lint pass; 289 workspace tests pass, 25 server tests skip; 27 root integration tests pass; frontend suite 88/88 passes. Docker daemon is unavailable now (Docker Desktop Linux-engine pipe not found), so Postgres-dependent tests cannot be reverified.
-- M2: scorer is implemented and has two root tests; MCP package is still a scaffold. No oracle or benchmark run is complete.
-- Exact next step: restore Docker availability, re-run all 25 server tests, then write and run the browser tutorial Playwright test plus mobile, keyboard and axe checks. Fix the UI-kit table nesting warning and review terminal canvas behavior in the real browser. Do not call M1 complete before these acceptance gates pass.
-- After M1 acceptance: implement the requested M2 engine-only parts. No NODE_17 content; no push or PR.
-- Local history: 23 commits; pnpm-lock.yaml is modified. No MORNING_REPORT has been written yet.
+M0, M1 and the M2 engine parts are implemented and accepted; the details of earlier
+checkpoints live in docs/STATUS.md (the ledger is authoritative — the historical text
+below and in MORNING_REPORT.md describe superseded states, not open work). Current
+release work: a tutorial-first public beta, tracked in
+docs/superpowers/plans/2026-11-09-production-readiness.md with a running execution
+ledger at docs/release/EXECUTION_LEDGER.md and the owner checklist at
+docs/release/MANUAL_LAUNCH.md.
 
-## Verify
+Fresh-verification commands:
 
 ```
 cd "C:/Users/T14S/BUP Hackathon"
 pnpm install
-pnpm build && pnpm test && pnpm lint
+pnpm build && pnpm test && pnpm lint        # DB-backed server tests REQUIRE Postgres
+pnpm run test:integration
+pnpm exec playwright test --workers=1       # browser tutorial + axe (chromium in CI)
 ```
-
-## Blockers
-
-- None blocking M0. Push/CI verification awaits owner auth (D5) — CI file will be
-  verified by running identical commands locally instead.
 
 ## Notes for a fresh session
 
-- Read docs/STATUS.md (ledger + environment) and docs/PLAN.md (M0 task table) first.
+- Read docs/STATUS.md (ledger + environment) and docs/release/RELEASE_REPORT.md first.
 - The two .md files in the repo root are PRIVATE (git-ignored): the master prompt
   contains the NODE_17 answer key (Appendix C) — never commit, never log, never quote
   into code. Never implement anything from the second file (product spec) that is not in
@@ -38,6 +35,8 @@ pnpm build && pnpm test && pnpm lint
 - Game logic only in packages/runtime; apps/server is transport-only. ESLint enforces
   the import bans for packages/{runtime,services,terminal,mcp}.
 - Commits: verify `git check-ignore` on the private docs first; add explicit paths.
+- `@iz/ui` and workspace packages resolve via dist: after editing a package's src,
+  rebuild it before web tests/e2e see the change.
 
 ## Continuation handoff
 Main owns all paths now (subagents stopped after provider token-rate-limit interruptions).
