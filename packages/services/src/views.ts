@@ -15,6 +15,7 @@ import type {
   WorldBundle,
 } from "@iz/schema";
 import { artifactVisible } from "@iz/runtime";
+import { compileMarkdown } from "./markdown.js";
 
 
 /**
@@ -249,7 +250,10 @@ export function forgeView(bundle: WorldBundle, state: RuntimeState, host: string
         author: identityRef(bundle, issue.author),
         date: issue.date,
         ast: artifact.ast,
-        comments: issue.comments.map((c) => ({ author: identityRef(bundle, c.author), date: c.date, ast: artifact.ast })),
+        // Each comment renders its OWN body — the artifact AST carries the
+        // body plus every comment, so reusing it rendered the full thread
+        // once per comment.
+        comments: issue.comments.map((c) => ({ author: identityRef(bundle, c.author), date: c.date, ast: compileMarkdown(c.body) })),
       },
     };
   }
@@ -364,7 +368,15 @@ export function archiveView(bundle: WorldBundle, state: RuntimeState, host: stri
   const segments = path.split("/").filter((s) => s !== "");
 
   if (segments[0] === "search") {
-    const query = decodeURIComponent(segments.slice(1).join("/") ?? "");
+    const joined = segments.slice(1).join("/");
+    // A path can carry a bare "%" that is not a valid escape (the route layer
+    // already decoded once): decode defensively and fall back to the raw text.
+    let query: string;
+    try {
+      query = decodeURIComponent(joined ?? "");
+    } catch {
+      query = joined ?? "";
+    }
     const q = query.toLowerCase();
     const results = bundle.artifacts
       .filter((a) => a.kind === "archive-document" && a.host === host && visible(bundle, state, a, now))

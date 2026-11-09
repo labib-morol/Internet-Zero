@@ -47,7 +47,9 @@ function gateFields<C extends z.ZodTypeAny>(check: C) {
     check,
     /** Ids of hosts, artifacts, events, reports this gate makes visible. */
     unlocks: z.array(Id).default([]),
-    score: z.number().int().default(100),
+    // Solving must never subtract; a world author wanting penalties models
+    // them via hint costs instead.
+    score: z.number().int().min(0).default(100),
   };
 }
 

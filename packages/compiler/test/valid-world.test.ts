@@ -111,7 +111,10 @@ describe("compileWorld on the valid fixture world", () => {
     expect(types.has("signature")).toBe(true);
     expect(types.has("stamp")).toBe(true);
     const fixed = findNode(readme.ast, (n) => n.type === "redaction");
-    expect(fixed).toMatchObject({ type: "redaction", removable: false, text: "rotated by the vendor technician" });
+    // FIXED redactions are hidden forever: their text is dropped at compile
+    // time so it can never reach a client through the serialized AST.
+    expect(fixed).toMatchObject({ type: "redaction", removable: false, text: "" });
+    expect(readme.body).not.toContain("rotated by the vendor technician");
 
     const lie = bundle.artifacts.find((a) => a.id === "a.m-lie")!;
     const removable = findNode(lie.ast, (n) => n.type === "redaction");

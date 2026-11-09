@@ -137,6 +137,9 @@ export function replayEvents(bundle: WorldBundle, state: RuntimeState, events: r
 
       case "ReportGroupAccepted": {
         const groups = state.reportGroupsAccepted[event.reportId] ?? [];
+        // Accepted groups COUNT as attempts (pinned by integrity.test.ts):
+        // the per-gate budget is conservative — correct submissions consume
+        // it too, so a fast legitimate run can still meet the cap.
         if (!groups.includes(event.groupId)) {
           groups.push(event.groupId);
           recordAttempt(state.attempts, event.reportId, event.at, event.by);

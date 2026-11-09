@@ -2,6 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ViewModel } from "@iz/schema";
 import { currentEntry, setViewFetchForTests, useBrowserStore, type Collectible } from "../src/browser/store.js";
+import { BrowserWindow } from "../src/browser/BrowserWindow.js";
 import { teamSocket, useSessionStore } from "@iz/ui";
 
 /**
@@ -84,5 +85,24 @@ describe("browser navigation identity", () => {
     expect(ok).toBe(false);
     expect(useBrowserStore.getState().load).toBe("error");
     expect(useBrowserStore.getState().error).toMatch(/address/i);
+  });
+
+  it("a failed navigation never renders the previous page under the new address", async () => {
+    setViewFetchForTests((host) =>
+      host === "b.pcp" ? Promise.reject(new Error("b.pcp is unreachable")) : Promise.resolve(viewFor(host))
+    );
+
+    await useBrowserStore.getState().navigate("a.pcp", "/");
+    expect(useBrowserStore.getState().load).toBe("ready");
+    await useBrowserStore.getState().navigate("b.pcp", "/");
+    expect(useBrowserStore.getState().load).toBe("error");
+
+    const { render, cleanup } = await import("@testing-library/react");
+    const { screen } = await import("@testing-library/react");
+    render(<BrowserWindow />);
+    expect(screen.getByText(/Connection problem/)).toBeInTheDocument();
+    // The previous page must not lurk beneath the error under b.pcp.
+    expect(screen.queryByText(/a\.pcp/)).toBeNull();
+    cleanup();
   });
 });

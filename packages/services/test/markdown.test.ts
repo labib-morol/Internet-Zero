@@ -136,3 +136,12 @@ describe("safeText", () => {
     expect(text).toContain("[stamp: ACME]");
   });
 });
+
+describe("fixed redaction transport (audit)", () => {
+  it("drops the text of fixed redactions at the source; removable keeps it for inspect", () => {
+    const fixed = compileMarkdown("Before [[redaction:fixed-secret-body|fixed]] after");
+    expect(JSON.stringify(fixed)).not.toContain("fixed-secret-body");
+    const removable = compileMarkdown("[[redaction:removable-secret-body|removable]]");
+    expect(JSON.stringify(removable)).toContain("removable-secret-body");
+  });
+});

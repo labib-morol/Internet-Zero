@@ -90,7 +90,10 @@ function parseMarker(kind: string, argsRaw: string, pos: Pos): SafeNode {
       if (mode !== "removable" && mode !== "fixed") {
         throw new MarkdownError("marker", `[[redaction:...]] mode must be "removable" or "fixed", got "${mode ?? ""}"`, pos.line, pos.column);
       }
-      return { type: "redaction", text, removable: mode === "removable" };
+      // A FIXED redaction is hidden forever: its text is dropped at the source
+      // so it can never reach a client through the serialized AST (only
+      // removable redactions carry text, for the inspect-layers reveal).
+      return { type: "redaction", text: mode === "removable" ? text : "", removable: mode === "removable" };
     }
     case "signature": {
       if (args.length !== 4) {

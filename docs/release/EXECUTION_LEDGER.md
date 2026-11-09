@@ -117,3 +117,23 @@ All RED-first in `apps/server/test/production-safety.test.ts` (6 tests, observed
 ## Final state
 
 All six plan tasks complete. Nothing committed (owner authorization pending); branch `release/tutorial-beta` holds the entire change set in the working tree. Time used ≈ 3h15m of the owner's ≈5h budget; stopped after scoped acceptance was genuinely satisfied rather than inventing more work.
+
+## Audit round (post-commit, owner-requested) — complete 05:55
+
+Commit b21dc6c pushed to origin/release/tutorial-beta (owner authorized commit+push;
+PR URL provided — gh CLI unavailable). Then a second audit pass: sweeps clean; three
+bug hunts (one agent-driven for the engine, two inline after the session's agent
+concurrency limit stopped the others). Eight fixes landed, all RED→GREEN verified:
+A1 duplicated issue comments (player-visible), A2 archive %-crash, A3 fixed-redaction
+text transport, A4 stale terminal result on conflict retry (+ real-conflict retry test
+via in-transaction phantom row), A5 stale page under navigation errors, A6 compiler
+duplicate-id check + fixture, A7 MCP uppercase-host opens, A8 stale rate-limit doc
+corrected to match the pinned conservative design (behavior unchanged — the hunt's
+proposed change would have broken the pinned integrity test). Forum findings recorded
+as not-applicable (schema cannot express gated posts); fold-implicit-gates deferred as
+an owner decision (contradicts D24).
+
+Infra: server suite testTimeout 60s + isolate:false after the recurring
+Windows-only 0xC0000409 fork crash; every suite green solo (server 67, web 107,
+integration 29, e2e 4/4, lint, typecheck, audit, gitleaks). Disclosed: the crash is
+environmental to this machine; CI (Linux) is the authority on the full battery.

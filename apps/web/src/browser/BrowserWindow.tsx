@@ -177,7 +177,7 @@ export function BrowserWindow(): ReactNode {
             </p>
           </div>
         )}
-        {entry !== undefined && view !== undefined && (
+        {entry !== undefined && load !== "error" && view !== undefined && (
           <ViewRenderer
             view={view}
             collectibles={collectibles}

@@ -24,6 +24,17 @@ const CASES: Array<{ check: number; name: string; mutations: Mutation[]; options
     mutations: [{ file: "hints.yaml", append: '- gate: g.nope\n  tier: 1\n  text: "Broken reference."\n  cost: 1\n' }],
   },
   {
+    check: 2,
+    name: "duplicate id: second gate definition is rejected",
+    mutations: [
+      {
+        file: "gates.yaml",
+        append:
+          '- id: g.first-commit\n  title: "Duplicate reset commit gate"\n  check:\n    kind: answer\n    answers: ["5f2e6a1b3c4d5e6f708192a3b4c5d6e7f8091a2b"]\n  unlocks: [mail.fix.pcp]\n  score: 100\n',
+      },
+    ],
+  },
+  {
     check: 3,
     name: "contradictory facts: same subject+predicate, different object",
     mutations: [

@@ -133,6 +133,10 @@ export async function submitAction(opts: SubmitActionOptions): Promise<SubmitOut
         lastSeq = retried.lastSeq;
         applied = retried.applied;
         state = retried.state;
+        // Never carry the first attempt's terminal result into the retry: the
+        // retried apply may reject outright, and a stale result would ride
+        // back to the client alongside the rejection.
+        terminalResult = undefined;
         if (action.type === "terminal" && applied.rejection === undefined) {
           terminalResult = runTerminalCommand(bundle, replayEvents(bundle, structuredClone(state), applied.events), action.host, action.cwd, action.line, actor.userId, clock.now());
           if (!terminalResult.ok) {

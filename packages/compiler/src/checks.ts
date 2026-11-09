@@ -79,6 +79,27 @@ export function runChecks(source: WorldSourceFiles, artifacts: Artifact[], asset
   // -------------------------------------------------------------------------
 
   function checkReferences(): void {
+    // Duplicate ids compile "fine" but silently lose content at runtime:
+    // lookups take the first definition and the second never exists. Each
+    // namespace is checked separately (a person and a gate may share an id).
+    const namespaces: Array<[string, string, Array<{ id: string }>]> = [
+      ["gate", "gates.yaml", source.gates],
+      ["report", "reports.yaml", source.reports],
+      ["person", "people.yaml", source.people],
+      ["org", "orgs.yaml", source.orgs],
+      ["identity", "identities.yaml", source.identities],
+      ["event", "events.yaml", source.events],
+    ];
+    for (const [kind, file, list] of namespaces) {
+      const seen = new Set<string>();
+      for (const item of list) {
+        if (seen.has(item.id)) {
+          add({ check: 2, file, id: item.id, message: `duplicate ${kind} id "${item.id}" — the second definition is silently ignored at runtime` });
+        }
+        seen.add(item.id);
+      }
+    }
+
     // world.yaml
     const entry = source.world.entry;
     const entrySlash = entry.indexOf("/");

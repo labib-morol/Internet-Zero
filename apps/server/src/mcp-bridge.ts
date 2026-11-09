@@ -75,7 +75,10 @@ export function gameToolBridge(ctx: AppContext, teamId: string, userId: string, 
       if (outcome.rejection) throw new Error('Unavailable');
       state = (await loadTeamState(ctx.db, bundle, teamId)).state;
       const slash = url.indexOf('/');
-      const host = slash === -1 ? url : url.slice(0, slash);
+      // `open` lowercases the host (runtime normalization); viewFor must look
+      // the page up the same way or an uppercase MCP url 500s after a
+      // successful open.
+      const host = (slash === -1 ? url : url.slice(0, slash)).toLowerCase();
       const path = slash === -1 ? '/' : url.slice(slash);
       const view = viewFor(bundle, state, host, path, now);
       if ('notFound' in view) throw new Error('Unavailable');

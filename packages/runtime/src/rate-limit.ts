@@ -18,9 +18,13 @@ export interface RateVerdict {
 /**
  * Rate-limit verdict for one key (gate id, or report id for report gates).
  *
- * Attempts are recorded ONLY as AnswerRejected / ReportRejected events, so
- * fold rebuilds them and the limit survives restarts. Rate-limited attempts
- * are recorded too ("abusers dig deeper"); correct answers are not attempts.
+ * Attempts are recorded from AnswerRejected / ReportRejected events AND from
+ * successful ones (GateSolved for answer gates, ReportGroupAccepted for
+ * reports) — they arrive as answer-free events, so fold rebuilds them and the
+ * limit survives restarts. The budget is deliberately conservative: correct
+ * submissions consume it too (pinned by integrity.test.ts), while rejected
+ * attempts are recorded as well ("abusers dig deeper"). Correct answers never
+ * appear in the log — only the attempt count does.
  *
  * The rolling window uses real session time (the injected clock), not world
  * time: this is an anti-brute-force guard, not fiction. retryAfterSeconds for
